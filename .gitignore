@@ -1,0 +1,7 @@
+.gitignore
+node_modules
+dist
+bin
+obj
+subjectAlternativeNames.ext
+.DS_Store
