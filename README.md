@@ -2,7 +2,7 @@
 
 ### Overview
 
-* An SPA sample using OAuth 2.0 and Open Id Connect, referenced in my blog at http://authguidance.com
+* An SPA sample using OAuth 2.0 and Open Id Connect, referenced in my blog at https://authguidance.com
 * **This sample implements our [API Architecture](http://authguidance.com/2017/10/03/api-tokens-claims) in Cross Platform C#**
 
 ### Details
