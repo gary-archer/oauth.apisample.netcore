@@ -76,7 +76,12 @@ class App {
      * Handle login responses on page load so that we have tokens and can call APIs
      */
     private async _handleLoginResponse(): Promise<void> {
+
+        // The first use of hash fragments is to receive login responses
         await this._authenticator!.handleLoginResponse();
+
+        // Once complete, listen for application level hash changes that set the SPA location
+        $(window).on('hashchange', this._onHashChange);
     }
 
     /*
@@ -90,12 +95,7 @@ class App {
      * Once we have run the page, start listening for hash changes
      */
     private async _runPage(): Promise<void> {
-
-        // Get data and create the view HTML
         await this._router!.executeView();
-
-        // Listen for changes to the SPA location
-        $(window).on('hashchange', this._onHashChange);
     }
 
     /*
@@ -113,10 +113,15 @@ class App {
     }
 
     /*
-     * Button handler to reset the hash location to the list view and refresh
+     * Force the On Home button to always force a reload of the current view
      */
     private _onHome(): void {
-        this._router!.moveHome();
+
+        if (location.hash !== '#home') {
+            location.hash = '#home';
+        } else {
+            location.hash = '#';
+        }
     }
 
     /*
