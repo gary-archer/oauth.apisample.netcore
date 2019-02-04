@@ -1,6 +1,6 @@
 {
   "name": "basicspa",
-  "version": "3.2.0",
+  "version": "3.0.0",
   "description": "A Basic SPA using the OIDC Client security library",
   "main": "app.ts",
   "scripts": {
@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "jquery": "^3.3.1",
+    "moment": "^2.24.0",
     "oidc-client": "^1.5.4"
   },
   "devDependencies": {

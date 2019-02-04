@@ -1,8 +1,8 @@
 import * as $ from 'jquery';
 import {CompanyTransactions} from '../entities/companyTransactions';
 import {Transaction} from '../entities/transaction';
-import {Authenticator} from '../plumbing/authenticator';
-import {HttpClient} from '../plumbing/httpClient';
+import {Authenticator} from '../plumbing/oauth/authenticator';
+import {HttpClient} from '../plumbing/utilities/httpClient';
 
 /*
  * Logic related to the transactions view
@@ -19,7 +19,7 @@ export class TransactionsView {
     /*
      * Class setup
      */
-    public constructor(authenticator: any, apiBaseUrl: string, companyId: string) {
+    public constructor(authenticator: Authenticator, apiBaseUrl: string, companyId: string) {
         this._authenticator = authenticator;
         this._apiBaseUrl = apiBaseUrl;
         this._companyId = companyId;
@@ -59,9 +59,9 @@ export class TransactionsView {
      */
     private _renderData(data: CompanyTransactions): void {
 
-        // Show buttons and render
+        // Show and clear
         $('.transactionscontainer').removeClass('hide');
-        $('.transactionslist').text('');
+        $('.transactionslist').html('');
         $('.transactionsheader').text(`Transactions for ${data.company.name}`);
 
         data.transactions.forEach((transaction: Transaction) => {
