@@ -18,6 +18,8 @@ namespace BasicApi.Configuration
             return appConfig;
         }
 
+        public List<string> TrustedOrigins {get; set;}
+
         public string SslCertificateFileName {get; set;}
 
         public string SslCertificatePassword {get; set;}
@@ -25,7 +27,5 @@ namespace BasicApi.Configuration
         public string ProxyUrl {get; set;}
 
         public bool useProxy {get; set;}
-
-        public List<string> TrustedOrigins {get; set;}
     }
 }

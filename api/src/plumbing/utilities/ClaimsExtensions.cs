@@ -6,7 +6,7 @@ namespace BasicApi.Plumbing.Utilities
     using System.Security.Claims;
     using IdentityModel;
     using Microsoft.AspNetCore.Http;
-    using BasicApi.Entities;
+    using BasicApi.Plumbing.OAuth;
 
     /*
      * Extensions related to claims in a principal
@@ -14,11 +14,11 @@ namespace BasicApi.Plumbing.Utilities
     public static class ClaimsExtensions
     {
         /*
-         * Our non standard claims
+         * Our custom claims
          */
         class CustomClaimTypes
         {
-            public const string UserCompanyId = "userCompanyId";
+            public const string AccountCovered = "accountCovered";
         }
 
         /*
@@ -35,23 +35,16 @@ namespace BasicApi.Plumbing.Utilities
                     "An unexpected identity type was encountered when setting claims");
             }
 
-            // Make a sanity check that we have expected claims
-            if (claims.UserInfo == null)
-            {
-                throw new InvalidOperationException(
-                    "SetAdditionalApiClaims was called but no additional claims are present");
-            }
-            
             // Add central user data claims
-            identity.AddClaim(new Claim(JwtClaimTypes.GivenName, claims.UserInfo.GivenName));
-            identity.AddClaim(new Claim(JwtClaimTypes.FamilyName, claims.UserInfo.FamilyName));
-            identity.AddClaim(new Claim(JwtClaimTypes.Email, claims.UserInfo.Email));
+            identity.AddClaim(new Claim(JwtClaimTypes.GivenName, claims.GivenName));
+            identity.AddClaim(new Claim(JwtClaimTypes.FamilyName, claims.FamilyName));
+            identity.AddClaim(new Claim(JwtClaimTypes.Email, claims.Email));
             
             // Add product user claims
-            foreach (var companyId in claims.UserCompanyIds)
+            foreach (var accountCovered in claims.AccountsCovered)
             {
-                var stringValue = Convert.ToString(companyId, CultureInfo.InvariantCulture);
-                identity.AddClaim(new Claim(CustomClaimTypes.UserCompanyId, stringValue));
+                var stringValue = Convert.ToString(accountCovered, CultureInfo.InvariantCulture);
+                identity.AddClaim(new Claim(CustomClaimTypes.AccountCovered, stringValue));
             }
         }
 
@@ -71,7 +64,7 @@ namespace BasicApi.Plumbing.Utilities
             string email = principal.Claims.FirstOrDefault(c => c.Type == JwtClaimTypes.Email)?.Value;
             
             // Read custom values
-            var userCompanyIds = principal.Claims.Where(c => c.Type == CustomClaimTypes.UserCompanyId).Select(c => c.Value).ToList();
+            var userCompanyIds = principal.Claims.Where(c => c.Type == CustomClaimTypes.AccountCovered).Select(c => c.Value).ToList();
 
             // Sanity check
             if (string.IsNullOrWhiteSpace(userId) ||
@@ -89,14 +82,14 @@ namespace BasicApi.Plumbing.Utilities
                 !string.IsNullOrWhiteSpace(familyName) &&
                 !string.IsNullOrWhiteSpace(email))
             {
-                claims.SetCentralUserData(givenName, familyName, email);
+                claims.SetCentralUserInfo(givenName, familyName, email);
             }
 
             // Return product user data claims if they exist
             if (userCompanyIds.Count > 0)
             {
                 var intValues = userCompanyIds.Select(s => Convert.ToInt32(s, CultureInfo.InvariantCulture));
-                claims.setProductSpecificUserRights(intValues.ToArray());
+                claims.AccountsCovered = intValues.ToArray();
             }
             
             return claims;

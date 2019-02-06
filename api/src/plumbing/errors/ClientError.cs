@@ -10,18 +10,54 @@ namespace BasicApi.Plumbing.Errors
      */
     public class ClientError : Exception
     {
-        public int StatusCode {get; private set;}
+        /*
+         * Mandatory fields for both 4xx and 500 errors
+         */
+        private int statusCode;
+        private string errorCode;
 
-        public string Area {get; private set;}
 
-        public int? Id {get; set;}
+        /*
+         * Extra fields for 500 errors
+         */
+         private  string area;
+         private int id;
+         private string utcTime;
 
-        public ClientError(int statusCode, string area, string message)
+        /*
+         * Construct from mandatory fields
+         */
+        public ClientError(int statusCode, string errorCode, string message)
             : base(message)
         {
-            this.StatusCode = statusCode;
-            this.Area = area;
-            this.Id = null;
+            // Set mandatory fields
+            this.statusCode = statusCode;
+            this.errorCode = errorCode;
+
+            // Initialise 5xx fields
+            this.area = String.Empty;
+            this.id = 0;
+            this.utcTime = String.Empty;
+        }
+
+        /*
+         * Accessors
+         */
+        public int StatusCode
+        {
+            get
+            {
+                return this.statusCode;
+            }
+        }
+
+        /*
+         * Set extra fields to return to the caller for 500 errors
+         */
+        public void setExceptionDetails(string area, int id, string utcTime) {
+            this.area = area;
+            this.id = id;
+            this.utcTime = utcTime;
         }
 
         /*
@@ -30,11 +66,14 @@ namespace BasicApi.Plumbing.Errors
         public JObject ToResponseFormat()
         {
             dynamic data = new JObject();
-            data.area = this.Area;
+            data.code = this.errorCode;
             data.message = this.Message;
-            if (this.Id != null)
+
+            if (this.id > 0 && this.area.Length > 0 && this.utcTime.Length > 0)
             {
-                data.id = this.Id;
+                data.id = this.id;
+                data.area = this.area;
+                data.utcTime = this.utcTime;
             }
 
             return data;
@@ -46,7 +85,7 @@ namespace BasicApi.Plumbing.Errors
         public JObject ToLogFormat()
         {
             dynamic data = new JObject();
-            data.statusCode = this.StatusCode;
+            data.statusCode = this.statusCode;
             data.body = this.ToResponseFormat();
             return data;
         }

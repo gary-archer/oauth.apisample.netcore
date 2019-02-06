@@ -14,28 +14,38 @@ namespace BasicApi.Plumbing.Errors
         const int MIN_ERROR_ID = 10000;
         const int MAX_ERROR_ID = 99999;
 
+        // Error fields
+        private int statusCode;
+        private string errorCode;
+        private string area;
+        private int instanceId;
+        private string utcTime;
+        private string details;
+
         /*
          * Generate a random id when created
          */
-        public ApiError(string message) : base(message)
+        public ApiError(string errorCode, string userMessage) : base(userMessage)
         {
-            this.InstanceId = new Random().Next(MIN_ERROR_ID, MAX_ERROR_ID);
+            this.statusCode = 500;
+            this.errorCode = errorCode;
+            this.area = "BasicApi";
+            this.instanceId = new Random().Next(MIN_ERROR_ID, MAX_ERROR_ID);
+            this.utcTime = DateTime.UtcNow.ToString("s");
+            this.details = String.Empty;
         }
 
         /*
-         * Custom fields
+         * Accessors
          */
-        public int StatusCode {get; set;}
+        public string Details 
+        {
+            set
+            {
+                this.details = value;
 
-        public string Area {get; set;}
-
-        public int InstanceId {get; private set;}
-
-        public string Url {get; set;}
-        
-        public DateTime Time {get; set;}
-
-        public string Details {get; set;}
+            }
+        }
 
         /*
          * Return a dynamic object that can be serialized by calling toString
@@ -43,18 +53,13 @@ namespace BasicApi.Plumbing.Errors
         public JObject ToLogFormat()
         {
             dynamic data = new JObject();
-            data.statusCode = this.StatusCode;
-            data.area = this.Area;
-            data.message = this.Message;
-            data.instanceId = this.InstanceId;
+            data.statusCode = this.statusCode;
+            data.clientError = this.ToClientError().ToLogFormat();
+            data.serviceError = new JObject();
+            data.serviceError.errorCode = this.errorCode;
+            data.serviceError.details = this.details;
             
-            if (data.url != null)
-            {
-                data.url = this.Url;
-            }
-
-            data.time = this.Time;
-            data.details = this.Details;
+            // TODO: Stack trace
             return data;
         }
 
@@ -63,8 +68,8 @@ namespace BasicApi.Plumbing.Errors
          */
         public ClientError ToClientError()
         {
-            var error = new ClientError(this.StatusCode, this.Area, this.Message);
-            error.Id = this.InstanceId;
+            var error = new ClientError(this.statusCode, this.area, this.Message);
+            error.setExceptionDetails(this.area, this.instanceId, this.utcTime);
             return error;
         }
     }

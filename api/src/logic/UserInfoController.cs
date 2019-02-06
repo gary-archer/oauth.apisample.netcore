@@ -2,6 +2,7 @@ namespace BasicApi.Logic
 {
     using Microsoft.AspNetCore.Mvc;
     using BasicApi.Entities;
+    using BasicApi.Plumbing.OAuth;
     using BasicApi.Plumbing.Utilities;
 
     /*
@@ -16,7 +17,8 @@ namespace BasicApi.Logic
         [HttpGet("current")]
         public UserInfoClaims GetUserClaimsAsync()
         {
-            return this.User.GetApiClaims().UserInfo;
+            var claims = this.User.GetApiClaims();
+            return new UserInfoClaims(claims.GivenName, claims.FamilyName, claims.Email);
         }
     }
 }

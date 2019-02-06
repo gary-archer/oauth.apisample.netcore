@@ -6,8 +6,8 @@ namespace BasicApi.Plumbing.OAuth
     using IdentityModel.Client;
     using Microsoft.Extensions.Configuration;
     using BasicApi.Configuration;
-    using BasicApi.Entities;
     using BasicApi.Plumbing.Errors;
+    using BasicApi.Plumbing.OAuth;
     using BasicApi.Plumbing.Utilities;
 
     /*
@@ -47,7 +47,7 @@ namespace BasicApi.Plumbing.OAuth
             string email = userInfo.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
 
             // Set our user info data points
-            claims.SetCentralUserData(givenName, familyName, email);
+            claims.SetCentralUserInfo(givenName, familyName, email);
         }
 
         /*

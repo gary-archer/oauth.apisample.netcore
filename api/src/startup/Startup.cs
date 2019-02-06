@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using IdentityModel.AspNetCore.OAuth2Introspection;
+    using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -14,6 +15,7 @@
     using BasicApi.Configuration;
     using BasicApi.Entities;
     using BasicApi.Logic;
+    using BasicApi.Plumbing.OAuth;
     using BasicApi.Plumbing.Utilities;
 
     /*
@@ -54,9 +56,10 @@
                                     .AllowCredentials());
             });
             
-            // Use a memory cache for claims caching
+            // Make the Microsoft runtime memory cache available for claims caching
             services.AddDistributedMemoryCache();
             
+            /* TO DELETE
             // We use Identity Model authentication to introspect and cache tokens
             services
                 .AddAuthentication(OAuth2IntrospectionDefaults.AuthenticationScheme)
@@ -83,7 +86,20 @@
                     // Support viewing the introspection traffic in a debugger such as Fiddler or Charles
                     options.DiscoveryHttpHandler = new ProxyHttpHandler(appConfig);
                     options.IntrospectionHttpHandler = new ProxyHttpHandler(appConfig);
-                });
+                });*/
+            
+            // We use a custom authentication scheme to manage introspection and claims caching
+            var builder = services
+                .AddAuthentication("Bearer")
+                .AddCustomHandler(options => {
+
+                        /*options.Authority = oauthConfig.Authority;
+                        options.ClientId = oauthConfig.ClientId;
+                        options.ClientSecret = oauthConfig.ClientSecret;
+                        options.NameClaimType = "uid";
+                        options.ProxyHttpHandler = new ProxyHttpHandler(appConfig)
+                        */
+                    });
 
             // Ensure that all API requests to controllers are verified by the above introspection
             services.AddMvc(options => 
@@ -138,13 +154,13 @@
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // These simple items are created as part of controller autowiring
-            services.AddTransient<AuthorizationMicroservice>();
-            services.AddTransient<JsonReader>();
-            services.AddTransient<CompanyRepository>();
+            services.AddScoped<AuthorizationRulesRepository>();
+            services.AddScoped<JsonReader>();
+            services.AddScoped<CompanyRepository>();
 
             // The claims middleware populates the ApiClaims object and sets it against the HTTP context's claims principal
             // When controller operations execute they access the HTTP context and extract the claims
-            services.AddTransient<ApiClaims>(ctx => ctx.GetService<IHttpContextAccessor>().HttpContext.User.GetApiClaims());
+            services.AddScoped<ApiClaims>(ctx => ctx.GetService<IHttpContextAccessor>().HttpContext.User.GetApiClaims());
         }
 
         /*

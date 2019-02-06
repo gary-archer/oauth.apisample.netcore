@@ -1,4 +1,4 @@
-namespace BasicApi.Entities
+namespace BasicApi.Plumbing.OAuth
 {
     /*
      * User Info claims used by the API

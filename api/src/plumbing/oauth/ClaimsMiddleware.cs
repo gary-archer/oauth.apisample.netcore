@@ -22,7 +22,7 @@ namespace BasicApi.Plumbing.OAuth
         private readonly IConfiguration configuration;
         private readonly ILogger logger;
         private readonly IDistributedCache cache;
-        private readonly AuthorizationMicroservice authorizationMicroservice;
+        private readonly AuthorizationRulesRepository authorizationRulesRepository;
 
         /*
          * Construct and call the base class
@@ -32,13 +32,13 @@ namespace BasicApi.Plumbing.OAuth
             IConfiguration configuration,
             ILoggerFactory loggerFactory,
             IDistributedCache cache,
-            AuthorizationMicroservice authorizationMicroservice)
+            AuthorizationRulesRepository authorizationRulesRepository)
         {
             this.next = next;
             this.configuration = configuration;
             this.logger = loggerFactory.CreateLogger<ClaimsMiddleware>();
             this.cache = cache;
-            this.authorizationMicroservice = authorizationMicroservice;
+            this.authorizationRulesRepository = authorizationRulesRepository;
         }
 
         /*
@@ -61,7 +61,7 @@ namespace BasicApi.Plumbing.OAuth
                 await userInfoClient.LookupCentralUserDataClaimsAsync(claims, accessToken);
 
                 // Look up product specific user data claims
-                await this.authorizationMicroservice.getProductClaims(claims, accessToken);
+                await this.authorizationRulesRepository.AddCustomClaims(accessToken, claims);
                 
                 // Cache results for subsequent requests with this token
                 int expiry = context.User.GetAccessTokenExpirationClaim();

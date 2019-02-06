@@ -6,6 +6,7 @@ namespace BasicApi.Logic
     using System.Threading.Tasks;
     using BasicApi.Entities;
     using BasicApi.Plumbing.Errors;
+    using BasicApi.Plumbing.OAuth;
     using BasicApi.Plumbing.Utilities;
 
     /*
@@ -35,24 +36,23 @@ namespace BasicApi.Logic
         /*
          * Return the list of companies from a hard coded data file
          */
-        public async Task<IEnumerable<Company>> GetListAsync()
+        public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
             // Read company data
             var companies = await this.jsonReader.ReadDataAsync<IEnumerable<Company>>(@"./data/companyList.json");
 
             // We will then filter on only authorized companies
-            var authorizedCompanies = companies.Where(c => this.IsUserAuthorizedForCompany(c.Id));
-            return authorizedCompanies;
+            return companies.Where(c => this.IsUserAuthorizedForCompany(c.Id));
         }
 
         /*
          * Get transaction details for a company
          */
-        public async Task<CompanyTransactions> GetTransactionsAsync(int id)
+        public async Task<CompanyTransactions> GetCompanyTransactionsAsync(int id)
         {
             // If the user is unauthorized we do not return any data
             if (!this.IsUserAuthorizedForCompany(id)) {
-                throw new ClientError(404, "DataAccess", $"Transactions for company {id} were not found for this user");
+                throw this.UnauthorizedError(id);
             }
 
             // Read company data and find the requested value by id
@@ -70,14 +70,25 @@ namespace BasicApi.Logic
                 }
             }
 
-            throw new ClientError(404, "DataAccess", $"Transactions for company {id} were not found for this user");
+            throw this.UnauthorizedError(id);
         }
 
         /*
          * Apply claims that were read when the access token was first validated
          */
         private bool IsUserAuthorizedForCompany(int companyId) {
-            return this.claims.UserCompanyIds.Any(id => id == companyId);
+            return this.claims.AccountsCovered.Any(id => id == companyId);
+        }
+
+        /*
+        * Return a 404 error if the user is not authorized
+        * Requests for both unauthorized and non existent data are treated the same
+        */
+        private ClientError UnauthorizedError(int companyId) {
+            return new ClientError(
+                404,
+                "company_not_found",
+                $"Company ${companyId} was not found for this user");
         }
     }
 }

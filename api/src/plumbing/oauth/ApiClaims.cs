@@ -1,4 +1,4 @@
-namespace BasicApi.Entities
+namespace BasicApi.Plumbing.OAuth
 {
     using System.Runtime.Serialization;
 
@@ -12,9 +12,9 @@ namespace BasicApi.Entities
         [DataMember]
         public string UserId {get; private set;}
 
-        // The calling application's client id can potentially be used for authorization
+        // The client id, which typically represents the calling application
         [DataMember]
-        public string CallingApplicationId {get; private set;}
+        public string ClientId {get; private set;}
 
         // OAuth scopes can represent high level areas of the business
         [DataMember]
@@ -22,11 +22,13 @@ namespace BasicApi.Entities
 
         // Details from the Central User Data for given name, family name and email
         [DataMember]
-        public UserInfoClaims UserInfo {get; private set;}
+        public string GivenName {get; private set;}
+        public string FamilyName {get; private set;}
+        public string Email {get; private set;}
 
         // Product Specific data used for authorization
         [DataMember]
-        public int[] UserCompanyIds {get; private set;}
+        public int[] AccountsCovered {get; set;}
 
         /*
          * Construct from input
@@ -34,24 +36,18 @@ namespace BasicApi.Entities
         public ApiClaims(string userId, string callingApplicationId, string[] scopes)
         {
             this.UserId = userId;
-            this.CallingApplicationId = callingApplicationId;
+            this.ClientId = callingApplicationId;
             this.Scopes = scopes;
         }
 
         /*
          * Set fields after receiving OAuth user info data
          */
-        public void SetCentralUserData(string givenName, string familyName, string email)
+        public void SetCentralUserInfo(string givenName, string familyName, string email)
         {
-            this.UserInfo = new UserInfoClaims(givenName, familyName, email);
-        }
-
-        /*
-         * Set a custom business rule
-         */
-        public void setProductSpecificUserRights(int[] userCompanyIds)
-        {
-            this.UserCompanyIds = userCompanyIds;
+            this.GivenName = givenName;
+            this.FamilyName = familyName;
+            this.Email = email;
         }
     }
 }

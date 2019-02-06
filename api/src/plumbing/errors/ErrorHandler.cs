@@ -36,7 +36,7 @@ namespace BasicApi.Plumbing.Errors
                 
                 // Log the error with an id
                 var errorToLog = apiError.ToLogFormat();
-                logger.LogError(new EventId(apiError.InstanceId), errorToLog.ToString());
+                logger.LogError(errorToLog.ToString());
 
                 // Return the client error to be returned
                 return apiError.ToClientError();
@@ -61,12 +61,9 @@ namespace BasicApi.Plumbing.Errors
             }
             
             // For other exceptions  we create a new object
-            return new ApiError("Problem Encountered")
+            return new ApiError("general_exception", "An unexpected exception occurred in the API")
             {
-                StatusCode = 500,
-                Area = "Exception",
-                Details = exception.ToString(),
-                Time = DateTime.UtcNow
+                Details = exception.ToString()
             };
         }
 
@@ -75,13 +72,10 @@ namespace BasicApi.Plumbing.Errors
          */
         public static ApiError FromMetadataError(DiscoveryResponse response, string url)
         {
-            return new ApiError("Metadata lookup failed")
+            return new ApiError("metadata_lookup_failure", "Metadata lookup failed")
             {
-                StatusCode = (int)response.StatusCode,
-                Area = "Metadata lookup",
-                Url = url,
-                Details = response.Raw,
-                Time = DateTime.UtcNow
+                // StatusCode = (int)response.StatusCode,
+                Details = response.Raw
             };
 
         }
@@ -91,13 +85,10 @@ namespace BasicApi.Plumbing.Errors
          */
         public static ApiError FromUserInfoError(UserInfoResponse response, string url)
         {
-            return new ApiError("User info lookup failed")
+            return new ApiError("userinfo_failure", "User info lookup failed")
             {
-                StatusCode = (int)response.HttpStatusCode,
-                Area = "User Info",
-                Url = url,
-                Details = response.Raw,
-                Time = DateTime.UtcNow
+                // StatusCode = (int)response.HttpStatusCode,
+                Details = response.Raw
             };
         }
     }

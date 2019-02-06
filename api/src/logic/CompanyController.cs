@@ -25,18 +25,18 @@
          * Get a list of summary information about companies
          */
         [HttpGet("")]
-        public async Task<IEnumerable<Company>> GetListAsync()
+        public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
-            return await this.repository.GetListAsync();
+            return await this.repository.GetCompanyListAsync();
         }
 
         /*
          * Get transaction details for a company
          */
         [HttpGet("{id}/transactions")]
-        public async Task<CompanyTransactions> GetTransactionsAsync(int id)
+        public async Task<CompanyTransactions> GetCompanyTransactionsAsync(int id)
         {
-            return await this.repository.GetTransactionsAsync(id);
+            return await this.repository.GetCompanyTransactionsAsync(id);
         }
     }
 }
