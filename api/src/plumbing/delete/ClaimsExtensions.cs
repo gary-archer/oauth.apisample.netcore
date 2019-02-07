@@ -64,7 +64,7 @@ namespace BasicApi.Plumbing.Utilities
             string email = principal.Claims.FirstOrDefault(c => c.Type == JwtClaimTypes.Email)?.Value;
             
             // Read custom values
-            var userCompanyIds = principal.Claims.Where(c => c.Type == CustomClaimTypes.AccountCovered).Select(c => c.Value).ToList();
+            var accountsCovered = principal.Claims.Where(c => c.Type == CustomClaimTypes.AccountCovered).Select(c => c.Value).ToList();
 
             // Sanity check
             if (string.IsNullOrWhiteSpace(userId) ||
@@ -86,9 +86,9 @@ namespace BasicApi.Plumbing.Utilities
             }
 
             // Return product user data claims if they exist
-            if (userCompanyIds.Count > 0)
+            if (accountsCovered.Count > 0)
             {
-                var intValues = userCompanyIds.Select(s => Convert.ToInt32(s, CultureInfo.InvariantCulture));
+                var intValues = accountsCovered.Select(s => Convert.ToInt32(s, CultureInfo.InvariantCulture));
                 claims.AccountsCovered = intValues.ToArray();
             }
             

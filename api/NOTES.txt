@@ -1,0 +1,4 @@
+1. Produce a list of claims and complete the default API handler
+   Get translation between ClaimsPrincipal and API Claims object working
+
+2. Log to ensure that the handler fires once per request

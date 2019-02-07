@@ -1,4 +1,4 @@
-namespace BasicApi.Plumbing.Utilities
+namespace BasicApi.Plumbing.OAuth
 {
     using System;
     using Microsoft.AspNetCore.Authentication;
@@ -14,11 +14,14 @@ namespace BasicApi.Plumbing.Utilities
         /*
          * Add our custom handler
          */
-        public static AuthenticationBuilder AddCustomHandler(
+        public static AuthenticationBuilder AddCustomAuthenticationHandler(
             this AuthenticationBuilder builder,
             Action<CustomAuthenticationOptions> options)
         {
             // builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<OAuth2IntrospectionOptions>, PostConfigureOAuth2IntrospectionOptions>());
-            return builder.AddScheme<CustomAuthenticationOptions, CustomAuthenticationHandler>("Bearer", options);
+            return builder.AddScheme<
+                        CustomAuthenticationOptions, 
+                        CustomAuthenticationHandler>("Bearer", options);
         }
     }
+}

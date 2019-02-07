@@ -17,6 +17,7 @@
     using BasicApi.Logic;
     using BasicApi.Plumbing.OAuth;
     using BasicApi.Plumbing.Utilities;
+    using BasicApi.Plumbing.Errors;
 
     /*
      * The application startup class
@@ -59,49 +60,18 @@
             // Make the Microsoft runtime memory cache available for claims caching
             services.AddDistributedMemoryCache();
             
-            /* TO DELETE
-            // We use Identity Model authentication to introspect and cache tokens
-            services
-                .AddAuthentication(OAuth2IntrospectionDefaults.AuthenticationScheme)
-                .AddOAuth2Introspection(options =>
-                {
-                    // Basic OAuth settings
-                    options.Authority = oauthConfig.Authority;
-                    options.ClientId = oauthConfig.ClientId;
-                    options.ClientSecret = oauthConfig.ClientSecret;
-                    
-                    // We are using introspection for JWTs so we need to override the default
-                    options.SkipTokensWithDots = false;
-                    
-                    // Our Okta developer setup requires this but we wouldn't use it for a production solution
-                    options.DiscoveryPolicy.ValidateEndpoints = false;
-
-                    // Turn on token caching and override the default 5 minute duration
-                    options.EnableCaching = true;
-                    options.CacheDuration = TimeSpan.FromMinutes(oauthConfig.DefaultTokenCacheMinutes);
-                    
-                    // Use the Okta immutable user id as the subject claim so that it is in the claims identity name
-                    options.NameClaimType = "uid";
-
-                    // Support viewing the introspection traffic in a debugger such as Fiddler or Charles
-                    options.DiscoveryHttpHandler = new ProxyHttpHandler(appConfig);
-                    options.IntrospectionHttpHandler = new ProxyHttpHandler(appConfig);
-                });*/
-            
             // We use a custom authentication scheme to manage introspection and claims caching
             var builder = services
                 .AddAuthentication("Bearer")
-                .AddCustomHandler(options => {
-
-                        /*options.Authority = oauthConfig.Authority;
+                .AddCustomAuthenticationHandler(options => {
+                        options.Authority = oauthConfig.Authority;
                         options.ClientId = oauthConfig.ClientId;
                         options.ClientSecret = oauthConfig.ClientSecret;
                         options.NameClaimType = "uid";
-                        options.ProxyHttpHandler = new ProxyHttpHandler(appConfig)
-                        */
+                        options.ProxyHttpHandler = new ProxyHttpHandler(appConfig);
                     });
 
-            // Ensure that all API requests to controllers are verified by the above introspection
+            // Ensure that all API requests to controllers are verified by the above handlers
             services.AddMvc(options => 
             {
                 options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
@@ -124,7 +94,7 @@
             // Configure behaviour of API options requests
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method != "OPTIONS",
-                api => ConfigureApi(api));
+                api => ConfigureApiCrossCuttingConceens(api));
 
             // Configure behaviour of SPA requests for static content
             app.UseWhen(
@@ -138,11 +108,11 @@
         /*
          * Configure our API's security and other aspects
          */
-        private void ConfigureApi(IApplicationBuilder app)
+        private void ConfigureApiCrossCuttingConceens(IApplicationBuilder app)
         {
-            app.UseAuthenticationMiddlewareWithErrorHandling();
-            app.UseClaimsMiddleware();
-            app.UseCustomExceptionHandler();
+            app.UseMiddleware<AuthenticationMiddlewareWithErrorHandling>();
+            app.UseMiddleware<ClaimsMiddleware>();
+            app.UseMiddleware<UnhandledExceptionMiddleware>();
         }
 
         /*
