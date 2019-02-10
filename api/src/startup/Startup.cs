@@ -63,6 +63,7 @@
             {
                 cache = provider.GetService<IDistributedCache>();
             }
+            var claimsCache = new ClaimsCache(cache);
             
             // Load issuer metadata during startup
             var proxyHttpHandler = new ProxyHttpHandler(this.jsonConfig.App);
@@ -72,11 +73,11 @@
             // Add our custom authentication handler, to manage introspection and claims caching
             var builder = services
                 .AddAuthentication("Bearer")
-                .AddCustomAuthenticationHandler(options => {
+                .AddScheme<CustomAuthenticationOptions, CustomAuthenticationHandler>("Bearer", options => {
                         options.OAuthConfiguration = this.jsonConfig.OAuth;
                         options.ProxyHttpHandler = proxyHttpHandler;
                         options.IssuerMetadata = issuerMetadata;
-                        options.ClaimsCache = new ClaimsCache(cache);
+                        options.ClaimsCache = claimsCache;
                     });
 
             // Ensure that all API requests to controllers are verified by the above handlers

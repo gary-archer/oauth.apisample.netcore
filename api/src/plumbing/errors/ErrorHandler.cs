@@ -105,9 +105,19 @@ namespace BasicApi.Plumbing.Errors
         {
             return new ApiError("metadata_lookup_failure", "Metadata lookup failed")
             {
-                Details = response.Error
+                Details = this.GetErrorDetails(response.Error, url)
             };
+        }
 
+        /*
+         * Report introspection failures
+         */
+        public ApiError FromIntrospectionError(IntrospectionResponse response, string url)
+        {
+            return new ApiError("introspection_failure", "Token validation failed")
+            {
+                Details = this.GetErrorDetails(response.Error, url)
+            };
         }
 
         /*
@@ -117,8 +127,38 @@ namespace BasicApi.Plumbing.Errors
         {
             return new ApiError("userinfo_failure", "User info lookup failed")
             {
-                Details = response.Error
+                Details = this.GetErrorDetails(response.Error, url)
             };
+        }
+
+        /*
+         * Report missing claim failures
+         */
+        public ApiError FromMissingClaim(string claimName)
+        {
+            return new ApiError("claims_failure", "Authorization data not found")
+            {
+                Details = $"An empty value was found for the expected claim ${claimName}"
+            };
+        }
+
+        /*
+         * A helper to concatenate details text
+         */
+        private string GetErrorDetails(string details, string url)
+        {
+            var detailsText = string.Empty;
+            if (!string.IsNullOrWhiteSpace(details)) 
+            {
+                detailsText += details;
+            }
+        
+            if(!string.IsNullOrWhiteSpace(url)) 
+            {
+                detailsText += $", URL: ${url}";
+            }
+
+            return detailsText;
         }
     }
 }

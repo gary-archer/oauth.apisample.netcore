@@ -63,7 +63,7 @@ namespace BasicApi.Plumbing.OAuth
                     ValidateEndpoints = false
                 };
                 
-                // Note that the IdentityModel calls ConfigureAwait(false) on the client
+                // Make the request
                 DiscoveryResponse response = await client.GetAsync();
                 
                 // Handle errors
@@ -85,7 +85,7 @@ namespace BasicApi.Plumbing.OAuth
         {
             using (var client = new UserInfoClient(userInfoEndpoint, new ProxyHttpHandler(this.appConfig)))
             {
-                // Note that the IdentityModel calls ConfigureAwait(false) on the client
+                // Make the request
                 UserInfoResponse response = await client.GetAsync(accessToken );
 
                 // Handle errors

@@ -1,5 +1,5 @@
-1. Wire up the three OAuth calls
-
-2. Get claims cache working
-
-3. Claims specialization to implement
+1. Finish OAuth calls
+   Current problems with ProxyHttpHandler being disposed - cf old solution
+ 
+2. Get claims cache working and serializing properly
+   Then do claims specialization

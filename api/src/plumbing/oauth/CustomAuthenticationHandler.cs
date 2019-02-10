@@ -2,6 +2,7 @@ namespace BasicApi.Plumbing.OAuth
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Security.Claims;
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
@@ -52,7 +53,7 @@ namespace BasicApi.Plumbing.OAuth
                     this.loggerFactory);
 
                 // Get the access token
-                string accessToken = "790245"; //TokenRetrieval.FromAuthorizationHeader()(context.Request);
+                string accessToken = this.ReadAccessToken();
 
                 // Try to perform the security handling
                 var claims = new ApiClaims();
@@ -108,6 +109,24 @@ namespace BasicApi.Plumbing.OAuth
                             ((ClientError)clientError).ToResponseFormat());
                 }
             }
+        }
+
+        /*
+         * Try to read the bearer header
+         */
+        private string ReadAccessToken()
+        {
+            string authorization = this.Request.Headers["Authorization"].FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(authorization))
+            {
+                var parts = authorization.Split(' ');
+                if (parts.Length == 2 && parts[0] == "Bearer") 
+                {
+                    return parts[1];
+                }
+            }
+
+            return null;
         }
 
         /*

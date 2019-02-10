@@ -25,6 +25,28 @@ namespace BasicApi.Plumbing.OAuth
             this.metadata = null;
         }
 
+        /*
+         * Return the metadata once loaded
+         */
+        public DiscoveryResponse Metadata
+        {
+            get
+            {
+                return this.metadata;
+            }
+        }
+
+        /*
+         * Return the proxy handler to consumers of the metadata who want to make HTTP calls
+         */
+        public ProxyHttpHandler ProxyHandler
+        {
+            get
+            {
+                return this.proxyHandler;
+            }
+        }
+
         /* 
          * Load metadata from our configuration URL
          */
@@ -40,7 +62,7 @@ namespace BasicApi.Plumbing.OAuth
                     ValidateEndpoints = false
                 };
                 
-                // Note that IdentityModel calls ConfigureAwait(false) on the client
+                // Make the request
                 DiscoveryResponse response = await client.GetAsync();
                 
                 // Handle errors
