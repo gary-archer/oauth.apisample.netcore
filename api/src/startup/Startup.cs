@@ -19,6 +19,7 @@
     using BasicApi.Plumbing.Utilities;
     using BasicApi.Plumbing.Errors;
     using Microsoft.Extensions.Caching.Distributed;
+    using Microsoft.Extensions.Logging;
 
     /*
      * The application startup class
@@ -28,7 +29,7 @@
         /*
          * Our injected configuration
          */
-        private Configuration jsonConfig;
+        private readonly Configuration jsonConfig;
 
         /*
          * Construct our application startup class from configuration
@@ -56,10 +57,15 @@
 
             // Make the Microsoft runtime memory cache available for claims caching
             services.AddDistributedMemoryCache();
-            var cache = services.BuildServiceProvider().GetService<IDistributedCache>();
+            IDistributedCache cache = null;
+            using(var provider = services.BuildServiceProvider())
+            {
+                cache = provider.GetService<IDistributedCache>();
+            }
             
             // Load issuer metadata
-            var issuerMetadata = new IssuerMetadata(this.jsonConfig.OAuth);
+            var proxyHttpHandler = new ProxyHttpHandler(this.jsonConfig.App);
+            var issuerMetadata = new IssuerMetadata(this.jsonConfig.OAuth, proxyHttpHandler);
             issuerMetadata.Load().Wait();
 
             // Add out custom authentication handler for introspection and claims caching
@@ -67,7 +73,7 @@
                 .AddAuthentication("Bearer")
                 .AddCustomAuthenticationHandler(options => {
                         options.OAuthConfiguration = this.jsonConfig.OAuth;
-                        options.ProxyHttpHandler = new ProxyHttpHandler(this.jsonConfig.App);
+                        options.ProxyHttpHandler = proxyHttpHandler;
                         options.IssuerMetadata = issuerMetadata;
                         options.ClaimsCache = new ClaimsCache(cache);
                     });

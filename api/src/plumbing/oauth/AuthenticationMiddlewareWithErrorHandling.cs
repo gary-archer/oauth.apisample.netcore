@@ -63,7 +63,8 @@ namespace BasicApi.Plumbing.OAuth
                     else
                     {
                         // Handle failures caught by Identity Model code and return a 500 response indicating failure
-                        var clientError = ErrorHandler.HandleError(result.Failure, logger);
+                        var handler = new ErrorHandler();
+                        var clientError = handler.HandleError(result.Failure, logger);
                         await ResponseErrorWriter.WriteErrorResponse(context, clientError.StatusCode, clientError.ToResponseFormat());
                     }
                 }
@@ -71,7 +72,8 @@ namespace BasicApi.Plumbing.OAuth
             catch (Exception exception)
             {
                 // Handle failures thrown from Identity Model code and return a 500 response indicating failure
-                var clientError = ErrorHandler.HandleError(exception, logger);
+                var handler = new ErrorHandler();
+                var clientError = handler.HandleError(exception, logger);
                 await ResponseErrorWriter.WriteErrorResponse(context, clientError.StatusCode, clientError.ToResponseFormat());
             }
         }

@@ -69,7 +69,8 @@ namespace BasicApi.Plumbing.OAuth
                 // Handle errors
                 if (this.IsFailedResponse(response.IsError, response.StatusCode))
                 {
-                    throw ErrorHandler.FromMetadataError(response, this.oauthConfig.Authority);
+                    var handler = new ErrorHandler();
+                    throw handler.FromMetadataError(response, this.oauthConfig.Authority);
                 }
 
                 // Return the user info endpoint
@@ -90,7 +91,8 @@ namespace BasicApi.Plumbing.OAuth
                 // Handle errors
                 if (this.IsFailedResponse(response.IsError, response.HttpStatusCode))
                 {
-                    throw ErrorHandler.FromUserInfoError(response, userInfoEndpoint);
+                    var handler = new ErrorHandler();
+                    throw handler.FromUserInfoError(response, userInfoEndpoint);
                 }
 
                 // Return the user info data

@@ -8,15 +8,25 @@ namespace BasicApi.Plumbing.Errors
     /*
      * Our error handler class
      */
-    public static class ErrorHandler
+    public class ErrorHandler
     {
+        /*
+         * Handle errors that prevent startup
+         */
+        public void HandleStartupException(Exception exception, ILogger logger)
+        {
+            var handledError = (ApiError)this.FromException(exception);
+            var errorToLog = handledError.ToLogFormat();
+            logger.LogError(errorToLog.ToString());
+        }
+
         /*
          * Do server side error handling then return an error to the client
          */
-        public static ClientError HandleError(Exception exception, ILogger logger)
+        public ClientError HandleError(Exception exception, ILogger logger)
         {
             // Ensure that the exception has a known type
-            var handledError = FromException(exception);
+            var handledError = this.FromException(exception);
             if (handledError is ClientError)
             {
                 // Client errors mean the caller did something wrong
@@ -46,7 +56,7 @@ namespace BasicApi.Plumbing.Errors
         /*
          * Ensure that the exception has a known type
          */
-        public static Exception FromException(Exception exception)
+        public Exception FromException(Exception exception)
         {
             // Already handled 500 errors
             if (exception is ApiError)
@@ -59,23 +69,43 @@ namespace BasicApi.Plumbing.Errors
             {
                 return exception as ClientError;
             }
+
+            // Also handle nested exceptions, including those during async completion or application startup
+            if (exception is AggregateException)
+            {
+                if (exception.InnerException is ApiError)
+                {
+                    return exception.InnerException;
+                }
+
+                if (exception.InnerException is ClientError)
+                {
+                    return exception.InnerException;
+                }
+
+                // Get the underlying exception if possible, for a shorter and clearer error message
+                if (exception.InnerException != null) 
+                {
+                    exception = exception.InnerException;
+                }
+            }
             
             // For other exceptions  we create a new object
             return new ApiError("general_exception", "An unexpected exception occurred in the API")
             {
-                Details = exception.ToString()
+                Details = exception.ToString(),
+                Stack = exception.StackTrace
             };
         }
 
         /*
          * Report metadata lookup failures
          */
-        public static ApiError FromMetadataError(DiscoveryResponse response, string url)
+        public ApiError FromMetadataError(DiscoveryResponse response, string url)
         {
             return new ApiError("metadata_lookup_failure", "Metadata lookup failed")
             {
-                // StatusCode = (int)response.StatusCode,
-                Details = response.Raw
+                Details = response.Error
             };
 
         }
@@ -83,12 +113,11 @@ namespace BasicApi.Plumbing.Errors
         /*
          * Report user info lookup failures
          */
-        public static ApiError FromUserInfoError(UserInfoResponse response, string url)
+        public ApiError FromUserInfoError(UserInfoResponse response, string url)
         {
             return new ApiError("userinfo_failure", "User info lookup failed")
             {
-                // StatusCode = (int)response.HttpStatusCode,
-                Details = response.Raw
+                Details = response.Error
             };
         }
     }

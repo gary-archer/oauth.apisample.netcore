@@ -21,6 +21,7 @@ namespace BasicApi.Plumbing.Errors
         private int instanceId;
         private string utcTime;
         private string details;
+        private string stack;
 
         /*
          * Generate a random id when created
@@ -33,16 +34,26 @@ namespace BasicApi.Plumbing.Errors
             this.instanceId = new Random().Next(MIN_ERROR_ID, MAX_ERROR_ID);
             this.utcTime = DateTime.UtcNow.ToString("s");
             this.details = String.Empty;
+            this.stack = null;
         }
 
         /*
          * Accessors
          */
-        public string Details 
+        public string Details
         {
             set
             {
                 this.details = value;
+
+            }
+        }
+
+        public string Stack 
+        {
+            set
+            {
+                this.stack = value;
 
             }
         }
@@ -54,12 +65,16 @@ namespace BasicApi.Plumbing.Errors
         {
             dynamic data = new JObject();
             data.statusCode = this.statusCode;
-            data.clientError = this.ToClientError().ToLogFormat();
+            data.clientError = this.ToClientError().ToResponseFormat();
             data.serviceError = new JObject();
             data.serviceError.errorCode = this.errorCode;
             data.serviceError.details = this.details;
+
+            if(!string.IsNullOrWhiteSpace(this.stack))
+            {
+                data.serviceError.stack = this.stack;
+            }
             
-            // TODO: Stack trace
             return data;
         }
 
@@ -68,7 +83,7 @@ namespace BasicApi.Plumbing.Errors
          */
         public ClientError ToClientError()
         {
-            var error = new ClientError(this.statusCode, this.area, this.Message);
+            var error = new ClientError(this.statusCode, "internal_server_error", this.Message);
             error.setExceptionDetails(this.area, this.instanceId, this.utcTime);
             return error;
         }

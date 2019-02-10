@@ -8,6 +8,7 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using BasicApi.Configuration;
+    using BasicApi.Plumbing.Errors;
     using BasicApi.Plumbing.Utilities;
 
     /*
@@ -26,30 +27,43 @@
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            // Use the configuration to build and run the web host
-            BuildWebHost(args, config).Run();
+            try {
+
+                // Build and run the web host
+                BuildWebHost(config).Run();
+            }
+            catch(Exception ex) {
+
+                // Report startup errors
+                var handler = new ErrorHandler();
+                handler.HandleStartupException(ex, LoggingHelper.CreateStartupLogger());
+            }
         }
 
         /* 
          * Create a web host to listen for HTTP requests
          */
-        private static IWebHost BuildWebHost(string[] args, IConfigurationRoot configuration)
+        private static IWebHost BuildWebHost(IConfigurationRoot configurationRoot)
         {
             // Read our custom configuration
-            var jsonConfig = Configuration.Load(configuration);
+            var jsonConfig = Configuration.Load(configurationRoot);
             var webUrl = new Uri(jsonConfig.App.TrustedOrigins[0]);
 
             return new WebHostBuilder()
-                .UseConfiguration(configuration)
                 
-                // Register our JSON configuration
-                .ConfigureServices(s => s.AddSingleton(jsonConfig))
+                .UseConfiguration(configurationRoot)
                 
-                // Configure a custom logging filter
-                .ConfigureLogging(logging =>
+                // Enable our JSON configuration object to be injected into other classes
+                .ConfigureServices(services => 
                 {
-                    logging.ClearProviders();
-                    logging.AddConsole().AddFilter(LoggingSetup.Filter);
+                    services.AddSingleton(jsonConfig);
+                })
+                
+                // Configure a custom logging filter to include just the classes in logging setup
+                .ConfigureLogging(loggingBuilder =>
+                {
+                    loggingBuilder.ClearProviders();
+                    loggingBuilder.AddConsole().AddFilter(LoggingHelper.Filter);
                 })
 
                 // Configure the Kestrel web server to listen over SSL
@@ -60,7 +74,11 @@
                         listenOptions.UseHttps($"./certs/{jsonConfig.App.SslCertificateFileName}", jsonConfig.App.SslCertificatePassword);
                     });
                 })
+                
+                // Serve web content from the root folder
                 .UseContentRoot(Directory.GetCurrentDirectory())
+
+                // Do main configuration in the startup class
                 .UseStartup<Startup>()
                 .Build();
         }

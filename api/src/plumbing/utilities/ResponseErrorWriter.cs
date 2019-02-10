@@ -16,11 +16,9 @@ namespace BasicApi.Plumbing.Utilities
          */
         public static async Task WriteInvalidTokenResponse(HttpContext context)
         {
-            // Return 401
             context.Response.StatusCode = 401;
             context.Response.Headers.Add("WWW-Authenticate", "Bearer");
 
-            // Write an understandable response for consumers
             AddCorsHeaderForErrorResponse(context);
             context.Response.ContentType = "application/json";
             var jsonData = JsonConvert.SerializeObject("Missing, invalid or expired access token");
