@@ -7,12 +7,15 @@ namespace BasicApi.Plumbing.OAuth
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
+    using BasicApi.Logic;
 
     /*
-    * Our custom handler class
+    * The entry point for custom authentication
     */
     public class CustomAuthenticationHandler : AuthenticationHandler<CustomAuthenticationOptions>
     {
+        private readonly ILoggerFactory loggerFactory;
+
         /*
          * Give the base class the options it needs
          */
@@ -22,23 +25,39 @@ namespace BasicApi.Plumbing.OAuth
             UrlEncoder urlEncoder,
             ISystemClock clock): base(options, loggerFactory, urlEncoder, clock)
         {
+            this.loggerFactory = loggerFactory;
         }
 
         /*
-         * The main authentication option
+         * This is called once per API request to perform authorization
          */
-        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+        protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            // TODO: Create hard coded working claims
-            var claims = new List<Claim>();
+            // Create authorization related classes on every API request
+            var authenticator = new Authenticator(this.Options.OAuthConfiguration, this.Options.IssuerMetadata);
+            var rulesRepository = new AuthorizationRulesRepository();
+            var claimsMiddleware = new ClaimsMiddleware(
+                this.Options.ClaimsCache,
+                authenticator,
+                rulesRepository,
+                this.loggerFactory);
 
-            // Create the security context
-            var id = new ClaimsIdentity(claims, Scheme.Name, Options.NameClaimType, Options.RoleClaimType);
-            var principal = new ClaimsPrincipal(id);
-            var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), Scheme.Name);
+            // Get the access token
+            string accessToken = "790245"; //TokenRetrieval.FromAuthorizationHeader()(context.Request);
 
-            // Return the result
-            return Task.FromResult(AuthenticateResult.Success(ticket));
+            // Try to perform the security handling
+            var claims = new ApiClaims();
+            var success = await claimsMiddleware.authorizeRequestAndSetClaims(accessToken, claims);
+            if (success) {
+
+                // On success, set up the .Net security context
+                var principal = ClaimsMapper.SerializeToClaimsPrincipal(claims);
+                var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), Scheme.Name);
+                return AuthenticateResult.Success(ticket);
+            }
+            
+            // Indicate failure
+            return AuthenticateResult.Fail("Authentication Failed");
         }
     }
 }

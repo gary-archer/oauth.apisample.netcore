@@ -3,6 +3,7 @@ namespace BasicApi.Plumbing.OAuth
     using System;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Builder;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Options;
 
@@ -18,10 +19,11 @@ namespace BasicApi.Plumbing.OAuth
             this AuthenticationBuilder builder,
             Action<CustomAuthenticationOptions> options)
         {
-            // builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<OAuth2IntrospectionOptions>, PostConfigureOAuth2IntrospectionOptions>());
-            return builder.AddScheme<
-                        CustomAuthenticationOptions, 
-                        CustomAuthenticationHandler>("Bearer", options);
+            // Register an object to initialize our authentication options after initialization has completed
+            // builder.Services.AddSingleton<IPostConfigureOptions<CustomAuthenticationOptions>, PostConfigureAuthenticationOptions>();
+            
+            // Add our custom authentication handler
+            return builder.AddScheme<CustomAuthenticationOptions, CustomAuthenticationHandler>("Bearer", options);
         }
     }
 }

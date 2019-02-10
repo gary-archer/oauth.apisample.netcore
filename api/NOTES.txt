@@ -1,4 +1,7 @@
-1. Produce a list of claims and complete the default API handler
-   Get translation between ClaimsPrincipal and API Claims object working
+1. Get post authentication creation working similar to Introspection
 
-2. Log to ensure that the handler fires once per request
+2. Get 401 authentication error responses working
+
+3. Wire up the three OAuth calls and test HTTP debugging
+
+4. Extensibility to implement as for Java

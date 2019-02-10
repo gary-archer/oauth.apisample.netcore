@@ -11,14 +11,23 @@ namespace BasicApi.Logic
     [Route("api/userclaims")]
     public class UserInfoController : Controller
     {
+        private readonly ApiClaims claims;
+
+        /*
+         * Receive dependencies
+         */
+        public UserInfoController(ApiClaims claims)
+        {
+            this.claims = claims;
+        }
+
         /*
          * Return user info to the UI
          */
         [HttpGet("current")]
-        public UserInfoClaims GetUserClaimsAsync()
+        public UserInfoClaims GetUserClaims()
         {
-            var claims = this.User.GetApiClaims();
-            return new UserInfoClaims(claims.GivenName, claims.FamilyName, claims.Email);
+            return new UserInfoClaims(this.claims.GivenName, this.claims.FamilyName, this.claims.Email);
         }
     }
 }

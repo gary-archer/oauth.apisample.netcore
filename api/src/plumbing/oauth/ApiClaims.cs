@@ -23,12 +23,12 @@ namespace BasicApi.Plumbing.OAuth
         public int[] AccountsCovered {get; set;}
 
         /*
-         * Construct from input
+         * Set token claims after introspection
          */
-        public ApiClaims(string userId, string callingApplicationId, string[] scopes)
+        public void SetTokenInfo(string userId, string clientId, string[] scopes)
         {
             this.UserId = userId;
-            this.ClientId = callingApplicationId;
+            this.ClientId = clientId;
             this.Scopes = scopes;
         }
 

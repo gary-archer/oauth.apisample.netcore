@@ -2,7 +2,7 @@
 {
     using System;
     using System.IO;
-    using IdentityModel.AspNetCore.OAuth2Introspection;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
@@ -18,6 +18,7 @@
     using BasicApi.Plumbing.OAuth;
     using BasicApi.Plumbing.Utilities;
     using BasicApi.Plumbing.Errors;
+    using Microsoft.Extensions.Caching.Distributed;
 
     /*
      * The application startup class
@@ -27,14 +28,14 @@
         /*
          * Our injected configuration
          */
-        private IConfiguration configuration;
+        private Configuration jsonConfig;
 
         /*
          * Construct our application startup class from configuration
          */
-        public Startup(IConfiguration configuration)
+        public Startup(Configuration jsonConfig)
         {
-            this.configuration = configuration;
+            this.jsonConfig = jsonConfig;
         }
 
         /*
@@ -42,33 +43,33 @@
          */
         public void ConfigureServices(IServiceCollection services)
         {
-            // Read our custom configuration
-            var appConfig = ApplicationConfiguration.Load(configuration);
-            var oauthConfig = OAuthConfiguration.Load(configuration);
-
             // Support CORS for our trusted origins
             services.AddCors(options => 
             {
                 options.AddPolicy(
                     "api", 
-                    policy => policy.WithOrigins(appConfig.TrustedOrigins.ToArray())
+                    policy => policy.WithOrigins(this.jsonConfig.App.TrustedOrigins.ToArray())
                                     .AllowAnyMethod()
                                     .AllowAnyHeader()
                                     .AllowCredentials());
             });
-            
+
             // Make the Microsoft runtime memory cache available for claims caching
             services.AddDistributedMemoryCache();
+            var cache = services.BuildServiceProvider().GetService<IDistributedCache>();
             
-            // We use a custom authentication scheme to manage introspection and claims caching
+            // Load issuer metadata
+            var issuerMetadata = new IssuerMetadata(this.jsonConfig.OAuth);
+            issuerMetadata.Load().Wait();
+
+            // Add out custom authentication handler for introspection and claims caching
             var builder = services
                 .AddAuthentication("Bearer")
                 .AddCustomAuthenticationHandler(options => {
-                        options.Authority = oauthConfig.Authority;
-                        options.ClientId = oauthConfig.ClientId;
-                        options.ClientSecret = oauthConfig.ClientSecret;
-                        options.NameClaimType = "uid";
-                        options.ProxyHttpHandler = new ProxyHttpHandler(appConfig);
+                        options.OAuthConfiguration = this.jsonConfig.OAuth;
+                        options.ProxyHttpHandler = new ProxyHttpHandler(this.jsonConfig.App);
+                        options.IssuerMetadata = issuerMetadata;
+                        options.ClaimsCache = new ClaimsCache(cache);
                     });
 
             // Ensure that all API requests to controllers are verified by the above handlers
@@ -101,17 +102,16 @@
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/spa")),
                 web => this.ConfigureWebServer(web));
             
-            // All requests use MVC
+            // All requests use ASP.Net core
             app.UseMvc();
         }
 
         /*
-         * Configure our API's security and other aspects
+         * Configure our API's middleware
          */
         private void ConfigureApiCrossCuttingConceens(IApplicationBuilder app)
         {
             app.UseMiddleware<AuthenticationMiddlewareWithErrorHandling>();
-            app.UseMiddleware<ClaimsMiddleware>();
             app.UseMiddleware<UnhandledExceptionMiddleware>();
         }
 
@@ -130,7 +130,8 @@
 
             // The claims middleware populates the ApiClaims object and sets it against the HTTP context's claims principal
             // When controller operations execute they access the HTTP context and extract the claims
-            services.AddScoped<ApiClaims>(ctx => ctx.GetService<IHttpContextAccessor>().HttpContext.User.GetApiClaims());
+            services.AddScoped<ApiClaims>(
+                ctx => ctx.GetService<IHttpContextAccessor>().HttpContext.User.DeserializeApiClaims());
         }
 
         /*

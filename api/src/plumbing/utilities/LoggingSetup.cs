@@ -1,7 +1,6 @@
 namespace BasicApi.Plumbing.Utilities
 {
     using Microsoft.Extensions.Logging;
-    using IdentityModel.AspNetCore.OAuth2Introspection;
     using BasicApi.Plumbing.Errors;
     using BasicApi.Plumbing.OAuth;
 
@@ -17,10 +16,9 @@ namespace BasicApi.Plumbing.Utilities
         {
             switch (category)
             {
-                case var a when a == typeof(OAuth2IntrospectionHandler).FullName:
-                case var b when b == typeof(AuthenticationMiddlewareWithErrorHandling).FullName:
-                case var c when c == typeof(ClaimsMiddleware).FullName:
-                case var d when d == typeof(UnhandledExceptionMiddleware).FullName:
+                case var a when a == typeof(AuthenticationMiddlewareWithErrorHandling).FullName:
+                case var b when b == typeof(ClaimsMiddleware).FullName:
+                case var c when c == typeof(UnhandledExceptionMiddleware).FullName:
                     return true;
 
                 default:

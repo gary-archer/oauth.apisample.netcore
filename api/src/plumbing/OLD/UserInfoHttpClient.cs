@@ -27,8 +27,8 @@ namespace BasicApi.Plumbing.OAuth
          */
         public UserInfoHttpClient(IConfiguration configuration)
         {
-            this.oauthConfig = OAuthConfiguration.Load(configuration);
-            this.appConfig = ApplicationConfiguration.Load(configuration);
+            this.oauthConfig = null; //OAuthConfiguration.Load(configuration);
+            this.appConfig = null; //ApplicationConfiguration.Load(configuration);
         }
 
         /*

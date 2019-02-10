@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="IdentityModel.AspNetCore.OAuth2Introspection" Version="3.4.1" />
+    <PackageReference Include="IdentityModel" Version="3.10.1" />
   </ItemGroup>
 
 </Project>

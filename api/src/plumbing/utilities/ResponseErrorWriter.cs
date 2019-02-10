@@ -1,7 +1,6 @@
 namespace BasicApi.Plumbing.Utilities
 {
     using System.Threading.Tasks;
-    using IdentityModel.AspNetCore.OAuth2Introspection;
     using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json;
     using BasicApi.Entities;
@@ -19,7 +18,6 @@ namespace BasicApi.Plumbing.Utilities
         {
             // Return 401
             context.Response.StatusCode = 401;
-            string token = TokenRetrieval.FromAuthorizationHeader()(context.Request);
             context.Response.Headers.Add("WWW-Authenticate", "Bearer");
 
             // Write an understandable response for consumers

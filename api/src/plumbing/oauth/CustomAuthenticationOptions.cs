@@ -1,6 +1,7 @@
 namespace BasicApi.Plumbing.OAuth
 {
     using Microsoft.AspNetCore.Authentication;
+    using BasicApi.Configuration;
     using BasicApi.Plumbing.Utilities;
 
     /*
@@ -8,15 +9,11 @@ namespace BasicApi.Plumbing.OAuth
     */
     public class CustomAuthenticationOptions : AuthenticationSchemeOptions
     {
-        public string Authority {get; set;}
+        public OAuthConfiguration OAuthConfiguration {get; set;}
 
-        public string ClientId {get; set;}
+        public IssuerMetadata IssuerMetadata {get; set;}
 
-        public string ClientSecret {get; set;}
-
-        public string NameClaimType {get; set;}
-
-        public string RoleClaimType {get; set;}
+        public ClaimsCache ClaimsCache {get; set;}
 
         public ProxyHttpHandler ProxyHttpHandler {get; set;}
     }

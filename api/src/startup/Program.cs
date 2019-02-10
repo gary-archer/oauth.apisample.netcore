@@ -5,6 +5,7 @@
     using System.Net;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using BasicApi.Configuration;
     using BasicApi.Plumbing.Utilities;
@@ -35,22 +36,28 @@
         private static IWebHost BuildWebHost(string[] args, IConfigurationRoot configuration)
         {
             // Read our custom configuration
-            var appConfig = ApplicationConfiguration.Load(configuration);
-            var webUrl = new Uri(appConfig.TrustedOrigins[0]);
+            var jsonConfig = Configuration.Load(configuration);
+            var webUrl = new Uri(jsonConfig.App.TrustedOrigins[0]);
 
-            // Create the web host to listen over SSL
             return new WebHostBuilder()
                 .UseConfiguration(configuration)
+                
+                // Register our JSON configuration
+                .ConfigureServices(s => s.AddSingleton(jsonConfig))
+                
+                // Configure a custom logging filter
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
                     logging.AddConsole().AddFilter(LoggingSetup.Filter);
                 })
+
+                // Configure the Kestrel web server to listen over SSL
                 .UseKestrel(options =>
                 {
                     options.Listen(IPAddress.Any, webUrl.Port, listenOptions =>
                     {   
-                        listenOptions.UseHttps($"./certs/{appConfig.SslCertificateFileName}", appConfig.SslCertificatePassword);
+                        listenOptions.UseHttps($"./certs/{jsonConfig.App.SslCertificateFileName}", jsonConfig.App.SslCertificatePassword);
                     });
                 })
                 .UseContentRoot(Directory.GetCurrentDirectory())

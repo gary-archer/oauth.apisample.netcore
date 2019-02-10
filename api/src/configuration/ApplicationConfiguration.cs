@@ -1,23 +1,12 @@
 namespace BasicApi.Configuration
 {
     using System.Collections.Generic;
-    using Microsoft.Extensions.Configuration;
 
     /*
      * Application specific settings
      */
     public class ApplicationConfiguration
     {
-        /*
-         * A helper method to load this custom configuration section
-         */
-        public static ApplicationConfiguration Load(IConfiguration configuration)
-        {
-            var appConfig = new ApplicationConfiguration();
-            configuration.GetSection("application").Bind(appConfig);
-            return appConfig;
-        }
-
         public List<string> TrustedOrigins {get; set;}
 
         public string SslCertificateFileName {get; set;}

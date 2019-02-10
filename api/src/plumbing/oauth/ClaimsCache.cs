@@ -10,22 +10,27 @@ namespace BasicApi.Plumbing.OAuth
     using BasicApi.Entities;
 
     /*
-     * Encapsulate cache getting and setting
+     * Encapsulate getting and setting claims from the cache
      */
-    public static class ClaimsCache
+    public class ClaimsCache
     {
+        private readonly IDistributedCache cache;
+
+        /*
+         * Receive the Microsoft cache object that we are wrapping
+         */
+        public ClaimsCache(IDistributedCache cache)
+        {
+            this.cache = cache;
+        }
+
         /*
          * Add our custom claims to the cache
          */
-        public static async Task AddClaimsMappedToTokenAsync(
-            this IDistributedCache cache, 
-            string token, 
-            int expiry, 
-            ApiClaims claims,
-            ILogger logger)
+        public async Task AddClaimsForTokenAsync(string accessToken, int expiry, ApiClaims claims)
         {
             // Get the hash as a cache key
-            var hash = Sha256($"CLAIMS_${token}");
+            var hash = Sha256(accessToken);
 
             // Serialize to bytes
             var json = JsonConvert.SerializeObject(claims);
@@ -39,33 +44,30 @@ namespace BasicApi.Plumbing.OAuth
             };
 
             // Add to the cache
-            logger.LogInformation($"ClaimsCache: Caching claims for token hash {hash} until {expiryTime}");
-            await cache.SetAsync(hash, bytes, options).ConfigureAwait(false);
+            // await this.cache.SetAsync(hash, bytes, options).ConfigureAwait(false);
         }
 
         /*
          * Read our custom claims from the cache or return null if not found
          */
-        public static async Task<ApiClaims> GetClaimsMappedToTokenAsync(
-            this IDistributedCache cache,
-            string token,
-            ILogger logger)
+        public async Task<bool> GetClaimsForTokenAsync(string accessToken, ApiClaims claims)
         {
             // Get the hash as a cache key
-            var hash = Sha256($"CLAIMS_${token}");
+            var hash = Sha256(accessToken);
 
             // See if bytes exists in the cache
-            var bytes = await cache.GetAsync(hash).ConfigureAwait(false);
-            if (bytes == null)
+            // var bytes = await this.cache.GetAsync(hash).ConfigureAwait(false);
+            // if (bytes == null)
             {
-                logger.LogInformation($"ClaimsCache: No existing claims found for token hash {hash}");
-                return null;
+                return false;
             }
 
             // Deserialize to claims
-            logger.LogInformation($"ClaimsCache: Found existing claims for token hash {hash}");
-            var json = Encoding.UTF8.GetString(bytes);
-            return JsonConvert.DeserializeObject<ApiClaims>(json);
+            // var json = Encoding.UTF8.GetString(bytes);
+            // JsonConvert.DeserializeObject<ApiClaims>(json);
+            // return true;
+
+            // TODO: Update supplied object
         }
 
         /*
