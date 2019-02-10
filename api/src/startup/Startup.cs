@@ -20,6 +20,7 @@
     using BasicApi.Plumbing.Errors;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.Logging;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
 
     /*
      * The application startup class
@@ -55,7 +56,7 @@
                                     .AllowCredentials());
             });
 
-            // Make the Microsoft runtime memory cache available for claims caching
+            // Set up the singleton claims cache object
             services.AddDistributedMemoryCache();
             IDistributedCache cache = null;
             using(var provider = services.BuildServiceProvider())
@@ -63,12 +64,12 @@
                 cache = provider.GetService<IDistributedCache>();
             }
             
-            // Load issuer metadata
+            // Load issuer metadata during startup
             var proxyHttpHandler = new ProxyHttpHandler(this.jsonConfig.App);
             var issuerMetadata = new IssuerMetadata(this.jsonConfig.OAuth, proxyHttpHandler);
             issuerMetadata.Load().Wait();
 
-            // Add out custom authentication handler for introspection and claims caching
+            // Add our custom authentication handler, to manage introspection and claims caching
             var builder = services
                 .AddAuthentication("Bearer")
                 .AddCustomAuthenticationHandler(options => {
@@ -98,10 +99,13 @@
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method == "OPTIONS",
                 api => app.UseCors("api"));
 
-            // Configure behaviour of API options requests
+            // Configure the API to use authentication and unhandled exception middleware
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method != "OPTIONS",
-                api => ConfigureApiCrossCuttingConceens(api));
+                api => {
+                    api.UseAuthentication();
+                    api.UseMiddleware<UnhandledExceptionMiddleware>();
+                });
 
             // Configure behaviour of SPA requests for static content
             app.UseWhen(
@@ -110,15 +114,6 @@
             
             // All requests use ASP.Net core
             app.UseMvc();
-        }
-
-        /*
-         * Configure our API's middleware
-         */
-        private void ConfigureApiCrossCuttingConceens(IApplicationBuilder app)
-        {
-            app.UseMiddleware<AuthenticationMiddlewareWithErrorHandling>();
-            app.UseMiddleware<UnhandledExceptionMiddleware>();
         }
 
         /*

@@ -41,7 +41,11 @@ namespace BasicApi.Plumbing.Errors
                 // Log full error details and return a less detailed error to the caller
                 var handler = new ErrorHandler();
                 var clientError = handler.HandleError(exception, logger);
-                await ResponseErrorWriter.WriteErrorResponse(context, clientError.StatusCode, clientError.ToResponseFormat());
+                await ResponseErrorWriter.WriteErrorResponse(
+                    context.Request,
+                    context.Response,
+                    clientError.StatusCode,
+                    clientError.ToResponseFormat());
             }
         }
     }

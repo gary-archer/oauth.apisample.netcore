@@ -1,7 +1,5 @@
-1. Get post authentication creation working similar to Introspection
+1. Wire up the three OAuth calls
 
-2. Get 401 authentication error responses working
+2. Get claims cache working
 
-3. Wire up the three OAuth calls and test HTTP debugging
-
-4. Extensibility to implement as for Java
+3. Claims specialization to implement

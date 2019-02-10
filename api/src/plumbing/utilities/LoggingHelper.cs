@@ -36,7 +36,7 @@ namespace BasicApi.Plumbing.Utilities
             {
                 case var a when a == typeof(Startup).FullName:
                 case var b when b == typeof(ClaimsMiddleware).FullName:
-                case var c when c == typeof(AuthenticationMiddlewareWithErrorHandling).FullName:
+                case var c when c == typeof(CustomAuthenticationHandler).FullName:
                 case var d when d == typeof(UnhandledExceptionMiddleware).FullName:
                     return true;
 

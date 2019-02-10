@@ -104,19 +104,5 @@ namespace BasicApi.Plumbing.OAuth
                 throw new InvalidOperationException($"Unable to read collection claim ${name} from the claim identity");
             }
         }
-
-        /*
-         * Look up the expiry time from the token, whose claim is added by Identity Model introspection
-         */
-        /*public static int GetAccessTokenExpirationClaim(this ClaimsPrincipal principal)
-        {
-            var expiryClaim = principal.Claims.FirstOrDefault(c => c.Type == JwtClaimTypes.Expiration);
-            if (expiryClaim == null)
-            {
-                throw new InvalidOperationException("Unable to find expiry claim with which to cache claims");
-            }
-
-            return Convert.ToInt32(expiryClaim.Value, CultureInfo.InvariantCulture);
-        }*/
     }
 }
