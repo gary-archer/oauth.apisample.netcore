@@ -1,5 +1,6 @@
 namespace BasicApi.Plumbing.OAuth
 {
+    using System;
     using System.Threading.Tasks;
     using BasicApi.Configuration;
     using BasicApi.Plumbing.Errors;
@@ -12,16 +13,16 @@ namespace BasicApi.Plumbing.OAuth
     public class IssuerMetadata
     {
         private readonly OAuthConfiguration configuration;
-        private readonly ProxyHttpHandler proxyHandler;
+        private readonly Func<ProxyHttpHandler> proxyFactory;
         private DiscoveryResponse metadata;
 
         /*
          * Receive dependencies
          */
-        public IssuerMetadata(OAuthConfiguration configuration, ProxyHttpHandler proxyHandler)
+        public IssuerMetadata(OAuthConfiguration configuration, Func<ProxyHttpHandler> proxyFactory)
         {
             this.configuration = configuration;
-            this.proxyHandler = proxyHandler;
+            this.proxyFactory = proxyFactory;
             this.metadata = null;
         }
 
@@ -36,23 +37,12 @@ namespace BasicApi.Plumbing.OAuth
             }
         }
 
-        /*
-         * Return the proxy handler to consumers of the metadata who want to make HTTP calls
-         */
-        public ProxyHttpHandler ProxyHandler
-        {
-            get
-            {
-                return this.proxyHandler;
-            }
-        }
-
         /* 
          * Load metadata from our configuration URL
          */
         public async Task Load()
         {
-            using (var client = new DiscoveryClient(this.configuration.Authority, this.proxyHandler))
+            using (var client = new DiscoveryClient(this.configuration.Authority, this.proxyFactory()))
             {
                 // In my Okta account the following endpoint does not exist under a /default path segment
                 // This causes Identity Model endpoint validation to fail, do disable it here

@@ -92,7 +92,7 @@ namespace BasicApi.Plumbing.OAuth
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new InvalidOperationException($"Unable to read claim ${name} from the claim identity");
+                throw new InvalidOperationException($"Unable to read claim {name} from the claims principal");
             }
 
         }
@@ -101,7 +101,7 @@ namespace BasicApi.Plumbing.OAuth
         {
             if (values.Count == 0)
             {
-                throw new InvalidOperationException($"Unable to read collection claim ${name} from the claim identity");
+                throw new InvalidOperationException($"Unable to read collection claim {name} from the claims principal");
             }
         }
     }

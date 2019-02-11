@@ -3,8 +3,10 @@ namespace BasicApi.Plumbing.Utilities
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json;
-    using BasicApi.Entities;
+    using Newtonsoft.Json.Linq;
     using Newtonsoft.Json.Serialization;
+    using BasicApi.Entities;
+    using BasicApi.Plumbing.Errors;
 
     /*
      * A helper class to write response errors
@@ -17,20 +19,20 @@ namespace BasicApi.Plumbing.Utilities
         public static async Task WriteInvalidTokenResponse(HttpRequest request, HttpResponse response)
         {
             // Write headers
+            response.ContentType = "application/json";
             response.Headers.Add("WWW-Authenticate", "Bearer");
             AddCorsHeaderForErrorResponse(request, response);
             
             // Write the body
             response.StatusCode = 401;
-            response.ContentType = "application/json";
-            var jsonData = JsonConvert.SerializeObject("Missing, invalid or expired access token");
-            await response.WriteAsync(jsonData);
+            var clientError = new ClientError(401, "unauthorized", "Missing, invalid or expired access token");
+            await response.WriteAsync(clientError.ToResponseFormat().ToString());
         }
 
         /*
          * Deliver a controlled 500 response to the caller
          */
-        public static async Task WriteErrorResponse(HttpRequest request, HttpResponse response, int statusCode, object error)
+        public static async Task WriteErrorResponse(HttpRequest request, HttpResponse response, int statusCode, JObject error)
         {
             // Write headers
             response.ContentType = "application/json";

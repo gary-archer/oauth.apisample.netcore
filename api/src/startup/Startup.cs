@@ -66,8 +66,8 @@
             var claimsCache = new ClaimsCache(cache);
             
             // Load issuer metadata during startup
-            var proxyHttpHandler = new ProxyHttpHandler(this.jsonConfig.App);
-            var issuerMetadata = new IssuerMetadata(this.jsonConfig.OAuth, proxyHttpHandler);
+            Func<ProxyHttpHandler> proxyFactory = () => new ProxyHttpHandler(this.jsonConfig.App);
+            var issuerMetadata = new IssuerMetadata(this.jsonConfig.OAuth, proxyFactory);
             issuerMetadata.Load().Wait();
 
             // Add our custom authentication handler, to manage introspection and claims caching
@@ -75,7 +75,7 @@
                 .AddAuthentication("Bearer")
                 .AddScheme<CustomAuthenticationOptions, CustomAuthenticationHandler>("Bearer", options => {
                         options.OAuthConfiguration = this.jsonConfig.OAuth;
-                        options.ProxyHttpHandler = proxyHttpHandler;
+                        options.ProxyHandlerFactory = proxyFactory;
                         options.IssuerMetadata = issuerMetadata;
                         options.ClaimsCache = claimsCache;
                     });

@@ -1,5 +1,6 @@
 namespace BasicApi.Plumbing.OAuth
 {
+    using System;
     using Microsoft.AspNetCore.Authentication;
     using BasicApi.Configuration;
     using BasicApi.Plumbing.Utilities;
@@ -15,6 +16,6 @@ namespace BasicApi.Plumbing.OAuth
 
         public ClaimsCache ClaimsCache {get; set;}
 
-        public ProxyHttpHandler ProxyHttpHandler {get; set;}
+        public Func<ProxyHttpHandler> ProxyHandlerFactory {get; set;}
     }
 }

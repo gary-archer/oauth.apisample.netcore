@@ -38,14 +38,22 @@ namespace BasicApi.Plumbing.OAuth
 
         /*
          * This is called once per API request to perform authorization
+         * Authentication related classes are technology neutral and could be easily made testable
          */
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             try
             {
-                // Create authorization related classes on every API request
-                var authenticator = new Authenticator(this.Options.OAuthConfiguration, this.Options.IssuerMetadata);
+                // Create the object that makes OAuth calls to the Authorization Server
+                var authenticator = new Authenticator(
+                    this.Options.OAuthConfiguration,
+                    this.Options.IssuerMetadata,
+                    this.Options.ProxyHandlerFactory);
+
+                // Create the object to manage custom API authorization rules
                 var rulesRepository = new AuthorizationRulesRepository();
+
+                // Create the overall middleware to deal with authentication and claims caching
                 var claimsMiddleware = new ClaimsMiddleware(
                     this.Options.ClaimsCache,
                     authenticator,
@@ -105,8 +113,8 @@ namespace BasicApi.Plumbing.OAuth
                     await ResponseErrorWriter.WriteErrorResponse(
                             this.Request,
                             this.Response,
-                            (int)statusCode,
-                            ((ClientError)clientError).ToResponseFormat());
+                            statusCode,
+                            clientError.ToResponseFormat());
                 }
             }
         }

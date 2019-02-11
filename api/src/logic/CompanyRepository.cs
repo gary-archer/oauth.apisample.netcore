@@ -88,7 +88,7 @@ namespace BasicApi.Logic
             return new ClientError(
                 404,
                 "company_not_found",
-                $"Company ${companyId} was not found for this user");
+                $"Company {companyId} was not found for this user");
         }
     }
 }

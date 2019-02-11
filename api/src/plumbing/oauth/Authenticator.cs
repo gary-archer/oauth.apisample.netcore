@@ -7,6 +7,8 @@ namespace BasicApi.Plumbing.OAuth
     using IdentityModel.Client;
     using BasicApi.Configuration;
     using BasicApi.Plumbing.Errors;
+    using BasicApi.Plumbing.Utilities;
+    using System.Net;
 
     /*
      * The class from which OAuth calls are initiated
@@ -18,14 +20,16 @@ namespace BasicApi.Plumbing.OAuth
          */
         private readonly OAuthConfiguration configuration;
         private readonly IssuerMetadata metadata;
+        private readonly Func<ProxyHttpHandler> proxyFactory;
 
         /*
         * Receive dependencies
         */
-        public Authenticator(OAuthConfiguration configuration, IssuerMetadata metadata)
+        public Authenticator(OAuthConfiguration configuration, IssuerMetadata metadata, Func<ProxyHttpHandler> proxyFactory)
         {
             this.configuration = configuration;
             this.metadata = metadata;
+            this.proxyFactory = proxyFactory;
         }
 
         /*
@@ -37,7 +41,7 @@ namespace BasicApi.Plumbing.OAuth
                 this.metadata.Metadata.IntrospectionEndpoint,
                 this.configuration.ClientId,
                 this.configuration.ClientSecret,
-                this.metadata.ProxyHandler))
+                this.proxyFactory()))
             {
                 // Send the access token
                 var request = new IntrospectionRequest()
@@ -72,19 +76,57 @@ namespace BasicApi.Plumbing.OAuth
         }
 
         /*
-         * The entry point for user lookup
+         * The entry point for user info lookup
          */
         public async Task<bool> SetCentralUserInfoClaims(string accessToken, ApiClaims claims)
         {
+            using (var client = new UserInfoClient(this.metadata.Metadata.UserInfoEndpoint, this.proxyFactory()))
+            {
+                // Make the request
+                UserInfoResponse response = await client.GetAsync(accessToken);
 
-            claims.SetCentralUserInfo("Guest", "User", "guestuser@authguidance.com");
-            return true;
+                // Handle errors
+                if (response.IsError)
+                {
+                    // Handle a race condition where the access token expires during user info lookup
+                    if(response.HttpStatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        return false;
+                    }
+
+                    // Handle technical errors
+                    var handler = new ErrorHandler();
+                    throw handler.FromUserInfoError(response, this.metadata.Metadata.UserInfoEndpoint);
+                }
+
+                // Get token claims and use the immutable user id as the subject claim
+                string givenName = this.GetUserInfoClaim(response, JwtClaimTypes.GivenName);
+                string familyName = this.GetUserInfoClaim(response, JwtClaimTypes.FamilyName);
+                string email = this.GetUserInfoClaim(response, JwtClaimTypes.Email);
+                claims.SetCentralUserInfo(givenName, familyName, email);
+                return true;
+            }
         }
 
         /*
          * A helper to check the expected claims are present
          */
         private string GetIntrospectionClaim(IntrospectionResponse response, string name)
+        {
+            var value = response.TryGet(name);
+            if (value == null)
+            {
+                var handler = new ErrorHandler();
+                throw handler.FromMissingClaim(name);
+            }
+
+            return value;
+        }
+
+        /*
+         * A helper to check the expected claims are present
+         */
+        private string GetUserInfoClaim(UserInfoResponse response, string name)
         {
             var value = response.TryGet(name);
             if (value == null)

@@ -138,7 +138,7 @@ namespace BasicApi.Plumbing.Errors
         {
             return new ApiError("claims_failure", "Authorization data not found")
             {
-                Details = $"An empty value was found for the expected claim ${claimName}"
+                Details = $"An empty value was found for the expected claim {claimName}"
             };
         }
 
@@ -155,7 +155,7 @@ namespace BasicApi.Plumbing.Errors
         
             if(!string.IsNullOrWhiteSpace(url)) 
             {
-                detailsText += $", URL: ${url}";
+                detailsText += $", URL: {url}";
             }
 
             return detailsText;
