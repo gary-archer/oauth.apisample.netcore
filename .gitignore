@@ -1,0 +1,10 @@
+.gitignore
+node_modules
+dist
+bin
+obj
+.DS_Store
+.vscode
+.vs
+api.sln
+api.csproj.user
