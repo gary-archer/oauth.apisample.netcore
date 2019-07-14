@@ -33,6 +33,9 @@ class App {
      */
     public async execute(): Promise<void> {
 
+        // Set initial state
+        $('.initiallydisabled').prop('disabled', true);
+
         // Set up click handlers
         $('#btnHome').click(this._onHome);
         $('#btnRefreshData').click(this._onRefreshData);

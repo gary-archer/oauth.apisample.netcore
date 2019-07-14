@@ -38,7 +38,7 @@ export class Authenticator {
             loadUserInfo: false,
             automaticSilentRenew: true,
             monitorSession: false,
-        };
+        } as Oidc.UserManagerSettings;
 
         // Create the user manager
         this._userManager = new Oidc.UserManager(settings);
@@ -97,12 +97,15 @@ export class Authenticator {
                 // Get the hash URL before the redirect
                 const data = JSON.parse(user.state);
 
-                // Replace the browser location, and remove the OAuth code and state parameters from the URL
-                // This avoids potential navigation and page refresh problems
+                // Replace the browser location, to prevent tokens being available during back navigation
                 history.replaceState({}, document.title, data.hash);
                 return true;
 
             } catch (e) {
+
+                // Prevent back navigation problems after errors
+                history.replaceState({}, document.title, '#');
+
                 // Handle OAuth response errors
                 throw ErrorHandler.getFromOAuthResponse(e, 'login_response_failed');
             }
