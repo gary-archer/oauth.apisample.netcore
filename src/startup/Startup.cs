@@ -109,6 +109,7 @@
 
         /// <summary>
         /// For this sample the API also serves web static content, which would not be done by a real API
+        /// It is expected that the SPA code sample has been built to a parallel folder
         /// </summary>
         /// <param name="app">The application builder</param>
         private void ConfigureWebStaticContentHosting(IApplicationBuilder app)
@@ -116,14 +117,14 @@
             // This will serve index.html as the default document
             app.UseDefaultFiles(new DefaultFilesOptions
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../spa")),
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../authguidance.websample.final")),
                 RequestPath = "/spa"
             });
 
             // This will serve JS, image and CSS files
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../spa")),
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../authguidance.websample.final")),
                 RequestPath = "/spa"
             });
         }
