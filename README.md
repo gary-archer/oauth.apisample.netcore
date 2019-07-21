@@ -12,7 +12,6 @@
 
 ### Programming Languages
 
-* TypeScript is used for the SPA
 * C# code and .Net Core 2 is used for the API
 
 ### Middleware Used
