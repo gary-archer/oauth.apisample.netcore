@@ -1,4 +1,4 @@
-# authguidance.websample.netcoreapi
+# authguidance.apisample.netcore
 
 ### Overview
 
