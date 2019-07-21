@@ -16,7 +16,6 @@
 
 ### Middleware Used
 
-* The [Oidc-Client Library](https://github.com/IdentityModel/oidc-client-js) is used to implement the Implicit Flow
 * The [IdentityModel2](https://github.com/IdentityModel/IdentityModel2) library is used for API token introspection
 * Kestrel is used to host both the API and the SPA content
 * Okta is used for the Authorization Server
