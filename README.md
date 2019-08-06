@@ -7,7 +7,7 @@
 
 ### Details
 
-* See the [Overview Page](http://authguidance.com/2018/01/05/net-core-code-sample-overview/) for hat the API does and how to run it
+* See the [Overview Page](http://authguidance.com/2018/01/05/net-core-code-sample-overview/) for what the API does and how to run it
 * See the [Coding Key Points](http://authguidance.com/2018/01/06/net-core-api-key-coding-points/) for technical implementation details
 
 ### Programming Languages
