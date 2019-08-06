@@ -2,7 +2,7 @@
 
 ### Overview
 
-* An SPA sample using OAuth 2.0 and Open Id Connect, referenced in my blog at https://authguidance.com
+* The final API code sample using OAuth 2.0 and Open Id Connect, referenced in my blog at https://authguidance.com
 * **The goal of this sample is to implement our [API Platform Architecture](https://authguidance.com/2019/03/24/api-platform-design/) in .Net Core**
 
 ### Details
