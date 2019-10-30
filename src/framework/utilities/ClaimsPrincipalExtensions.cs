@@ -5,17 +5,14 @@ namespace Framework.Utilities
     using System.Linq;
     using System.Security.Claims;
 
-    /// <summary>
-    /// Helper methods to deal with claims set against the claims principal
-    /// </summary>
+    /*
+     * Helper methods to deal with claims set against the claims principal
+     */
     public static class ClaimsPrincipalExtensions
     {
-        /// <summary>
-        /// Get a string claim from the claims principal and check results
-        /// </summary>
-        /// <param name="principal">The claims principal</param>
-        /// <param name="name">The name of the claim</param>
-        /// <returns>The claim value</returns>
+        /*
+         * Get a string claim from the claims principal and check results
+         */
         public static string GetStringClaim(this ClaimsPrincipal principal, string name)
         {
             string value = principal.Claims.FirstOrDefault(c => c.Type == name)?.Value;
@@ -27,12 +24,9 @@ namespace Framework.Utilities
             return value;
         }
 
-        /// <summary>
-        /// Get a set of string claims from the claims principal and check results
-        /// </summary>
-        /// <param name="principal">The claims principal</param>
-        /// <param name="name">The name of the claim set</param>
-        /// <returns>The set of claim values</returns>
+        /*
+         * Get a set of string claims from the claims principal and check results
+         */
         public static IEnumerable<string> GetStringClaimSet(this ClaimsPrincipal principal, string name)
         {
             var stringValues = principal.Claims.Where(c => c.Type == name).Select(c => c.Value).ToList();

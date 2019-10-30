@@ -4,9 +4,9 @@ namespace Framework.Errors
     using System.Net;
     using Newtonsoft.Json.Linq;
 
-    /// <summary>
-    /// Our standard representation of an API error, including how it is logged and translated to a client error
-    /// </summary>
+    /*
+     * Our standard representation of an API error, including how it is logged and translated to a client error
+     */
     public sealed class ApiError : Exception
     {
         // A range for random error ids
@@ -21,11 +21,6 @@ namespace Framework.Errors
         private readonly string utcTime;
         private string details;
 
-        /// <summary>
-        /// Initialise fields when created
-        /// </summary>
-        /// <param name="errorCode">The API error code</param>
-        /// <param name="userMessage">A short technical message for the client</param>
         public ApiError(string errorCode, string userMessage) : base(userMessage)
         {
             this.errorCode = errorCode;
@@ -44,10 +39,9 @@ namespace Framework.Errors
             }
         }
 
-        /// <summary>
-        /// Return a dynamic object that can be serialized by calling toString
-        /// </summary>
-        /// <returns>A JSON object representing the logged format of an API error</returns>
+        /*
+         * Return a dynamic object that can be serialized by calling toString
+         */
         public JObject ToLogFormat()
         {
             dynamic data = new JObject();
@@ -59,10 +53,9 @@ namespace Framework.Errors
             return data;
         }
 
-        /// <summary>
-        /// Translate to a confidential error that is returned to the API caller, with a reference to the logged details
-        /// </summary>
-        /// <returns>A client representation of the API error</returns>
+        /*
+         * Translate to a confidential error that is returned to the API caller, with a reference to the logged details
+         */
         public ClientError ToClientError()
         {
             var error = new ClientError(this.statusCode, this.errorCode, this.Message);

@@ -13,24 +13,15 @@ namespace Framework.OAuth
     using Framework.Errors;
     using Framework.Utilities;
 
-    /// <summary>
-    /// An instance of this class is created for every API request
-    /// </summary>
+    /*
+     * An instance of this class is created for every API request
+     */
     public sealed class AuthorizationFilter<TClaims> : AuthenticationHandler<AuthorizationFilterOptions>
         where TClaims : CoreApiClaims, new()
     {
-        // Injected dependencies
         private readonly ClaimsMiddleware<TClaims> claimsMiddleware;
         private readonly ILoggerFactory loggerFactory;
 
-        /// <summary>
-        /// The base class requires the first four parameters
-        /// </summary>
-        /// <param name="options">The options</param>
-        /// <param name="loggerFactory">The logger factory</param>
-        /// <param name="urlEncoder">A URL encoder</param>
-        /// <param name="clock">A system clock</param>
-        /// <param name="claimsMiddleware">The claims middleware for this API request</param>
         public AuthorizationFilter(
             IOptionsMonitor<AuthorizationFilterOptions> options,
             ILoggerFactory loggerFactory,
@@ -42,10 +33,9 @@ namespace Framework.OAuth
             this.loggerFactory = loggerFactory;
         }
 
-        /// <summary>
-        /// This is called once per API request to perform authorization
-        /// </summary>
-        /// <returns>The .Net authenticate result</returns>
+        /*
+         * This is called once per API request to perform authorization
+         */
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             try
@@ -88,11 +78,9 @@ namespace Framework.OAuth
             }
         }
 
-        /// <summary>
-        /// This returns any authentication error responses to the API caller
-        /// </summary>
-        /// <param name="properties">Some properties</param>
-        /// <returns>A task to await</returns>
+        /*
+         * This returns any authentication error responses to the API caller
+         */
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
         {
             var statusCode = this.GetRequestItem<int>("statusCode");
@@ -116,10 +104,9 @@ namespace Framework.OAuth
             }
         }
 
-        /// <summary>
-        /// Try to read the bearer token from the authorization header
-        /// </summary>
-        /// <returns>The access token or null if not found</returns>
+        /*
+         * Try to read the bearer token from the authorization header
+         */
         private string ReadAccessToken()
         {
             string authorization = this.Request.Headers["Authorization"].FirstOrDefault();
@@ -135,12 +122,9 @@ namespace Framework.OAuth
             return null;
         }
 
-        /// <summary>
-        /// Get a request item and manage casting 
-        /// </summary>
-        /// <typeparam name="T">The type of the item</typeparam>
-        /// <param name="name">The name of the item</param>
-        /// <returns>The item or a default value if not found</returns>
+        /*
+         * Get a request item and manage casting 
+         */
         private T GetRequestItem<T>(string name)
         {
             var item = this.Request.HttpContext.Items[name];

@@ -1,8 +1,8 @@
 namespace Framework.Configuration
 {
-    /// <summary>
-    /// Framework specific OAuth settings
-    /// </summary>
+    /*
+     * Framework specific OAuth settings
+     */
     public sealed class OAuthConfiguration
     {
         public string Authority {get; set;}

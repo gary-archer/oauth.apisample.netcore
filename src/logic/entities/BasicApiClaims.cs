@@ -9,9 +9,9 @@
     using Framework.OAuth;
     using Framework.Utilities;
 
-    /// <summary>
-    /// Our API overrides the core claims to support additional custom claims
-    /// </summary>
+    /*
+     * Our API overrides the core claims to support additional custom claims
+     */
     public class BasicApiClaims : CoreApiClaims
     {
         // Our custom claim
@@ -21,10 +21,9 @@
         [DataMember]
         public int[] AccountsCovered { get; set; }
 
-        /// <summary>
-        /// Read our custom claims from the claims principal
-        /// </summary>
-        /// <param name="principal">The claims principal to update ourself from</param>
+        /*
+         * Read our custom claims from the claims principal
+         */
         public override void ReadFromPrincipal(ClaimsPrincipal principal)
         {
             // Base processing
@@ -36,10 +35,9 @@
                                             .ToArray();
         }
 
-        /// <summary>
-        /// Add claims to be included in the claims principal
-        /// </summary>
-        /// <param name="claimsList">A list of claims to add to</param>
+        /*
+         * Add claims to be included in the claims principal
+         */
         public override void WriteToPrincipal(IList<Claim> claimsList)
         {
             // Base processing

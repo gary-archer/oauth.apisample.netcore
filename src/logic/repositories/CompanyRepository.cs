@@ -8,9 +8,9 @@ namespace BasicApi.Logic.Repositories
     using BasicApi.Logic.Entities;
     using BasicApi.Utilities;
 
-    /// <summary>
-    /// A repository class for serving data
-    /// </summary>
+    /*
+     * A repository class for serving data
+     */
     public class CompanyRepository
     {
         // Claims for this API request
@@ -19,21 +19,18 @@ namespace BasicApi.Logic.Repositories
         // This injected class deals with text file infrastructure
         private readonly JsonReader jsonReader;
 
-        /// <summary>
-        /// Receive dependencies when constructed
-        /// </summary>
-        /// <param name="claims">The claims for the user in the token</param>
-        /// <param name="jsonReader">An infrastructure class</param>
+        /*
+         * Receive dependencies when constructed
+         */
         public CompanyRepository(BasicApiClaims claims, JsonReader jsonReader)
         {
             this.claims = claims;
             this.jsonReader = jsonReader;
         }
 
-        /// <summary>
-        /// Return the list of companies from a hard coded data file
-        /// </summary>
-        /// <returns>A collection of companies</returns>
+        /*
+         * Return the list of companies from a hard coded data file
+         */
         public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
             // Read company data
@@ -43,11 +40,9 @@ namespace BasicApi.Logic.Repositories
             return companies.Where(c => this.IsUserAuthorizedForCompany(c.Id));
         }
 
-        /// <summary>
-        /// Get transaction details for a company
-        /// </summary>
-        /// <param name="id">The company id</param>
-        /// <returns>A company and its transactions</returns>
+        /*
+         * Get transaction details for a company
+         */
         public async Task<CompanyTransactions> GetCompanyTransactionsAsync(int id)
         {
             // If the user is unauthorized we do not return any data
@@ -73,21 +68,17 @@ namespace BasicApi.Logic.Repositories
             throw this.UnauthorizedError(id);
         }
 
-        /// <summary>
-        /// Apply claims that were read when the access token was first validated
-        /// </summary>
-        /// <param name="companyId">The company id</param>
-        /// <returns>True if the user covers this account</returns>
+        /*
+         * Apply claims that were read when the access token was first validated
+         */
         private bool IsUserAuthorizedForCompany(int companyId) {
             return this.claims.AccountsCovered.Any(id => id == companyId);
         }
 
-        /// <summary>
-        /// Return a 404 error if the user is not authorized
-        /// Requests for both unauthorized and non existent data are treated the same
-        /// </summary>
-        /// <param name="companyId">The company id</param>
-        /// <returns>A 404 error</returns>
+        /*
+         * Return a 404 error if the user is not authorized
+         * Requests for both unauthorized and non existent data are treated the same
+         */
         private ClientError UnauthorizedError(int companyId) {
             return new ClientError(
                 HttpStatusCode.NotFound,

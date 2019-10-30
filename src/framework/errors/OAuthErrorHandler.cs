@@ -5,17 +5,14 @@ namespace Framework.Errors
     using IdentityModel.Client;
     using Newtonsoft.Json.Linq;
 
-    /// <summary>
-    /// Framework specific error handling
-    /// </summary>
+    /*
+     * Framework specific error handling
+     */
     public sealed class OAuthErrorHandler : BaseErrorHandler
     {
-        /// <summary>
-        /// Report metadata lookup failures clearly
-        /// </summary>
-        /// <param name="response">The response</param>
-        /// <param name="url">The URL we called</param>
-        /// <returns>Details to log specific to this scenario</returns>
+        /*
+         * Report metadata lookup failures clearly
+         */
         public ApiError FromMetadataError(DiscoveryResponse response, string url)
         {
             var data = this.ReadOAuthErrorResponse(response.Json);
@@ -24,12 +21,9 @@ namespace Framework.Errors
             return apiError;
         }
 
-        /// <summary>
-        /// Report introspection failures clearly
-        /// </summary>
-        /// <param name="response">The response</param>
-        /// <param name="url">The URL we called</param>
-        /// <returns>Details to log specific to this scenario</returns>
+        /*
+         * Report introspection failures clearly
+         */
         public ApiError FromIntrospectionError(IntrospectionResponse response, string url)
         {
             var data = this.ReadOAuthErrorResponse(response.Json);
@@ -38,12 +32,9 @@ namespace Framework.Errors
             return apiError;
         }
 
-        /// <summary>
-        /// Report user info failures clearly
-        /// </summary>
-        /// <param name="response">The response</param>
-        /// <param name="url">The URL we called</param>
-        /// <returns>Details to log specific to this scenario</returns>
+        /*
+         * Report user info failures clearly
+         */
         public ApiError FromUserInfoError(UserInfoResponse response, string url)
         {
             var data = this.ReadOAuthErrorResponse(response.Json);
@@ -52,11 +43,9 @@ namespace Framework.Errors
             return apiError;
         }
 
-        /// <summary>
-        /// Handle unexpected data errors if an expected claim was not found in an OAuth message
-        /// </summary>
-        /// <param name="claimName"></param>
-        /// <returns></returns>
+        /*
+         * Handle unexpected data errors if an expected claim was not found in an OAuth message
+         */
         public ApiError FromMissingClaim(string claimName)
         {
             return new ApiError("claims_failure", "Authorization data not found")
@@ -65,11 +54,9 @@ namespace Framework.Errors
             };
         }
 
-        /// <summary>
-        /// Return any OAuth protocol error details
-        /// </summary>
-        /// <param name="jsonBody"></param>
-        /// <returns></returns>
+        /*
+         * Return any OAuth protocol error details
+         */
         private Tuple<string, string> ReadOAuthErrorResponse(JObject jsonBody)
         {
             string code = null;
@@ -83,13 +70,9 @@ namespace Framework.Errors
             return Tuple.Create(code, description);
         }
 
-        /// <summary>
-        /// Create an error object from an error code and include the OAuth error code in the user message
-        /// </summary>
-        /// <param name="errorCode">The error code</param>
-        /// <param name="userMessage">A short technical messaage for the client</param>
-        /// <param name="oauthErrorCode">The OAuth error code if present</param>
-        /// <returns></returns>
+        /*
+         * Create an error object from an error code and include the OAuth error code in the user message
+         */
         private ApiError CreateOAuthApiError(string errorCode, string userMessage, string oauthErrorCode)
         {
             string message = userMessage;
@@ -100,13 +83,9 @@ namespace Framework.Errors
             return new ApiError(errorCode, message);
         }
 
-        /// <summary>
-        /// A helper to concatenate error parts
-        /// </summary>
-        /// <param name="oauthErrorDescription">The OAuth error description if present</param>
-        /// <param name="details">Error details</param>
-        /// <param name="url">The URL where the problem occurred</param>
-        /// <returns>A concatenated details string</returns>
+        /*
+         * A helper to concatenate error parts
+         */
         private string GetErrorDetails(string oauthErrorDescription, string details, string url)
         {
             var parts = new List<string>();

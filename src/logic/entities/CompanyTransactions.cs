@@ -2,9 +2,9 @@ namespace BasicApi.Logic.Entities
 {
     using System.Collections.Generic;
 
-    /// <summary>
-    /// A company and its transactions
-    /// </summary>
+    /*
+     * A company and its transactions
+     */
     public class CompanyTransactions
     {
         public int? Id {get; set;}

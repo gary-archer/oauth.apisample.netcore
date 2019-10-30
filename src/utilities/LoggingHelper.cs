@@ -4,15 +4,14 @@ namespace BasicApi.Utilities
     using Microsoft.Extensions.Logging;
     using BasicApi.Startup;
 
-    /// <summary>
-    /// Logging utility methods
-    /// </summary>
+    /*
+     * Logging utility methods
+     */
     public static class LoggingHelper
     {
-        /// <summary>
-        /// Create a logger for reporting startup exceptions
-        /// </summary>
-        /// <returns>The logger</returns>
+        /*
+         * Create a logger for reporting startup exceptions
+         */
         public static ILogger CreateStartupLogger()
         {
             var serviceCollection = new ServiceCollection();

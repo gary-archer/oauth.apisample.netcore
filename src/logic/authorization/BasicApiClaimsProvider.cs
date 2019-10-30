@@ -4,18 +4,15 @@ namespace BasicApi.Logic.Authorization
     using Framework.OAuth;
     using BasicApi.Logic.Entities;
 
-    /// <summary>
-    /// A custom claims provider to include extra domain specific claims in the claims cache
-    /// </summary>
+    /*
+     * A custom claims provider to include extra domain specific claims in the claims cache
+     */
     public class BasicApiClaimsProvider : CustomClaimsProvider<BasicApiClaims>
     {
-        /// <summary>
-        /// The interface supports returning results based on the user id from the token
-        /// This might involve a database lookup or a call to another service
-        /// </summary>
-        /// <param name="accessToken">The access token, which could be sent to a service</param>
-        /// <param name="claims">The claims to update</param>
-        /// <returns>A task to await</returns>
+        /*
+         * The interface supports returning results based on the user id from the token
+         * This might involve a database lookup or a call to another service
+         */
         public override Task AddCustomClaimsAsync(string accessToken, BasicApiClaims claims)
         {
             // Any attempts to access data for company 3 will result in an unauthorized error

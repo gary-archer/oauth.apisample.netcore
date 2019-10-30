@@ -3,19 +3,17 @@ namespace BasicApi.Configuration
     using Microsoft.Extensions.Configuration;
     using Framework.Configuration;
 
-    /// <summary>
-    /// A class to manage our JSON configuration as an object
-    /// </summary>
+    /*
+     * A class to manage our JSON configuration as an object
+     */
     public class Configuration
     {
         public ApplicationConfiguration App {get; private set;}
         public OAuthConfiguration OAuth {get; private set;}
 
-        /// <summary>
-        /// A helper method to load this custom configuration section
-        /// </summary>
-        /// <param name="configuration">The .Net configuration</param>
-        /// <returns>An object to represent our custom JSON configuration</returns>
+        /*
+         * A helper method to load this custom configuration section
+         */
         public static Configuration Load(IConfiguration configuration)
         {
             var appConfig = new ApplicationConfiguration();

@@ -1,8 +1,8 @@
 namespace BasicApi.Logic.Entities
 {
-    /// <summary>
-    /// A single transaction 
-    /// </summary>
+    /*
+     * A single transaction 
+     */
     public class Transaction
     {
         public string Id {get; set;}

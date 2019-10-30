@@ -17,28 +17,21 @@
     using BasicApi.Logic.Repositories;
     using BasicApi.Utilities;
 
-    /// <summary>
-    /// The application startup class
-    /// </summary>
+    /*
+     * The application startup class
+     */
     public class Startup
     {
-        // Our injected configuration
         private readonly Configuration jsonConfig;
 
-        /// <summary>
-        /// Construct our application startup class from configuration
-        /// </summary>
-        /// <param name="jsonConfig">The configuration from our JSON file</param>
         public Startup(Configuration jsonConfig)
         {
             this.jsonConfig = jsonConfig;
         }
 
-        /// <summary>
-        /// Called by the runtime and used to configure the HTTP request pipeline
-        /// </summary>
-        /// <param name="app">The application builder</param>
-        /// <param name="env">The environment</param>
+        /*
+         * Called by the runtime and used to configure the HTTP request pipeline
+         */
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             // Configure API pre flight requests
@@ -63,10 +56,9 @@
             app.UseMvc();
         }
 
-        /// <summary>
-        /// Called by the runtime to add services to the IOC container
-        /// </summary>
-        /// <param name="services">The .Net core services</param>
+        /*
+         * Called by the runtime to add services to the IOC container
+         */
         public void ConfigureServices(IServiceCollection services)
         {
             // Support CORS for our trusted origins
@@ -107,11 +99,10 @@
             services.AddScoped<CompanyRepository>();
         }
 
-        /// <summary>
-        /// For this sample the API also serves web static content, which would not be done by a real API
-        /// It is expected that the SPA code sample has been built to a parallel folder
-        /// </summary>
-        /// <param name="app">The application builder</param>
+        /*
+         * For this sample the API also serves web static content, which would not be done by a real API
+         * It is expected that the SPA code sample has been built to a parallel folder
+         */
         private void ConfigureWebStaticContentHosting(IApplicationBuilder app)
         {
             // This will serve index.html as the default document

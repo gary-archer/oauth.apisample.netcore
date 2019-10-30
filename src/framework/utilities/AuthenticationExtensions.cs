@@ -3,18 +3,14 @@
     using Microsoft.AspNetCore.Authentication;
     using Framework.OAuth;
 
-    /// <summary>
-    /// Helper methods for setting up authentication
-    /// </summary>
+    /*
+     * Helper methods for setting up authentication
+     */
     public static class AuthenticationExtensions
     {
-        /// <summary>
-        /// An extension method to register our custom authentication handler
-        /// </summary>
-        /// <typeparam name="TClaims"></typeparam>
-        /// <param name="builder"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
+        /*
+         * An extension method to register our custom authentication handler
+         */
         public static AuthorizationFilterBuilder<TClaims> AddCustomAuthorizationFilter<TClaims>(
             this AuthenticationBuilder builder, AuthorizationFilterOptions options) 
                 where TClaims: CoreApiClaims, new()

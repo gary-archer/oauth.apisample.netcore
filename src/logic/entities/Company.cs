@@ -1,8 +1,8 @@
 namespace BasicApi.Logic.Entities
 {
-    /// <summary>
-    /// Details for a company
-    /// </summary>
+    /*
+     * Details for a company
+     */
     public class Company
     {
         public int Id {get; set;}

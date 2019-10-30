@@ -2,9 +2,9 @@ namespace BasicApi.Configuration
 {
     using System.Collections.Generic;
 
-    /// <summary>
-    /// Application specific settings
-    /// </summary>
+    /*
+     * Application specific settings
+     */
     public class ApplicationConfiguration
     {
         public List<string> TrustedOrigins {get; set;}

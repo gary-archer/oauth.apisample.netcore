@@ -8,9 +8,9 @@
     using Framework.Configuration;
     using Framework.Utilities;
 
-    /// <summary>
-    /// Helper methods for setting up authentication
-    /// </summary>
+    /*
+     * Helper methods for setting up authentication
+     */
     public sealed class AuthorizationFilterBuilder<TClaims> where TClaims : CoreApiClaims, new()
     {
         // Our OAuth configuration
@@ -25,20 +25,17 @@
         // An object to support HTTP debugging
         private Func<HttpClientHandler> httpProxyFactory;
 
-        /// <summary>
-        /// Create our builder and receive our options
-        /// </summary>
-        /// <param name="options">The options</param>
+        /*
+         * Create our builder and receive our options
+         */
         public AuthorizationFilterBuilder(AuthorizationFilterOptions options)
         {
             this.configuration = options.OAuthConfiguration;
         }
 
-        /// <summary>
-        /// Provide the type of custom claims provider
-        /// </summary>
-        /// <typeparam name="TProvider">The type of provider</typeparam>
-        /// <returns>The builder</returns>
+        /*
+         * Provide the type of custom claims provider
+         */
         public AuthorizationFilterBuilder<TClaims> WithCustomClaimsProvider<TProvider>()
             where TProvider : CustomClaimsProvider<TClaims>
         {
@@ -46,31 +43,27 @@
             return this;
         }
 
-        /// <summary>
-        /// Store an ASP.Net core services reference which we will update later
-        /// </summary>
-        /// <param name="services">The services</param>
-        /// <returns>The builder</returns>
+        /*
+         * Store an ASP.Net core services reference which we will update later
+         */
         public AuthorizationFilterBuilder<TClaims> WithServices(IServiceCollection services)
         {
             this.services = services;
             return this;
         }
 
-        /// <summary>
-        /// Store an object to manage HTTP debugging
-        /// </summary>
-        /// <param name="httpProxyFactory">A factory object to create custom HTTP handlers</param>
-        /// <returns>The builder</returns>
+        /*
+         * Store an object to manage HTTP debugging
+         */
         public AuthorizationFilterBuilder<TClaims> WithHttpDebugging(bool enabled, string url)
         {
             this.httpProxyFactory = () => new ProxyHttpHandler(enabled, url);
             return this;
         }
 
-        /// <summary>
-        /// Do the work of validating the configuration and finalizing configuration
-        /// </summary>
+        /*
+         * Do the work of validating the configuration and finalizing configuration
+         */
         public void Build()
         {
             // Check prerequisites and get the Microsoft cache
@@ -104,12 +97,9 @@
             this.RegisterAuthenticationDependencies(issuerMetadata, claimsCache);
         }
 
-        /// <summary>
-        /// Verify and return a prerequisite service
-        /// </summary>
-        /// <typeparam name="T">The type of the service</typeparam>
-        /// <param name="provider">The provider</param>
-        /// <returns>The service</returns>
+        /*
+         * Verify and return a prerequisite service
+         */
         private T VerifyPrerequisite<T>(ServiceProvider provider) where T: class
         {
             var result = provider.GetService<T>();
@@ -121,11 +111,9 @@
             return result;
         }
 
-        /// <summary>
-        /// Register framework dependencies
-        /// </summary>
-        /// <param name="issuerMetadata">The singleton issuer metadata</param>
-        /// <param name="cache">The singleton claims cache</param>
+        /*
+         * Register framework dependencies
+         */
         private void RegisterAuthenticationDependencies(IssuerMetadata issuerMetadata, ClaimsCache<TClaims> cache)
         {
             // Register singletons

@@ -7,23 +7,17 @@ namespace Framework.OAuth
     using Framework.Errors;
     using IdentityModel.Client;
 
-    /// <summary>
-    /// A class to download Open Id Connect metadata at application startup
-    /// </summary>
+    /*
+     * A class to download Open Id Connect metadata at application startup
+     */
     public sealed class IssuerMetadata
     {
-        // Dependencies
         private readonly OAuthConfiguration configuration;
         private readonly Func<HttpClientHandler> proxyFactory;
 
         // The metadata
         public DiscoveryResponse Metadata { get; private set; }
 
-        /// <summary>
-        /// Receive dependencies
-        /// </summary>
-        /// <param name="configuration">The OAuth configuration</param>
-        /// <param name="proxyFactory">An object from which to create HTTP proxy handlers</param>
         public IssuerMetadata(OAuthConfiguration configuration, Func<HttpClientHandler> proxyFactory)
         {
             this.configuration = configuration;
@@ -31,10 +25,9 @@ namespace Framework.OAuth
             this.Metadata = null;
         }
 
-        /// <summary>
-        /// Load metadata from our configuration URL
-        /// </summary>
-        /// <returns>A task to await</returns>
+        /*
+         * Load metadata from our configuration URL
+         */
         public async Task Load()
         {
             using (var client = new DiscoveryClient(this.configuration.Authority, this.proxyFactory()))

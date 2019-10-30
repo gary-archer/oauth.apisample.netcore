@@ -2,17 +2,14 @@
 {
     using System.Threading.Tasks;
 
-    /// <summary>
-    /// A base class for adding custom claims from within core claims handling code
-    /// </summary>
+    /*
+     * A base class for adding custom claims from within core claims handling code
+     */
     public class CustomClaimsProvider<TClaims> where TClaims : CoreApiClaims, new()
     {
-        /// <summary>
-        /// The method to add claims
-        /// </summary>
-        /// <param name="accessToken">The access token</param>
-        /// <param name="claims">The claims to update</param>
-        /// <returns>A task to await</returns>
+        /*
+         * This is overridden by base classes
+         */
         public virtual Task AddCustomClaimsAsync(string accessToken, TClaims claims)
         {
             return Task.FromResult(0);

@@ -3,9 +3,9 @@
     using System.Net;
     using Newtonsoft.Json.Linq;
 
-    /// <summary>
-    /// An interface that all types of client error object support
-    /// </summary>
+    /*
+     * An interface that all types of client error object support
+     */
     public interface IClientError
     {
         // Return the HTTP status code

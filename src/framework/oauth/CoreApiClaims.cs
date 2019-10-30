@@ -7,9 +7,9 @@ namespace Framework.OAuth
     using IdentityModel;
     using Framework.Utilities;
 
-    /// <summary>
-    /// API claims used for authorization
-    /// </summary>
+    /*
+     * API claims used for authorization
+     */
     [DataContract]
     public class CoreApiClaims
     {
@@ -35,12 +35,9 @@ namespace Framework.OAuth
         [DataMember]
         public string Email {get; private set;}
 
-        /// <summary>
-        /// Set token claims after introspection
-        /// </summary>
-        /// <param name="userId">The immutable user id</param>
-        /// <param name="clientId">The calling application</param>
-        /// <param name="scopes">The scopes which can be used for authorization</param>
+        /*
+         * Set token claims after introspection
+         */
         public void SetTokenInfo(string userId, string clientId, string[] scopes)
         {
             this.UserId = userId;
@@ -48,12 +45,9 @@ namespace Framework.OAuth
             this.Scopes = scopes;
         }
 
-        /// <summary>
-        /// Set fields after receiving OAuth user info data
-        /// </summary>
-        /// <param name="givenName">The given name</param>
-        /// <param name="familyName">The family name</param>
-        /// <param name="email">The email</param>
+        /*
+         * Set fields after receiving OAuth user info data
+         */
         public void SetCentralUserInfo(string givenName, string familyName, string email)
         {
             this.GivenName = givenName;
@@ -61,10 +55,9 @@ namespace Framework.OAuth
             this.Email = email;
         }
 
-        /// <summary>
-        /// Update this claims object from the claims principal
-        /// </summary>
-        /// <param name="principal">The claims principal to update ourself from</param>
+        /*
+         * Update this claims object from the claims principal
+         */
         public virtual void ReadFromPrincipal(ClaimsPrincipal principal)
         {
             // Read token values
@@ -78,10 +71,9 @@ namespace Framework.OAuth
             this.Email = principal.GetStringClaim(JwtClaimTypes.Email);
         }
 
-        /// <summary>
-        /// Add claims to be included in the claims principal
-        /// </summary>
-        /// <param name="claimsList">A list of claims to add to</param>
+        /*
+         * Add claims to be included in the claims principal
+         */
         public virtual void WriteToPrincipal(IList<Claim> claimsList)
         {
             // Add token claims

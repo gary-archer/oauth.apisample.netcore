@@ -9,38 +9,31 @@
     using BasicApi.Logic.Entities;
     using BasicApi.Logic.Repositories;
 
-    /// <summary>
-    /// A controller for our company resources
-    /// </summary>
+    /*
+     * A controller for our company resources
+     */
     [Route("api/companies")]
     public class CompanyController : Controller
     {
         private readonly CompanyRepository repository;
 
-        /// <summary>
-        /// Receive dependencies
-        /// </summary>
-        /// <param name="repository">The repository used by the controller</param>
         public CompanyController(CompanyRepository repository)
         {
             this.repository = repository;
         }
 
-        /// <summary>
-        /// Get a list of summary information about companies
-        /// </summary>
-        /// <returns>A collection of companies</returns>
+        /*
+         * Get a list of summary information about companies
+         */
         [HttpGet("")]
         public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
             return await this.repository.GetCompanyListAsync();
         }
 
-        /// <summary>
-        /// Get transaction details for a company
-        /// </summary>
-        /// <param name="id">A numeric company id</param>
-        /// <returns>A company and its transactions</returns>
+        /*
+         * Get transaction details for a company
+         */
         [HttpGet("{id}/transactions")]
         public async Task<CompanyTransactions> GetCompanyTransactionsAsync(string id)
         {

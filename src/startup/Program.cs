@@ -11,15 +11,14 @@
     using BasicApi.Errors;
     using BasicApi.Utilities;
 
-    /// <summary>
-    /// Our entry point class
-    /// </summary>
+    /*
+     * Our entry point class
+     */
     public class Program
     {
-        /// <summary>
-        /// Our entry point method
-        /// </summary>
-        /// <param name="args">Startup arguments</param>
+        /*
+         * Our entry point method
+         */
         public static void Main(string[] args)
         {
             // First handle configuration
@@ -41,11 +40,9 @@
             }
         }
 
-        /// <summary>
-        /// Build a host to handle HTTP requests
-        /// </summary>
-        /// <param name="configurationRoot">The .Net core configuration</param>
-        /// <returns>A built web host</returns>
+        /*
+         * Build a host to handle HTTP requests
+         */
         private static IWebHost BuildWebHost(IConfigurationRoot configurationRoot)
         {
             // Read our custom configuration

@@ -4,17 +4,14 @@ namespace BasicApi.Utilities
     using System.Threading.Tasks;
     using Newtonsoft.Json;
 
-    /// <summary>
-    /// A utility reader class
-    /// </summary>
+    /*
+     * A utility reader class
+     */
     public class JsonReader
     {
-        /// <summary>
-        /// Read JSON text and deserialize it into objects
-        /// </summary>
-        /// <typeparam name="T">The type of entities to deserialize</typeparam>
-        /// <param name="filePath">The JSON file location</param>
-        /// <returns>A .Net object of type T</returns>
+        /*
+         * Read JSON text and deserialize it into objects
+         */
         public async Task<T> ReadDataAsync<T>(string filePath)
         {
             string jsonText = await File.ReadAllTextAsync(filePath);

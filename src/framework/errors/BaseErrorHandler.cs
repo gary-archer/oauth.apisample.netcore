@@ -3,17 +3,14 @@
     using System;
     using Microsoft.Extensions.Logging;
 
-    /// <summary>
-    /// A framework base class for error handling
-    /// </summary>
+    /*
+     * A framework base class for error handling
+     */
     public class BaseErrorHandler
     {
-        /// <summary>
-        /// Do error handling and logging, then return an error to the client
-        /// </summary>
-        /// <param name="exception">The exception</param>
-        /// <param name="logger">The logger</param>
-        /// <returns>An error to return to the API caller</returns>
+        /*
+         * Do error handling and logging, then return an error to the client
+         */
         public IClientError HandleError(Exception exception, ILogger logger)
         {
             // Already handled API errors
@@ -44,11 +41,9 @@
             return apiError.ToClientError();
         }
 
-        /// <summary>
-        /// A default implementation for creating an API error from an unrecognised exception
-        /// </summary>
-        /// <param name="ex">The caught exception</param>
-        /// <returns>The API error object in our standard format</returns>
+        /*
+         * A default implementation for creating an API error from an unrecognised exception
+         */
         protected static ApiError FromException(Exception ex)
         {
             // Get the exception to use
@@ -68,12 +63,9 @@
             };
         }
 
-        /// <summary>
-        /// Try to convert an exception to a known type
-        /// </summary>
-        /// <typeparam name="T">The type of exception</typeparam>
-        /// <param name="exception">The exception caught</param>
-        /// <returns>The typed exception or null if the type does not match</returns>
+        /*
+         * Try to convert an exception to a known type
+         */
         protected T TryConvertException<T>(Exception exception) where T : class
         {
             if (typeof(T).IsAssignableFrom(exception.GetType()))

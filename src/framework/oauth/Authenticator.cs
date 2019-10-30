@@ -10,22 +10,15 @@ namespace Framework.OAuth
     using Framework.Configuration;
     using Framework.Errors;
 
-    /// <summary>
-    /// The class from which OAuth calls are initiated
-    /// </summary>
+    /*
+     * The class from which OAuth calls are initiated
+     */
     public sealed class Authenticator
     {
-        // The injected dependencies
         private readonly OAuthConfiguration configuration;
         private readonly IssuerMetadata metadata;
         private readonly Func<HttpClientHandler> proxyFactory;
 
-        /// <summary>
-        /// Receive dependencies
-        /// </summary>
-        /// <param name="configuration">The configuration</param>
-        /// <param name="metadata">Metadata loaded at application startup</param>
-        /// <param name="proxyFactory">An object to create HTTP proxy handlers</param>
         public Authenticator(OAuthConfiguration configuration, IssuerMetadata metadata, Func<HttpClientHandler> proxyFactory)
         {
             this.configuration = configuration;
@@ -33,12 +26,9 @@ namespace Framework.OAuth
             this.proxyFactory = proxyFactory;
         }
 
-        /// <summary>
-        /// The entry point for validating an access token
-        /// </summary>
-        /// <param name="accessToken">The token</param>
-        /// <param name="claims">A claims object to populate</param>
-        /// <returns>True on success, along with the expiry claim, or false to indicate expiry</returns>
+        /*
+         * The entry point for validating an access token
+         */
         public async Task<Tuple<bool, int>> ValidateTokenAndSetClaims(string accessToken, CoreApiClaims claims)
         {
             using (var client = new IntrospectionClient(
@@ -82,12 +72,6 @@ namespace Framework.OAuth
         /*
          * The entry point for user info lookup
          */
-        /// <summary>
-        /// The entry point for user info lookup
-        /// </summary>
-        /// <param name="accessToken">The token</param>
-        /// <param name="claims">A claims object to update</param>
-        /// <returns>True on success, or false to indicate expiry</returns>
         public async Task<bool> SetCentralUserInfoClaims(string accessToken, CoreApiClaims claims)
         {
             using (var client = new UserInfoClient(this.metadata.Metadata.UserInfoEndpoint, this.proxyFactory()))
@@ -118,12 +102,9 @@ namespace Framework.OAuth
             }
         }
 
-        /// <summary>
-        /// A helper to check the expected claims are present
-        /// </summary>
-        /// <param name="response">The introspection response</param>
-        /// <param name="name">The name of the token claim to read</param>
-        /// <returns>The claim value or null if not found</returns>
+        /*
+         * A helper to check the expected introspection claims are present
+         */
         private string GetIntrospectionClaim(IntrospectionResponse response, string name)
         {
             var value = response.TryGet(name);
@@ -136,12 +117,9 @@ namespace Framework.OAuth
             return value;
         }
 
-        /// <summary>
-        /// A helper to check the expected claims are present
-        /// </summary>
-        /// <param name="response">The user info response</param>
-        /// <param name="name">The name of the user info claim to read</param>
-        /// <returns>The claim value or null if not found</returns>
+        /*
+         * A helper to check the expected user info claims are present
+         */
         private string GetUserInfoClaim(UserInfoResponse response, string name)
         {
             var value = response.TryGet(name);

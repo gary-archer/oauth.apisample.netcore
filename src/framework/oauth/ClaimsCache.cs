@@ -8,32 +8,23 @@ namespace Framework.OAuth
     using Newtonsoft.Json;
     using Framework.Configuration;
 
-    /// <summary>
-    /// Encapsulate getting and setting claims from the cache
-    /// </summary>
+    /*
+     * Encapsulate getting and setting claims from the cache
+     */
     public sealed class ClaimsCache<TClaims> where TClaims: CoreApiClaims
     {
         private readonly IDistributedCache cache;
         private readonly OAuthConfiguration configuration;
 
-        /// <summary>
-        /// Receive the Microsoft cache object that we are wrapping
-        /// </summary>
-        /// <param name="cache">The Microsoft thread safe cache</param>
-        /// <param name="configuration">Our configuration</param>
         public ClaimsCache(IDistributedCache cache, OAuthConfiguration configuration)
         {
             this.cache = cache;
             this.configuration = configuration;
         }
 
-        /// <summary>
-        /// Add our custom claims to the cache
-        /// </summary>
-        /// <param name="accessToken">The access token</param>
-        /// <param name="expiryClaimSeconds">The expiry time of the token as a number of seconds since the Unix Epoch time</param>
-        /// <param name="claims">Our claims as a plain .Net object</param>
-        /// <returns>A task to await</returns>
+        /*
+         * Add our custom claims to the cache
+         */
         public async Task AddClaimsForTokenAsync(string accessToken, int expiryClaimSeconds, TClaims claims)
         {
             // Check for a race condition where the token passes validation but it expired when it gets here
@@ -63,11 +54,9 @@ namespace Framework.OAuth
             }
         }
 
-        /// <summary>
-        /// Read our custom claims from the cache or return null if not found
-        /// </summary>
-        /// <param name="accessToken">The access token</param>
-        /// <returns>The claims or null if not found</returns>
+        /*
+         * Read our custom claims from the cache or return null if not found
+         */
         public async Task<TClaims> GetClaimsForTokenAsync(string accessToken)
         {
             // Get the hash as a cache key and see if it exists in the cache
@@ -83,11 +72,9 @@ namespace Framework.OAuth
             return JsonConvert.DeserializeObject<TClaims>(json);
         }
 
-        /// <summary>
-        /// Get the hash of an input string
-        /// </summary>
-        /// <param name="input">The input</param>
-        /// <returns>A SHA 256 hash of the input</returns>
+        /*
+         * Get the hash of an input string
+         */
         private static string Sha256(string input)
         {
             using (var sha = SHA256.Create())

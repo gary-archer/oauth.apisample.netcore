@@ -4,9 +4,9 @@ namespace Framework.Errors
     using System.Net;
     using Newtonsoft.Json.Linq;
 
-    /// <summary>
-    /// Client errors returned when there are framework failures
-    /// </summary>
+    /*
+     * The error type for an incorrect client request
+     */
     public sealed class ClientError : Exception, IClientError
     {
         // Mandatory fields for both 4xx and 500 errors
@@ -18,12 +18,6 @@ namespace Framework.Errors
         private int id;
         private string utcTime;
 
-        /// <summary>
-        /// Construct from mandatory fields
-        /// </summary>
-        /// <param name="statusCode">The status code</param>
-        /// <param name="errorCode">An error code for the consumer</param>
-        /// <param name="message">A short technical message</param>
         public ClientError(HttpStatusCode statusCode, string errorCode, string message)
             : base(message)
         {
@@ -45,22 +39,18 @@ namespace Framework.Errors
             }
         }
 
-        /// <summary>
-        /// Set extra fields to return to the caller for 500 errors
-        /// </summary>
-        /// <param name="area">The area where the error occurred</param>
-        /// <param name="id">A unique id for the error occurrence</param>
-        /// <param name="utcTime">The time when the error occurred</param>
+        /*
+         * Set extra fields to return to the caller for 500 errors
+         */
         public void setExceptionDetails(string area, int id, string utcTime) {
             this.area = area;
             this.id = id;
             this.utcTime = utcTime;
         }
 
-        /// <summary>
-        /// Return a dynamic object that can be serialized by calling toString
-        /// </summary>
-        /// <returns>A JSON object representing the response format, without a status code</returns>
+        /*
+         * Return a dynamic object that can be serialized by calling toString
+         */
         public JObject ToResponseFormat()
         {
             dynamic data = new JObject();

@@ -2,16 +2,14 @@
 
 namespace Framework.Errors
 {
-    /// <summary>
-    /// Helper extensions for all client errors
-    /// </summary>
+    /*
+     * Helper extensions for all client errors
+     */
     public static class ClientErrorExtensions
     {
-        /// <summary>
-        /// Convert a client error to the log format, including the status code
-        /// </summary>
-        /// <param name="clientError">The client error</param>
-        /// <returns>A status and body</returns>
+        /*
+         * Convert a client error to the log format, including the status code
+         */
         public static JObject ToLogFormat(this IClientError clientError)
         {
             dynamic data = new JObject();
