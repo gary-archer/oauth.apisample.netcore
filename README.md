@@ -17,7 +17,7 @@
 ### Middleware Used
 
 * The [IdentityModel2](https://github.com/IdentityModel/IdentityModel2) library is used for API OAuth operations
-* The [Microsoft In Memory Cache](https://docs.microsoft.com/en-us/aspnet/core/performance/caching/memory?view=aspnetcore-2.2) is used to cache API claims in memory
+* The [Microsoft In Memory Cache](https://docs.microsoft.com/en-us/aspnet/core/performance/caching/memory) is used to cache API claims in memory
 * Kestrel is used to host the API
 * Okta is used for the Authorization Server
 * OpenSSL is used for SSL certificate handling

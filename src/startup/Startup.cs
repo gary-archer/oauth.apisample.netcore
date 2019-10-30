@@ -32,7 +32,7 @@
         /*
          * Called by the runtime and used to configure the HTTP request pipeline
          */
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             // Configure API pre flight requests
             app.UseWhen(
@@ -52,8 +52,12 @@
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/spa")),
                 web => this.ConfigureWebStaticContentHosting(web));
 
-            // All requests use ASP.Net core
-            app.UseMvc();
+            // Use controller attributes for routing
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
 
         /*
@@ -105,17 +109,19 @@
          */
         private void ConfigureWebStaticContentHosting(IApplicationBuilder app)
         {
+            const string webStaticContentRoot = "../authguidance.websample.final/spa";
+
             // This will serve index.html as the default document
             app.UseDefaultFiles(new DefaultFilesOptions
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../authguidance.websample.final")),
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), webStaticContentRoot)),
                 RequestPath = "/spa"
             });
 
             // This will serve JS, image and CSS files
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../authguidance.websample.final")),
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), webStaticContentRoot)),
                 RequestPath = "/spa"
             });
         }

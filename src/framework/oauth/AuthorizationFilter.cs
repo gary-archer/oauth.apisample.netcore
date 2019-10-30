@@ -59,8 +59,8 @@ namespace Framework.OAuth
                 }
                 else {
                     
-                    // For 401 responses we set a status for the challenge method which will fire later
-                    this.Request.HttpContext.Items.TryAdd("statusCode", 401);
+                    // Return the error response to the client
+                    await ResponseErrorWriter.WriteInvalidTokenResponse(this.Request, this.Response);
                     return AuthenticateResult.NoResult();
                 }
             }
@@ -70,37 +70,14 @@ namespace Framework.OAuth
                 var handler = new OAuthErrorHandler();
                 var logger = this.loggerFactory.CreateLogger<AuthorizationFilter<TClaims>>();
                 var clientError = handler.HandleError(exception, logger);
-                
-                // Next store fields for the challenge method which will fire later
-                this.Request.HttpContext.Items.TryAdd("statusCode", clientError.StatusCode);
-                this.Request.HttpContext.Items.TryAdd("clientError", clientError);
-                return AuthenticateResult.NoResult();
-            }
-        }
 
-        /*
-         * This returns any authentication error responses to the API caller
-         */
-        protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
-        {
-            var statusCode = this.GetRequestItem<int>("statusCode");
-            if (statusCode == 401)
-            {
-                // Write 401 responses due to invalid tokens
-                await ResponseErrorWriter.WriteInvalidTokenResponse(this.Request, this.Response);
-            }
-            else if (statusCode == 500)
-            {
-                // Write 500 responses due to technical errors during authentication
-                var clientError = this.GetRequestItem<ClientError>("clientError");
-                if(clientError != null)
-                {
-                    await ResponseErrorWriter.WriteErrorResponse(
+                // Return the error response to the client
+                await ResponseErrorWriter.WriteErrorResponse(
                             this.Request,
                             this.Response,
-                            statusCode,
+                            500,
                             clientError.ToResponseFormat());
-                }
+                return AuthenticateResult.NoResult();
             }
         }
 
