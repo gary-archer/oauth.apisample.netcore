@@ -1,9 +1,0 @@
-1. Layout of files in line with Node + Java
-
-2. General testing + reading before merging
-   Currently auth errors get 'StatusCode cannot be set because the response has already started'
-   Unhandled exception handler is firing - make it catch auth errors?
-
-3. Update to latest IdentityModel
-
-4. Elastic Search logging
