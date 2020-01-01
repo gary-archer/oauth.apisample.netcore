@@ -1,0 +1,21 @@
+﻿using Newtonsoft.Json.Linq;
+
+namespace Framework.Errors
+{
+    /*
+     * Helper extensions for all client errors
+     */
+    public static class ClientErrorExtensions
+    {
+        /*
+         * Convert a client error to the log format, including the status code
+         */
+        public static JObject ToLogFormat(this IClientError clientError)
+        {
+            dynamic data = new JObject();
+            data.statusCode = clientError.StatusCode;
+            data.body = clientError.ToResponseFormat();
+            return data;
+        }
+    }
+}
