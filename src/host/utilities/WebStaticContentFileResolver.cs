@@ -4,7 +4,7 @@ namespace SampleApi.Host.Utilities
     using Microsoft.AspNetCore.Http;
 
     /*
-     * A utility to customise how static content is served
+     * A utility to apply any special logic when static content is served
      */
     public class WebStaticContentFileResolver
     {

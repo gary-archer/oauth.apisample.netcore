@@ -1,13 +1,11 @@
 ﻿namespace SampleApi.Host.Startup
 {
-    using System.IO;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;    
     using Microsoft.AspNetCore.Mvc.Authorization;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.FileProviders;
     using Framework.OAuth;
     using Framework.Utilities;
     using SampleApi.Host.Authorization;
@@ -48,10 +46,12 @@
                     api.UseMiddleware<UnhandledExceptionHandler>();
                 });
 
-            // Configure behaviour of SPA requests for static content
+            // For demo purposes we also serve static content for requests for the below paths
             app.UseWhen(
-                ctx => ctx.Request.Path.StartsWithSegments(new PathString("/spa")),
-                web => this.ConfigureWebStaticContentHosting(web));
+                ctx => ctx.Request.Path.StartsWithSegments(new PathString("/spa")) ||
+                       ctx.Request.Path.StartsWithSegments(new PathString("/desktop")) ||
+                       ctx.Request.Path.StartsWithSegments(new PathString("/mobile")),
+                web => WebStaticContent.Configure(web));
 
             // Use controller attributes for routing
             app.UseRouting();
@@ -103,32 +103,6 @@
             services.AddScoped<JsonReader>();
             services.AddScoped<CompanyRepository>();
             services.AddScoped<CompanyService>();
-        }
-
-        /*
-         * For this sample the API also serves web static content, which would not be done by a real API
-         * It is expected that the SPA code sample has been built to a parallel folder
-         */
-        private void ConfigureWebStaticContentHosting(IApplicationBuilder app)
-        {
-            const string webStaticContentRoot = "../authguidance.websample.final/spa";
-
-            // Handle custom file resolution when serving static files
-            app.UseMiddleware<WebStaticContentFileResolver>();
-
-            // This will serve index.html as the default document
-            app.UseDefaultFiles(new DefaultFilesOptions
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), webStaticContentRoot)),
-                RequestPath = "/spa"
-            });
-
-            // This will serve JS, image and CSS files
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), webStaticContentRoot)),
-                RequestPath = "/spa"
-            });
         }
     }
 }
