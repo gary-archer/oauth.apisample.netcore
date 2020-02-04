@@ -2,7 +2,6 @@ namespace SampleApi.Host.Utilities
 {
     using System.IO;
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.Extensions.FileProviders;
     
     /*
      * For this sample the API also serves web static content, which would not be done by a real API
@@ -26,28 +25,28 @@ namespace SampleApi.Host.Utilities
             // This will serve the SPA#s index.html as the default document
             app.UseDefaultFiles(new DefaultFilesOptions
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), spaRoot)),
+                FileProvider = new CustomPhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), spaRoot)),
                 RequestPath = "/spa"
             });
 
             // This will serve JS, image and CSS files for the SPA
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), spaRoot)),
+                FileProvider = new CustomPhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), spaRoot)),
                 RequestPath = "/spa"
             });
 
             // Serve post login HTML pages used by our first desktop sample
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), desktopRoot)),
+                FileProvider = new CustomPhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), desktopRoot)),
                 RequestPath = "/desktop"
             });
 
             // Serve post login and logout HTML pages used by our Android sample to prevent Chrome Custom Tabs hangs
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), mobileRoot)),
+                FileProvider = new CustomPhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), mobileRoot)),
                 RequestPath = "/mobile"
             });
         }
