@@ -6,6 +6,7 @@
     using Microsoft.AspNetCore.Http;    
     using Microsoft.AspNetCore.Mvc.Authorization;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
     using Framework.OAuth;
     using Framework.Utilities;
     using SampleApi.Host.Authorization;
@@ -31,8 +32,17 @@
         /*
          * Called by the runtime and used to configure the HTTP request pipeline
          */
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            // Use log4net for logging
+            /*var options = new Log4NetProviderOptions
+            {
+                ExternalConfigurationSetup = true,
+                UseWebOrAppConfig = false,
+                LoggerRepository = Log4NetHelper.ProductionRepository
+            };
+            loggerFactory.AddLog4Net(options);*/
+            
             // Configure API pre flight requests
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method == "OPTIONS",

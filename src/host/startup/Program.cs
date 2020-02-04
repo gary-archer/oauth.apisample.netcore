@@ -49,6 +49,7 @@
             var jsonConfig = Configuration.Load(configurationRoot);
             var webUrl = new Uri(jsonConfig.App.TrustedOrigins[0]);
 
+            // Build the web host
             return new WebHostBuilder()
                 
                 .UseConfiguration(configurationRoot)
@@ -59,12 +60,24 @@
                     services.AddSingleton(jsonConfig);
                 })
                 
-                // Configure logging to use our JSON configuration and to output to the console
                 .ConfigureLogging(loggingBuilder =>
                 {
-                    loggingBuilder
+                    // Use ASP.Net Core for development logging
+                    /*loggingBuilder
                         .AddConfiguration(configurationRoot.GetSection("Logging"))
-                        .AddConsole();
+                        .AddConsole();*/
+
+                    // Use log4net for our production JSON logging
+                    Log4NetHelper.ConfigureProductionRepository();
+
+                    // Tell ASP.Net to use log4net for the above logger
+                    var options = new Log4NetProviderOptions
+                    {
+                        ExternalConfigurationSetup = true,
+                        UseWebOrAppConfig = false,
+                        LoggerRepository = Log4NetHelper.ProductionRepository
+                    };
+                    loggingBuilder.AddLog4Net(options);
                 })
 
                 // Configure the Kestrel web server to listen over SSL

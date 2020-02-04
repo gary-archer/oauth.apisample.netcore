@@ -6,6 +6,7 @@
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using Framework.Errors;
+    using SampleApi.Host.Utilities;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Repositories;
 
@@ -28,6 +29,9 @@
         [HttpGet("")]
         public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
+            Log4NetHelper.TestLogging();
+            Log4NetHelper.TestLogging();
+            Log4NetHelper.TestLogging();
             return await this.service.GetCompanyListAsync();
         }
 

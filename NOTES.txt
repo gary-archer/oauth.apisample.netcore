@@ -1,0 +1,5 @@
+LOGGING NEXT STEPS
+
+1. Get JSON basics working
+
+2. Update errors
