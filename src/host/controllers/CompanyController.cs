@@ -29,9 +29,7 @@
         [HttpGet("")]
         public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
-            Log4NetHelper.TestLogging();
-            Log4NetHelper.TestLogging();
-            Log4NetHelper.TestLogging();
+            Log4NetHelper.TestLogging("Get Company List");
             return await this.service.GetCompanyListAsync();
         }
 
@@ -41,6 +39,8 @@
         [HttpGet("{id}/transactions")]
         public async Task<CompanyTransactions> GetCompanyTransactionsAsync(string id)
         {
+            Log4NetHelper.TestLogging($"Get Transactions for Company {id}");
+
             // Return a 400 if the id is not a number
             int idValue;
             if (!int.TryParse(id, NumberStyles.Any, CultureInfo.InvariantCulture, out idValue) || idValue <= 0)

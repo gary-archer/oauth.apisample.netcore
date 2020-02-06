@@ -63,9 +63,9 @@
                 .ConfigureLogging(loggingBuilder =>
                 {
                     // Use ASP.Net Core for development logging
-                    /*loggingBuilder
-                        .AddConfiguration(configurationRoot.GetSection("Logging"))
-                        .AddConsole();*/
+                    loggingBuilder
+                        .AddConfiguration(configurationRoot.GetSection("DevelopmentLogging"))
+                        .AddConsole();
 
                     // Use log4net for our production JSON logging
                     Log4NetHelper.ConfigureProductionRepository();
@@ -75,7 +75,7 @@
                     {
                         ExternalConfigurationSetup = true,
                         UseWebOrAppConfig = false,
-                        LoggerRepository = Log4NetHelper.ProductionRepository,
+                        LoggerRepository = Log4NetHelper.InstanceName,
                     };
                     loggingBuilder.AddLog4Net(options);
                 })
