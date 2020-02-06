@@ -9,7 +9,6 @@
     using Microsoft.Extensions.Logging;
     using SampleApi.Host.Configuration;
     using SampleApi.Host.Errors;
-    using SampleApi.Host.Utilities;
 
     /*
      * Our entry point class
@@ -35,7 +34,8 @@
             catch (Exception ex)
             {
                 // Report startup errors
-                var handler = new UnhandledExceptionHandler(LoggingHelper.CreateStartupLogger());
+                var factory = new Framework.Logging.LoggerFactory();
+                var handler = new UnhandledExceptionHandler(factory.CreateStartupLogger());
                 handler.HandleStartupException(ex);
             }
         }
@@ -68,14 +68,15 @@
                         .AddConsole();
 
                     // Use log4net for our production JSON logging
-                    Log4NetHelper.ConfigureProductionRepository();
+                    var factory = new Framework.Logging.LoggerFactory();
+                    factory.ConfigureProductionRepository();
 
                     // Tell ASP.Net to use log4net for the above logger
                     var options = new Log4NetProviderOptions
                     {
                         ExternalConfigurationSetup = true,
                         UseWebOrAppConfig = false,
-                        LoggerRepository = Log4NetHelper.InstanceName,
+                        LoggerRepository = Framework.Logging.LoggerFactory.InstanceName,
                     };
                     loggingBuilder.AddLog4Net(options);
                 })
