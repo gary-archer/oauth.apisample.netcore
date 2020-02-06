@@ -22,11 +22,10 @@ namespace SampleApi.Host.Errors
         /*
          * Log the request and response
          */
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, LogEntry logEntry)
         {
             // TODO: Create the log entry and add it to the container
-            System.Console.WriteLine("*** Adding this request's log entry to the container");
-            var logEntry = new LogEntry();
+            System.Console.WriteLine("*** Adding to this request's log entry");
 
             // Run the next handler
             await this.next(context);

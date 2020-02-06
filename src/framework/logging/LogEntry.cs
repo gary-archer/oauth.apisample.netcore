@@ -11,6 +11,7 @@ namespace Framework.Logging
 
         public LogEntry()
         {
+            System.Console.WriteLine("Creating Log Entry for a Request");
             this.error = null;
         }
 

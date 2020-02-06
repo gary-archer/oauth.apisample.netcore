@@ -1,5 +1,6 @@
 ﻿namespace SampleApi.Host.Startup
 {
+    using Framework.Logging;
     using Framework.OAuth;
     using Framework.Utilities;
     using Microsoft.AspNetCore.Authorization;
@@ -104,10 +105,11 @@
                 options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
             });
 
-            // Register dependencies for our API's logic, to be created per request
+            // Register our API's dependencies, which are per request scoped
             services.AddScoped<JsonReader>();
             services.AddScoped<CompanyRepository>();
             services.AddScoped<CompanyService>();
+            services.AddScoped<LogEntry>();
         }
     }
 }

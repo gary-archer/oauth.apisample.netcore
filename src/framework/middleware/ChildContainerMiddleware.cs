@@ -23,8 +23,7 @@ namespace SampleApi.Host.Errors
          */
         public async Task Invoke(HttpContext context)
         {
-            // TODO: Add the child container
-            System.Console.WriteLine("*** Creating the child container for this request");
+            System.Console.WriteLine("*** Child container middleware");
 
             // Run the next handler
             await this.next(context);
