@@ -4,7 +4,7 @@ namespace SampleApi.Logic.Repositories
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
-    using Framework.Errors;
+    using Framework.Api.Base.Errors;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Utilities;
 

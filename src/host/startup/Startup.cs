@@ -1,8 +1,9 @@
 ﻿namespace SampleApi.Host.Startup
 {
-    using Framework.Logging;
-    using Framework.OAuth;
-    using Framework.Utilities;
+    using Framework.Api.Base.Logging;
+    using Framework.Api.Base.Middleware;
+    using Framework.Api.Base.OAuth;
+    using Framework.Api.Base.Utilities;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -11,7 +12,6 @@
     using Microsoft.Extensions.DependencyInjection;
     using SampleApi.Host.Authorization;
     using SampleApi.Host.Configuration;
-    using SampleApi.Host.Errors;
     using SampleApi.Host.Utilities;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Repositories;

@@ -1,6 +1,6 @@
 namespace SampleApi.Host.Configuration
 {
-    using Framework.Configuration;
+    using Framework.Api.OAuth.Configuration;
     using Microsoft.Extensions.Configuration;
 
     /*

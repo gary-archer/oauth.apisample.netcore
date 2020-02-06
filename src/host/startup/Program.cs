@@ -3,12 +3,13 @@
     using System;
     using System.IO;
     using System.Net;
+    using Framework.Api.Base.Errors;
+    using Framework.Api.Base.Middleware;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using SampleApi.Host.Configuration;
-    using SampleApi.Host.Errors;
 
     /*
      * Our entry point class
@@ -67,7 +68,7 @@
                         .AddConsole();
 
                     // Use log4net for our production JSON logging
-                    var factory = new Framework.Logging.LoggerFactory();
+                    var factory = new Framework.Api.Base.Logging.LoggerFactory();
                     factory.ConfigureProductionRepository();
 
                     // Tell ASP.Net to use log4net for the above logger
@@ -75,7 +76,7 @@
                     {
                         ExternalConfigurationSetup = true,
                         UseWebOrAppConfig = false,
-                        LoggerRepository = Framework.Logging.LoggerFactory.InstanceName,
+                        LoggerRepository = Framework.Api.Base.Logging.LoggerFactory.InstanceName,
                     };
                     loggingBuilder.AddLog4Net(options);
                 })

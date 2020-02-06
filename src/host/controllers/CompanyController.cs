@@ -4,7 +4,7 @@
     using System.Globalization;
     using System.Net;
     using System.Threading.Tasks;
-    using Framework.Errors;
+    using Framework.Api.Base.Errors;
     using Microsoft.AspNetCore.Mvc;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Repositories;
