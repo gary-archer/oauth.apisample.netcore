@@ -38,7 +38,7 @@ namespace SampleApi.Host.Errors
          */
         public void HandleStartupException(Exception exception)
         {
-            base.HandleError(exception, this.logger);
+            this.HandleError(exception, this.logger);
         }
 
         /*

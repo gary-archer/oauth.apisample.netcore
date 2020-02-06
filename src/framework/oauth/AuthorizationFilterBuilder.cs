@@ -101,7 +101,8 @@
         /*
          * Verify and return a prerequisite service
          */
-        private T VerifyPrerequisite<T>(ServiceProvider provider) where T : class
+        private T VerifyPrerequisite<T>(ServiceProvider provider)
+            where T : class
         {
             var result = provider.GetService<T>();
             if (result == null)

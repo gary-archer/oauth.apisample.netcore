@@ -55,7 +55,6 @@ namespace Framework.OAuth
             }
             catch (ClientError)
             {
-
                 // Handle 401 responses
                 this.Request.HttpContext.Items.TryAdd("statusCode", 401);
                 return AuthenticateResult.NoResult();

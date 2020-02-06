@@ -66,7 +66,8 @@
         /*
          * Try to convert an exception to a known type
          */
-        protected T TryConvertException<T>(Exception exception) where T : class
+        protected T TryConvertException<T>(Exception exception)
+            where T : class
         {
             if (typeof(T).IsAssignableFrom(exception.GetType()))
             {
