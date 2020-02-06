@@ -1,2 +1,4 @@
-Disable CodeLens under:
-  Tools / Options / Texxt Editor / All Languages
+CodeLens
+--------
+  Tools / Options / Texxt Editor / All Languages / CodeLens
+  File / Preferences / Settings / Text Editor / CodeLens
