@@ -48,9 +48,9 @@ namespace Framework.Logging
         {
             var repository = LogManager.CreateRepository($"{InstanceName}Repository", typeof(Hierarchy));
 
-            // Uncomment to view internal messages such as problems creating log files
+            /* Uncomment to view internal messages such as problems creating log files
             log4net.Util.LogLog.InternalDebugging = true;
-            log4net.Util.LogLog.EmitInternalMessages = true;
+            */
 
             var consoleAppender = this.CreateConsoleAppender();
             var fileAppender = this.CreateFileAppender();

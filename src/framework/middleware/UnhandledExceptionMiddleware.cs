@@ -10,7 +10,7 @@ namespace SampleApi.Host.Errors
     /*
      * The application exception handler
      */
-    public class UnhandledExceptionHandler : BaseErrorHandler
+    public class UnhandledExceptionMiddleware : BaseErrorHandler
     {
         private readonly RequestDelegate next;
         private readonly ILogger logger;
@@ -18,7 +18,7 @@ namespace SampleApi.Host.Errors
         /*
          * An override constructor for startup exceptions
          */
-        public UnhandledExceptionHandler(ILogger logger)
+        public UnhandledExceptionMiddleware(ILogger logger)
         {
             this.next = null;
             this.logger = logger;
@@ -27,10 +27,10 @@ namespace SampleApi.Host.Errors
         /*
          * Store a reference to the next middleware
          */
-        public UnhandledExceptionHandler(RequestDelegate next, ILoggerFactory loggerFactory)
+        public UnhandledExceptionMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
         {
             this.next = next;
-            this.logger = loggerFactory.CreateLogger<UnhandledExceptionHandler>();
+            this.logger = loggerFactory.CreateLogger<UnhandledExceptionMiddleware>();
         }
 
         /*

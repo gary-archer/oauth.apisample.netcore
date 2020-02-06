@@ -38,13 +38,17 @@
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method == "OPTIONS",
                 api => app.UseCors("api"));
 
-            // Configure API requests to use our framework security and error handling
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method != "OPTIONS",
                 api =>
                 {
+                    // Ensure that authentication middleware is called for API requests
                     api.UseAuthentication();
-                    api.UseMiddleware<UnhandledExceptionHandler>();
+
+                    // Add framework middleware for API cross cutting concerns
+                    api.UseMiddleware<ChildContainerMiddleware>();
+                    api.UseMiddleware<LoggerMiddleware>();
+                    api.UseMiddleware<UnhandledExceptionMiddleware>();
                 });
 
             // For demo purposes we also serve static content for requests for the below paths

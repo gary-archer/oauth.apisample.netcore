@@ -35,7 +35,7 @@
             {
                 // Report startup errors
                 var factory = new Framework.Logging.LoggerFactory();
-                var handler = new UnhandledExceptionHandler(factory.CreateStartupLogger());
+                var handler = new UnhandledExceptionMiddleware(factory.CreateStartupLogger());
                 handler.HandleStartupException(ex);
             }
         }
