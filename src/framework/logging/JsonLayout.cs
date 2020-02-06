@@ -4,6 +4,7 @@ namespace Framework.Logging
     using System.IO;
     using log4net.Core;
     using log4net.Layout;
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     /*
@@ -33,7 +34,8 @@ namespace Framework.Logging
             var data = e.MessageObject as JObject;
             if (data != null)
             {
-                writer.Write(data.ToString() + Environment.NewLine);
+                var formatting = this.prettyPrint ? Formatting.Indented : Formatting.None;
+                writer.Write(data.ToString(formatting) + Environment.NewLine);
             }
         }
     }
