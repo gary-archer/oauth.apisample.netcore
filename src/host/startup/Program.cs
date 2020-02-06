@@ -9,7 +9,6 @@
     using Microsoft.Extensions.Logging;
     using SampleApi.Host.Configuration;
     using SampleApi.Host.Errors;
-    using SampleApi.Host.Utilities;
 
     /*
      * Our entry point class
@@ -27,15 +26,15 @@
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            try {
-
+            try
+            {
                 // Build and run the web host
                 BuildWebHost(config).Run();
             }
-            catch(Exception ex) {
-
+            catch (Exception ex)
+            {
                 // Report startup errors
-                var handler = new UnhandledExceptionHandler(LoggingHelper.CreateStartupLogger());
+                var handler = new UnhandledExceptionMiddleware();
                 handler.HandleStartupException(ex);
             }
         }
@@ -49,33 +48,47 @@
             var jsonConfig = Configuration.Load(configurationRoot);
             var webUrl = new Uri(jsonConfig.App.TrustedOrigins[0]);
 
+            // Build the web host
             return new WebHostBuilder()
-                
+
                 .UseConfiguration(configurationRoot)
-                
+
                 // Enable our JSON configuration object to be injected into other classes
-                .ConfigureServices(services => 
+                .ConfigureServices(services =>
                 {
                     services.AddSingleton(jsonConfig);
                 })
-                
-                // Configure logging to use our JSON configuration and to output to the console
+
                 .ConfigureLogging(loggingBuilder =>
                 {
+                    // Use ASP.Net Core for development logging
                     loggingBuilder
-                        .AddConfiguration(configurationRoot.GetSection("Logging"))
+                        .AddConfiguration(configurationRoot.GetSection("DevelopmentLogging"))
                         .AddConsole();
+
+                    // Use log4net for our production JSON logging
+                    var factory = new Framework.Logging.LoggerFactory();
+                    factory.ConfigureProductionRepository();
+
+                    // Tell ASP.Net to use log4net for the above logger
+                    var options = new Log4NetProviderOptions
+                    {
+                        ExternalConfigurationSetup = true,
+                        UseWebOrAppConfig = false,
+                        LoggerRepository = Framework.Logging.LoggerFactory.InstanceName,
+                    };
+                    loggingBuilder.AddLog4Net(options);
                 })
 
                 // Configure the Kestrel web server to listen over SSL
                 .UseKestrel(options =>
                 {
                     options.Listen(IPAddress.Any, webUrl.Port, listenOptions =>
-                    {   
+                    {
                         listenOptions.UseHttps($"./certs/{jsonConfig.App.SslCertificateFileName}", jsonConfig.App.SslCertificatePassword);
                     });
                 })
-                
+
                 // Serve web content from the root folder
                 .UseContentRoot(Directory.GetCurrentDirectory())
 

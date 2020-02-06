@@ -2,9 +2,9 @@ namespace Framework.Utilities
 {
     using System.Net;
     using System.Threading.Tasks;
+    using Framework.Errors;
     using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json.Linq;
-    using Framework.Errors;
 
     /*
      * A helper class to write response errors
@@ -20,7 +20,7 @@ namespace Framework.Utilities
             response.ContentType = "application/json";
             response.Headers.Add("WWW-Authenticate", "Bearer");
             AddCorsHeaderForErrorResponse(request, response);
-            
+
             // Write the body
             response.StatusCode = 401;
             var clientError = new ClientError(HttpStatusCode.Unauthorized, "unauthorized", "Missing, invalid or expired access token");
@@ -35,7 +35,7 @@ namespace Framework.Utilities
             // Write headers
             response.ContentType = "application/json";
             AddCorsHeaderForErrorResponse(request, response);
-            
+
             // Write the body
             response.StatusCode = statusCode;
             await response.WriteAsync(error.ToString());
@@ -51,10 +51,10 @@ namespace Framework.Utilities
 
             if (response.Headers[CORS_HEADER].Count == 0)
             {
-                var originHeader = request.Headers["Origin"];	
-                if (originHeader.Count > 0)	
-                {	
-                    response.Headers.Add(CORS_HEADER, originHeader.ToString());	
+                var originHeader = request.Headers["Origin"];
+                if (originHeader.Count > 0)
+                {
+                    response.Headers.Add(CORS_HEADER, originHeader.ToString());
                 }
             }
         }

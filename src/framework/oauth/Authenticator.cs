@@ -5,11 +5,11 @@ namespace Framework.OAuth
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using Framework.Configuration;
+    using Framework.Errors;
     using IdentityModel;
     using IdentityModel.Client;
     using Microsoft.AspNetCore.Http;
-    using Framework.Configuration;
-    using Framework.Errors;
 
     /*
      * The class from which OAuth calls are initiated
@@ -45,20 +45,20 @@ namespace Framework.OAuth
         /*
          * Introspection processing
          */
-        private async Task<int> IntrospectTokenAndSetTokenClaims(string accessToken, CoreApiClaims claims) {
-
-            using(var client = new HttpClient(this.proxyFactory()))
+        private async Task<int> IntrospectTokenAndSetTokenClaims(string accessToken, CoreApiClaims claims)
+        {
+            using (var client = new HttpClient(this.proxyFactory()))
             {
                 // Send the request
                 var request = new TokenIntrospectionRequest
                 {
                     Address = this.metadata.IntrospectionEndpoint,
-                    ClientId = configuration.ClientId,
-                    ClientSecret = configuration.ClientSecret,
-                    Token = accessToken
+                    ClientId = this.configuration.ClientId,
+                    ClientSecret = this.configuration.ClientSecret,
+                    Token = accessToken,
                 };
                 var response = await client.IntrospectTokenAsync(request);
-                
+
                 // Handle errors
                 if (response.IsError)
                 {
@@ -88,21 +88,21 @@ namespace Framework.OAuth
          */
         private async Task SetCentralUserInfoClaims(string accessToken, CoreApiClaims claims)
         {
-            using(var client = new HttpClient(this.proxyFactory()))
+            using (var client = new HttpClient(this.proxyFactory()))
             {
                 // Send the request
                 var request = new UserInfoRequest
                 {
                     Address = this.metadata.UserInfoEndpoint,
-                    Token = accessToken
+                    Token = accessToken,
                 };
                 var response = await client.GetUserInfoAsync(request);
-                
+
                 // Handle errors
                 if (response.IsError)
                 {
                     // Handle a race condition where the access token expires during user info lookup
-                    if(response.HttpStatusCode == HttpStatusCode.Unauthorized)
+                    if (response.HttpStatusCode == HttpStatusCode.Unauthorized)
                     {
                         throw ClientError.Create401("Access token is expired and failed user info lookup");
                     }

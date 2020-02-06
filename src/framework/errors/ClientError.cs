@@ -9,23 +9,18 @@ namespace Framework.Errors
      */
     public sealed class ClientError : Exception, IClientError
     {
-        /*
-         * A helper method to return a 401 error
-         */
-        public static ClientError Create401(string reaaon)
-        {
-            return new ClientError(HttpStatusCode.Unauthorized, "unauthorized", "Missing, invalid or expired access token");
-        }
-
         // Mandatory fields for both 4xx and 500 errors
         private readonly HttpStatusCode statusCode;
         private readonly string errorCode;
 
         // Extra fields for 500 errors
-        private  string area;
+        private string area;
         private int id;
         private string utcTime;
 
+        /*
+         * All client errors use an error code
+         */
         public ClientError(HttpStatusCode statusCode, string errorCode, string message)
             : base(message)
         {
@@ -48,9 +43,18 @@ namespace Framework.Errors
         }
 
         /*
+         * A helper method to return a 401 error
+         */
+        public static ClientError Create401(string reaaon)
+        {
+            return new ClientError(HttpStatusCode.Unauthorized, "unauthorized", "Missing, invalid or expired access token");
+        }
+
+        /*
          * Set extra fields to return to the caller for 500 errors
          */
-        public void setExceptionDetails(string area, int id, string utcTime) {
+        public void SetExceptionDetails(string area, int id, string utcTime)
+        {
             this.area = area;
             this.id = id;
             this.utcTime = utcTime;

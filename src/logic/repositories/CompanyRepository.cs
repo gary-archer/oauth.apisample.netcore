@@ -51,10 +51,11 @@ namespace SampleApi.Logic.Repositories
             if (foundCompany != null)
             {
                 // If the user is unauthorized we do not return any data
-                if (!this.IsUserAuthorizedForCompany(foundCompany)) {
+                if (!this.IsUserAuthorizedForCompany(foundCompany))
+                {
                     throw this.UnauthorizedError(id);
                 }
-            
+
                 // Read transactions data and find the requested value by id
                 var allTransactions = await this.jsonReader.ReadDataAsync<IEnumerable<CompanyTransactions>>(@"./data/companyTransactions.json");
                 var foundTransactions = allTransactions.FirstOrDefault(t => t.Id == id);
@@ -71,7 +72,8 @@ namespace SampleApi.Logic.Repositories
         /*
          * Apply claims that were read when the access token was first validated
          */
-        private bool IsUserAuthorizedForCompany(Company company) {
+        private bool IsUserAuthorizedForCompany(Company company)
+        {
             return this.claims.RegionsCovered.Any(region => region == company.Region);
         }
 
@@ -79,7 +81,8 @@ namespace SampleApi.Logic.Repositories
          * Return a 404 error if the user is not authorized
          * Requests for both unauthorized and non existent data are treated the same
          */
-        private ClientError UnauthorizedError(int companyId) {
+        private ClientError UnauthorizedError(int companyId)
+        {
             return new ClientError(
                 HttpStatusCode.NotFound,
                 "company_not_found",

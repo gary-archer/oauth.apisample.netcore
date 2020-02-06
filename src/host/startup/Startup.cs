@@ -1,13 +1,14 @@
 ﻿namespace SampleApi.Host.Startup
 {
+    using Framework.Logging;
+    using Framework.OAuth;
+    using Framework.Utilities;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;    
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc.Authorization;
     using Microsoft.Extensions.DependencyInjection;
-    using Framework.OAuth;
-    using Framework.Utilities;
     using SampleApi.Host.Authorization;
     using SampleApi.Host.Configuration;
     using SampleApi.Host.Errors;
@@ -38,12 +39,16 @@
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method == "OPTIONS",
                 api => app.UseCors("api"));
 
-            // Configure API requests to use our framework security and error handling
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method != "OPTIONS",
-                api => {
+                api =>
+                {
+                    // Ensure that authentication middleware is called for API requests
                     api.UseAuthentication();
-                    api.UseMiddleware<UnhandledExceptionHandler>();
+
+                    // Add framework middleware for API cross cutting concerns
+                    api.UseMiddleware<LoggerMiddleware>();
+                    api.UseMiddleware<UnhandledExceptionMiddleware>();
                 });
 
             // For demo purposes we also serve static content for requests for the below paths
@@ -86,23 +91,24 @@
                 .AddAuthentication("Bearer")
                 .AddCustomAuthorizationFilter<SampleApiClaims>(new AuthorizationFilterOptions()
                 {
-                    OAuthConfiguration = this.jsonConfig.OAuth
+                    OAuthConfiguration = this.jsonConfig.OAuth,
                 })
                 .WithCustomClaimsProvider<SampleApiClaimsProvider>()
                 .WithServices(services)
-                .WithHttpDebugging(this.jsonConfig.App.useProxy, this.jsonConfig.App.ProxyUrl)
+                .WithHttpDebugging(this.jsonConfig.App.UseProxy, this.jsonConfig.App.ProxyUrl)
                 .Build();
 
             // Apply the above authorization filter to all API requests
-            services.AddMvc(options => 
+            services.AddMvc(options =>
             {
                 options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
             });
 
-            // Register dependencies for our API's logic, to be created per request
+            // Register our API's dependencies, which are per request scoped
             services.AddScoped<JsonReader>();
             services.AddScoped<CompanyRepository>();
             services.AddScoped<CompanyService>();
+            services.AddScoped<LogEntry>();
         }
     }
 }

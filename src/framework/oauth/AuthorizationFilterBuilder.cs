@@ -2,17 +2,18 @@
 {
     using System;
     using System.Net.Http;
+    using Framework.Configuration;
+    using Framework.Utilities;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using Framework.Configuration;
-    using Framework.Utilities;
 
     /*
      * Helper methods for setting up authentication
      */
-    public sealed class AuthorizationFilterBuilder<TClaims> where TClaims : CoreApiClaims, new()
+    public sealed class AuthorizationFilterBuilder<TClaims>
+        where TClaims : CoreApiClaims, new()
     {
         // Our OAuth configuration
         private readonly OAuthConfiguration configuration;
@@ -67,12 +68,11 @@
          */
         public void Build()
         {
-            using (var provider = services.BuildServiceProvider())
+            using (var provider = this.services.BuildServiceProvider())
             {
                 // Check prerequisites and get the Microsoft cache
-                VerifyPrerequisite<IHttpContextAccessor>(provider);
-                IDistributedCache cache = VerifyPrerequisite<IDistributedCache>(provider);
-                
+                this.VerifyPrerequisite<IHttpContextAccessor>(provider);
+                IDistributedCache cache = this.VerifyPrerequisite<IDistributedCache>(provider);
 
                 // Load issuer metadata during startup
                 var issuerMetadata = new IssuerMetadata(this.configuration, this.httpProxyFactory);
@@ -92,7 +92,7 @@
                 {
                     this.httpProxyFactory = () => new ProxyHttpHandler(false, null);
                 }
-            
+
                 // Update dependency injection
                 this.RegisterAuthenticationDependencies(issuerMetadata, claimsCache);
             }
@@ -101,10 +101,11 @@
         /*
          * Verify and return a prerequisite service
          */
-        private T VerifyPrerequisite<T>(ServiceProvider provider) where T: class
+        private T VerifyPrerequisite<T>(ServiceProvider provider)
+            where T : class
         {
             var result = provider.GetService<T>();
-            if(result == null)
+            if (result == null)
             {
                 throw new InvalidOperationException($"The prerequisite service {typeof(T).Name} has not been configured");
             }

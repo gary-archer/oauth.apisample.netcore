@@ -4,8 +4,8 @@ namespace Framework.OAuth
     using System.Linq;
     using System.Runtime.Serialization;
     using System.Security.Claims;
-    using IdentityModel;
     using Framework.Utilities;
+    using IdentityModel;
 
     /*
      * API claims used for authorization
@@ -15,25 +15,25 @@ namespace Framework.OAuth
     {
         // The immutable user id from the access token, which may exist in the API's database
         [DataMember]
-        public string UserId {get; private set;}
+        public string UserId { get; private set; }
 
         // The client id, which typically represents the calling application
         [DataMember]
-        public string ClientId {get; private set;}
+        public string ClientId { get; private set; }
 
         // OAuth scopes can represent high level areas of the business
         [DataMember]
-        public string[] Scopes {get; private set;}
+        public string[] Scopes { get; private set; }
 
         // Details from the Central User Data for given name, family name and email
         [DataMember]
-        public string GivenName {get; private set;}
+        public string GivenName { get; private set; }
 
         [DataMember]
-        public string FamilyName {get; private set;}
+        public string FamilyName { get; private set; }
 
         [DataMember]
-        public string Email {get; private set;}
+        public string Email { get; private set; }
 
         /*
          * Set token claims after introspection
