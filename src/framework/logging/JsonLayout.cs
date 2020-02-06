@@ -34,7 +34,10 @@ namespace Framework.Logging
             var data = e.MessageObject as JObject;
             if (data != null)
             {
+                // Console output is indented and file output is a single object per line
                 var formatting = this.prettyPrint ? Formatting.Indented : Formatting.None;
+
+                // Write the data
                 writer.Write(data.ToString(formatting) + Environment.NewLine);
             }
         }
