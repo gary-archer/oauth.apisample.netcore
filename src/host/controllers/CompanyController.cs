@@ -5,7 +5,6 @@
     using System.Net;
     using System.Threading.Tasks;
     using Framework.Errors;
-    using Framework.Logging;
     using Microsoft.AspNetCore.Mvc;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Repositories;
@@ -29,7 +28,6 @@
         [HttpGet("")]
         public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
-            LoggerFactory.TestLogging("Get Company List");
             return await this.service.GetCompanyListAsync();
         }
 
@@ -39,8 +37,6 @@
         [HttpGet("{id}/transactions")]
         public async Task<CompanyTransactions> GetCompanyTransactionsAsync(string id)
         {
-            LoggerFactory.TestLogging($"Get Transactions for Company {id}");
-
             // Return a 400 if the id is not a number
             int idValue;
             if (!int.TryParse(id, NumberStyles.Any, CultureInfo.InvariantCulture, out idValue) || idValue <= 0)

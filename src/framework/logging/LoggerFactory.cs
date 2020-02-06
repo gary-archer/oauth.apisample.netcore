@@ -4,9 +4,6 @@ namespace Framework.Logging
     using log4net.Appender;
     using log4net.Config;
     using log4net.Repository.Hierarchy;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
-    using SampleApi.Host.Startup;
 
     /*
      * Set up log4net without a configuration file
@@ -14,31 +11,6 @@ namespace Framework.Logging
     public class LoggerFactory
     {
         public const string InstanceName = "Production";
-
-        /*
-         * A temporary method to test logging
-         */
-        public static void TestLogging(string message)
-        {
-            var logger = LogManager.GetLogger($"{InstanceName}Repository", $"{InstanceName}Logger");
-            logger.Warn(message);
-        }
-
-        /*
-         * Create a logger for reporting startup exceptions
-         */
-        public ILogger CreateStartupLogger()
-        {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddLogging(builder => builder.AddConsole());
-            using (var serviceProvider = serviceCollection.BuildServiceProvider())
-            {
-                using (var loggerFactory = serviceProvider.GetService<Microsoft.Extensions.Logging.ILoggerFactory>())
-                {
-                    return loggerFactory.CreateLogger<Startup>();
-                }
-            }
-        }
 
         /*
          * Create the log4net setup to support JSON logging
@@ -55,6 +27,14 @@ namespace Framework.Logging
             var consoleAppender = this.CreateConsoleAppender();
             var fileAppender = this.CreateFileAppender();
             BasicConfigurator.Configure(repository, consoleAppender, fileAppender);
+        }
+
+        /*
+         * Return the logger to other classes in the framework
+         */
+        public ILog GetProductionLogger()
+        {
+            return LogManager.GetLogger($"{InstanceName}Repository", $"{InstanceName}Logger");
         }
 
         /*

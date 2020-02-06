@@ -3,9 +3,9 @@ namespace SampleApi.Host.Errors
     using System;
     using System.Threading.Tasks;
     using Framework.Errors;
+    using Framework.Logging;
     using Framework.Utilities;
     using Microsoft.AspNetCore.Http;
-    using Microsoft.Extensions.Logging;
 
     /*
      * The application exception handler
@@ -13,24 +13,21 @@ namespace SampleApi.Host.Errors
     public class UnhandledExceptionMiddleware : BaseErrorHandler
     {
         private readonly RequestDelegate next;
-        private readonly ILogger logger;
 
         /*
-         * An override constructor for startup exceptions
+         * An overridden constructor for startup exceptions
          */
-        public UnhandledExceptionMiddleware(ILogger logger)
+        public UnhandledExceptionMiddleware()
         {
             this.next = null;
-            this.logger = logger;
         }
 
         /*
-         * Store a reference to the next middleware
+         * The usual middleware constructor
          */
-        public UnhandledExceptionMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
+        public UnhandledExceptionMiddleware(RequestDelegate next)
         {
             this.next = next;
-            this.logger = loggerFactory.CreateLogger<UnhandledExceptionMiddleware>();
         }
 
         /*
@@ -38,13 +35,15 @@ namespace SampleApi.Host.Errors
          */
         public void HandleStartupException(Exception exception)
         {
-            this.HandleError(exception, this.logger);
+            var logEntry = new LogEntry();
+            this.HandleError(exception, logEntry);
+            logEntry.End(null);
         }
 
         /*
          * Controller exceptions are caught here
          */
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, LogEntry logEntry)
         {
             try
             {
@@ -54,7 +53,7 @@ namespace SampleApi.Host.Errors
             catch (Exception exception)
             {
                 // Log full error details and return a less detailed error to the caller
-                var clientError = this.HandleError(exception, this.logger);
+                var clientError = this.HandleError(exception, logEntry);
                 await ResponseErrorWriter.WriteErrorResponse(
                     context.Request,
                     context.Response,

@@ -6,10 +6,10 @@ namespace Framework.OAuth
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
     using Framework.Errors;
+    using Framework.Logging;
     using Framework.Utilities;
     using IdentityModel;
     using Microsoft.AspNetCore.Authentication;
-    using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
 
     /*
@@ -19,18 +19,16 @@ namespace Framework.OAuth
         where TClaims : CoreApiClaims, new()
     {
         private readonly Authorizer<TClaims> authorizer;
-        private readonly ILoggerFactory loggerFactory;
 
         public AuthorizationFilter(
             IOptionsMonitor<AuthorizationFilterOptions> options,
-            ILoggerFactory loggerFactory,
+            Microsoft.Extensions.Logging.ILoggerFactory loggerFactory,
             UrlEncoder urlEncoder,
             ISystemClock clock,
             Authorizer<TClaims> authorizer)
                 : base(options, loggerFactory, urlEncoder, clock)
         {
             this.authorizer = authorizer;
-            this.loggerFactory = loggerFactory;
         }
 
         /*
@@ -63,8 +61,9 @@ namespace Framework.OAuth
             {
                 // Handle 500 responses by first logging the error
                 var handler = new OAuthErrorHandler();
-                var logger = this.loggerFactory.CreateLogger<AuthorizationFilter<TClaims>>();
-                var clientError = handler.HandleError(exception, logger);
+                var logEntry = new LogEntry();
+                var clientError = handler.HandleError(exception, logEntry);
+                logEntry.End(this.Response);
 
                 // Next store fields for the challenge method which will fire later
                 this.Request.HttpContext.Items.TryAdd("statusCode", clientError.StatusCode);

@@ -34,8 +34,7 @@
             catch (Exception ex)
             {
                 // Report startup errors
-                var factory = new Framework.Logging.LoggerFactory();
-                var handler = new UnhandledExceptionMiddleware(factory.CreateStartupLogger());
+                var handler = new UnhandledExceptionMiddleware();
                 handler.HandleStartupException(ex);
             }
         }

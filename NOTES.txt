@@ -2,3 +2,12 @@ CodeLens
 --------
   Tools / Options / Texxt Editor / All Languages / CodeLens
   File / Preferences / Settings / Text Editor / CodeLens
+
+  Non standard Okta introspect error response:
+  {
+    "errorCode":"invalid_client",
+    "errorSummary":"Invalid value for 'client_id' parameter.",
+    "errorLink":"invalid_client",
+    "errorId":"oaeiwRKEkpxRtefQlw8elwKZA",
+    "errorCauses":[]
+  }

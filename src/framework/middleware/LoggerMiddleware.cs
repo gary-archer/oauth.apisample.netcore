@@ -24,13 +24,14 @@ namespace SampleApi.Host.Errors
          */
         public async Task Invoke(HttpContext context, LogEntry logEntry)
         {
-            // TODO: Create the log entry and add it to the container
-            System.Console.WriteLine("*** Adding to this request's log entry");
+            // Start logging request details
+            logEntry.Start(context.Request);
 
-            // Run the next handler
+            // Run subsequent handlers including the controller operation
             await this.next(context);
 
-            // TODO: Update the log entry here
+            // Log response details before exiting
+            logEntry.End(context.Response);
         }
     }
 }

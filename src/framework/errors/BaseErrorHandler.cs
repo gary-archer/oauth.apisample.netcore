@@ -1,7 +1,7 @@
 ﻿namespace Framework.Errors
 {
     using System;
-    using Microsoft.Extensions.Logging;
+    using Framework.Logging;
 
     /*
      * A framework base class for error handling
@@ -11,14 +11,14 @@
         /*
          * Do error handling and logging, then return an error to the client
          */
-        public IClientError HandleError(Exception exception, ILogger logger)
+        public IClientError HandleError(Exception exception, LogEntry logEntry)
         {
             // Already handled API errors
             var apiError = this.TryConvertException<ApiError>(exception);
             if (apiError != null)
             {
                 // Log the error, which will include technical support details
-                logger.LogError(apiError.ToLogFormat().ToString());
+                logEntry.AddApiError(apiError);
 
                 // Return a client error to the caller
                 return apiError.ToClientError();
@@ -29,7 +29,7 @@
             if (clientError != null)
             {
                 // Log the error without an id
-                logger.LogError(clientError.ToLogFormat().ToString());
+                logEntry.AddClientError(clientError);
 
                 // Return the thrown error to the caller
                 return clientError;
@@ -37,7 +37,7 @@
 
             // Unhandled exceptions
             apiError = BaseErrorHandler.FromException(exception);
-            logger.LogError(apiError.ToLogFormat().ToString());
+            logEntry.AddApiError(apiError);
             return apiError.ToClientError();
         }
 

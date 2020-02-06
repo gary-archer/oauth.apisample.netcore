@@ -30,9 +30,11 @@ namespace Framework.Logging
          */
         public override void Format(TextWriter writer, LoggingEvent e)
         {
-            dynamic data = new JObject();
-            data.message = e.MessageObject;
-            writer.Write(data.ToString() + Environment.NewLine);
+            var data = e.MessageObject as JObject;
+            if (data != null)
+            {
+                writer.Write(data.ToString() + Environment.NewLine);
+            }
         }
     }
 }

@@ -47,7 +47,6 @@
                     api.UseAuthentication();
 
                     // Add framework middleware for API cross cutting concerns
-                    api.UseMiddleware<ChildContainerMiddleware>();
                     api.UseMiddleware<LoggerMiddleware>();
                     api.UseMiddleware<UnhandledExceptionMiddleware>();
                 });
