@@ -1,14 +1,14 @@
 namespace SampleApi.Logic.Entities
 {
     /*
-     * A single transaction 
+     * A single transaction
      */
     public class Transaction
     {
-        public string Id {get; set;}
+        public string Id { get; set; }
 
-        public string InvestorId {get; set;}
+        public string InvestorId { get; set; }
 
-        public double AmountUsd {get; set;}
+        public double AmountUsd { get; set; }
     }
 }

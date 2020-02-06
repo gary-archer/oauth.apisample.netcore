@@ -27,13 +27,13 @@
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            try {
-
+            try
+            {
                 // Build and run the web host
                 BuildWebHost(config).Run();
             }
-            catch(Exception ex) {
-
+            catch (Exception ex)
+            {
                 // Report startup errors
                 var handler = new UnhandledExceptionHandler(LoggingHelper.CreateStartupLogger());
                 handler.HandleStartupException(ex);
@@ -51,15 +51,15 @@
 
             // Build the web host
             return new WebHostBuilder()
-                
+
                 .UseConfiguration(configurationRoot)
-                
+
                 // Enable our JSON configuration object to be injected into other classes
-                .ConfigureServices(services => 
+                .ConfigureServices(services =>
                 {
                     services.AddSingleton(jsonConfig);
                 })
-                
+
                 .ConfigureLogging(loggingBuilder =>
                 {
                     // Use ASP.Net Core for development logging
@@ -75,7 +75,7 @@
                     {
                         ExternalConfigurationSetup = true,
                         UseWebOrAppConfig = false,
-                        LoggerRepository = Log4NetHelper.ProductionRepository
+                        LoggerRepository = Log4NetHelper.ProductionRepository,
                     };
                     loggingBuilder.AddLog4Net(options);
                 })
@@ -84,11 +84,11 @@
                 .UseKestrel(options =>
                 {
                     options.Listen(IPAddress.Any, webUrl.Port, listenOptions =>
-                    {   
+                    {
                         listenOptions.UseHttps($"./certs/{jsonConfig.App.SslCertificateFileName}", jsonConfig.App.SslCertificatePassword);
                     });
                 })
-                
+
                 // Serve web content from the root folder
                 .UseContentRoot(Directory.GetCurrentDirectory())
 

@@ -59,7 +59,7 @@
             // Create a generic exception API error and note that in .Net the call stack is included in the details
             return new ApiError("server_error", "An unexpected exception occurred in the API")
             {
-                Details = exception.ToString()
+                Details = exception.ToString(),
             };
         }
 

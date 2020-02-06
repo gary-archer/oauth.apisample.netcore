@@ -5,17 +5,17 @@ namespace SampleApi.Logic.Entities
      */
     public class UserInfoClaims
     {
-        public string GivenName {get; private set;}
-
-        public string FamilyName {get; private set;}
-
-        public string Email {get; private set;}
-
         public UserInfoClaims(string givenName, string familyName, string email)
         {
             this.GivenName = givenName;
             this.FamilyName = familyName;
             this.Email = email;
         }
+
+        public string GivenName { get; private set; }
+
+        public string FamilyName { get; private set; }
+
+        public string Email { get; private set; }
     }
 }

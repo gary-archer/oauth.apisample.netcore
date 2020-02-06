@@ -5,12 +5,12 @@ namespace Framework.OAuth
     using System.Security.Claims;
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
+    using Framework.Errors;
+    using Framework.Utilities;
     using IdentityModel;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
-    using Framework.Errors;
-    using Framework.Utilities;
 
     /*
      * An instance of this class is created for every API request and manages Microsoft specific classes
@@ -26,7 +26,8 @@ namespace Framework.OAuth
             ILoggerFactory loggerFactory,
             UrlEncoder urlEncoder,
             ISystemClock clock,
-            Authorizer<TClaims> authorizer): base(options, loggerFactory, urlEncoder, clock)
+            Authorizer<TClaims> authorizer)
+                : base(options, loggerFactory, urlEncoder, clock)
         {
             this.authorizer = authorizer;
             this.loggerFactory = loggerFactory;
@@ -40,20 +41,21 @@ namespace Framework.OAuth
             try
             {
                 // Perform the security handling to get claims
-                TClaims claims = await this.authorizer.execute(this.Request);
+                TClaims claims = await this.authorizer.Execute(this.Request);
 
                 // Get claims into a collection
                 var claimsList = new List<Claim>();
                 claims.Output(claimsList);
 
                 // Set up the .Net security context
-                var identity = new ClaimsIdentity(claimsList, Scheme.Name, JwtClaimTypes.Subject, string.Empty);
+                var identity = new ClaimsIdentity(claimsList, this.Scheme.Name, JwtClaimTypes.Subject, string.Empty);
                 var principal = new ClaimsPrincipal(identity);
-                var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), Scheme.Name);
+                var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), this.Scheme.Name);
                 return AuthenticateResult.Success(ticket);
             }
-            catch (ClientError) {
-                    
+            catch (ClientError)
+            {
+
                 // Handle 401 responses
                 this.Request.HttpContext.Items.TryAdd("statusCode", 401);
                 return AuthenticateResult.NoResult();
@@ -64,7 +66,7 @@ namespace Framework.OAuth
                 var handler = new OAuthErrorHandler();
                 var logger = this.loggerFactory.CreateLogger<AuthorizationFilter<TClaims>>();
                 var clientError = handler.HandleError(exception, logger);
-                
+
                 // Next store fields for the challenge method which will fire later
                 this.Request.HttpContext.Items.TryAdd("statusCode", clientError.StatusCode);
                 this.Request.HttpContext.Items.TryAdd("clientError", clientError);
@@ -87,7 +89,7 @@ namespace Framework.OAuth
             {
                 // Write 500 responses due to technical errors during authentication
                 var clientError = this.GetRequestItem<ClientError>("clientError");
-                if(clientError != null)
+                if (clientError != null)
                 {
                     await ResponseErrorWriter.WriteErrorResponse(
                             this.Request,
@@ -96,16 +98,15 @@ namespace Framework.OAuth
                             clientError.ToResponseFormat());
                 }
             }
-
         }
 
         /*
-         * Get a request item and manage casting 
+         * Get a request item and manage casting
          */
         private T GetRequestItem<T>(string name)
         {
             var item = this.Request.HttpContext.Items[name];
-            if(item != null)
+            if (item != null)
             {
                 return (T)item;
             }

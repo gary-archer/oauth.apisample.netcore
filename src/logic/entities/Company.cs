@@ -5,16 +5,16 @@ namespace SampleApi.Logic.Entities
      */
     public class Company
     {
-        public int Id {get; set;}
+        public int Id { get; set; }
 
-        public string Name {get; set;}
+        public string Name { get; set; }
 
-        public string Region {get; set;}
+        public string Region { get; set; }
 
-        public double TargetUsd {get; set;}
+        public double TargetUsd { get; set; }
 
-        public double InvestmentUsd {get; set;}
+        public double InvestmentUsd { get; set; }
 
-        public int NoInvestors {get; set;}
+        public int NoInvestors { get; set; }
     }
 }

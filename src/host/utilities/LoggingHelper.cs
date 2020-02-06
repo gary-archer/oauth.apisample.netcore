@@ -16,9 +16,9 @@ namespace SampleApi.Host.Utilities
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddLogging(builder => builder.AddConsole());
-            using(var serviceProvider = serviceCollection.BuildServiceProvider())
+            using (var serviceProvider = serviceCollection.BuildServiceProvider())
             {
-                using(var loggerFactory = serviceProvider.GetService<ILoggerFactory>())
+                using (var loggerFactory = serviceProvider.GetService<ILoggerFactory>())
                 {
                     return loggerFactory.CreateLogger<Startup>();
                 }

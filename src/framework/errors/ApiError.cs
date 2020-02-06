@@ -10,8 +10,8 @@ namespace Framework.Errors
     public sealed class ApiError : Exception
     {
         // A range for random error ids
-        const int MIN_ERROR_ID = 10000;
-        const int MAX_ERROR_ID = 99999;
+        private const int MinErrorId = 10000;
+        private const int MaxErrorId = 99999;
 
         // Error fields
         private readonly string errorCode;
@@ -21,12 +21,13 @@ namespace Framework.Errors
         private readonly string utcTime;
         private string details;
 
-        public ApiError(string errorCode, string userMessage) : base(userMessage)
+        public ApiError(string errorCode, string userMessage)
+            : base(userMessage)
         {
             this.errorCode = errorCode;
             this.statusCode = HttpStatusCode.InternalServerError;
             this.area = "SampleApi";
-            this.instanceId = new Random().Next(MIN_ERROR_ID, MAX_ERROR_ID);
+            this.instanceId = new Random().Next(MinErrorId, MaxErrorId);
             this.utcTime = DateTime.UtcNow.ToString("s");
             this.details = string.Empty;
         }
@@ -59,7 +60,7 @@ namespace Framework.Errors
         public ClientError ToClientError()
         {
             var error = new ClientError(this.statusCode, this.errorCode, this.Message);
-            error.setExceptionDetails(this.area, this.instanceId, this.utcTime);
+            error.SetExceptionDetails(this.area, this.instanceId, this.utcTime);
             return error;
         }
     }

@@ -16,7 +16,7 @@ namespace SampleApi.Host.Authorization
         public override Task AddCustomClaimsAsync(string accessToken, SampleApiClaims claims)
         {
             // Any attempts to access data for company 3 will result in an unauthorized error
-            claims.RegionsCovered = new string[]{"Europe", "USA"};
+            claims.RegionsCovered = new string[]{ "Europe", "USA" };
             return Task.FromResult(0);
         }
     }

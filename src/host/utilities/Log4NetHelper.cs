@@ -5,13 +5,13 @@ namespace SampleApi.Host.Utilities
     using log4net.Core;
     using log4net.Layout;
     using log4net.Repository.Hierarchy;
-    
+
     /*
      * Set up log4net without a configuration file
      */
     public static class Log4NetHelper
     {
-        public static string ProductionRepository = "PRODUCTION";
+        public const string ProductionRepository = "PRODUCTION";
 
         /*
          * Create the log4net setup to support JSON logging
@@ -31,7 +31,7 @@ namespace SampleApi.Host.Utilities
             roller.MaxSizeRollBackups = 5;
             roller.MaximumFileSize = "1GB";
             roller.RollingStyle = RollingFileAppender.RollingMode.Size;
-            roller.StaticLogFileName = true;            
+            roller.StaticLogFileName = true;
             roller.ActivateOptions();
             hierarchy.Root.AddAppender(roller);*/
 

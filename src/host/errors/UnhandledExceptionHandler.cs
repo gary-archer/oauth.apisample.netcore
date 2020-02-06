@@ -2,10 +2,10 @@ namespace SampleApi.Host.Errors
 {
     using System;
     using System.Threading.Tasks;
+    using Framework.Errors;
+    using Framework.Utilities;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Logging;
-    using Framework.Utilities;
-    using Framework.Errors;
 
     /*
      * The application exception handler
@@ -54,7 +54,7 @@ namespace SampleApi.Host.Errors
             catch (Exception exception)
             {
                 // Log full error details and return a less detailed error to the caller
-                var clientError = this.HandleError(exception, logger);
+                var clientError = this.HandleError(exception, this.logger);
                 await ResponseErrorWriter.WriteErrorResponse(
                     context.Request,
                     context.Response,

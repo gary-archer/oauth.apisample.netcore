@@ -4,15 +4,16 @@ namespace Framework.OAuth
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
+    using Framework.Configuration;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
-    using Framework.Configuration;
 
     /*
      * Encapsulate getting and setting claims from the cache
      */
-    public sealed class ClaimsCache<TClaims> where TClaims: CoreApiClaims
+    public sealed class ClaimsCache<TClaims>
+        where TClaims : CoreApiClaims
     {
         private readonly IDistributedCache cache;
         private readonly OAuthConfiguration configuration;
@@ -49,15 +50,15 @@ namespace Framework.OAuth
                 {
                     secondsToCache = this.configuration.DefaultTokenCacheMinutes * 60;
                 }
-                
+
                 // Serialize claims to bytes
                 var json = JsonConvert.SerializeObject(claims);
                 var bytes = Encoding.UTF8.GetBytes(json);
 
-                // Cache the token until the above time                
+                // Cache the token until the above time
                 var options = new DistributedCacheEntryOptions
                 {
-                    AbsoluteExpiration = now.AddSeconds(secondsToCache)
+                    AbsoluteExpiration = now.AddSeconds(secondsToCache),
                 };
 
                 this.logger.LogDebug($"Adding token to claims cache for {secondsToCache} seconds (hash: {hash})");

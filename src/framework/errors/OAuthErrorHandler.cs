@@ -16,7 +16,7 @@ namespace Framework.Errors
         public ApiError FromMetadataError(DiscoveryDocumentResponse response, string url)
         {
             var data = this.ReadOAuthErrorResponse(response.Json);
-            var apiError = CreateOAuthApiError("metadata_lookup_failure", "Metadata lookup failed", data.Item1);
+            var apiError = this.CreateOAuthApiError("metadata_lookup_failure", "Metadata lookup failed", data.Item1);
             apiError.Details = this.GetErrorDetails(data.Item2, response.Error, url);
             return apiError;
         }
@@ -27,7 +27,7 @@ namespace Framework.Errors
         public ApiError FromIntrospectionError(TokenIntrospectionResponse response, string url)
         {
             var data = this.ReadOAuthErrorResponse(response.Json);
-            var apiError = CreateOAuthApiError("introspection_failure", "Token validation failed", data.Item1);
+            var apiError = this.CreateOAuthApiError("introspection_failure", "Token validation failed", data.Item1);
             apiError.Details = this.GetErrorDetails(data.Item2, response.Error, url);
             return apiError;
         }
@@ -38,7 +38,7 @@ namespace Framework.Errors
         public ApiError FromUserInfoError(UserInfoResponse response, string url)
         {
             var data = this.ReadOAuthErrorResponse(response.Json);
-            var apiError = CreateOAuthApiError("userinfo_failure", "User info lookup failed", data.Item1);
+            var apiError = this.CreateOAuthApiError("userinfo_failure", "User info lookup failed", data.Item1);
             apiError.Details = this.GetErrorDetails(data.Item2, response.Error, url);
             return apiError;
         }
@@ -50,7 +50,7 @@ namespace Framework.Errors
         {
             return new ApiError("claims_failure", "Authorization data not found")
             {
-                Details = $"An empty value was found for the expected claim {claimName}"
+                Details = $"An empty value was found for the expected claim {claimName}",
             };
         }
 
@@ -61,7 +61,7 @@ namespace Framework.Errors
         {
             string code = null;
             string description = null;
-            if(jsonBody != null)
+            if (jsonBody != null)
             {
                 code = jsonBody.TryGetString("error");
                 description = jsonBody.TryGetString("error_description");
@@ -76,7 +76,8 @@ namespace Framework.Errors
         private ApiError CreateOAuthApiError(string errorCode, string userMessage, string oauthErrorCode)
         {
             string message = userMessage;
-            if (!string.IsNullOrWhiteSpace(oauthErrorCode)) {
+            if (!string.IsNullOrWhiteSpace(oauthErrorCode))
+            {
                 message += $" : {oauthErrorCode}";
             }
 
@@ -89,21 +90,23 @@ namespace Framework.Errors
         private string GetErrorDetails(string oauthErrorDescription, string details, string url)
         {
             var parts = new List<string>();
-            
-            if (!string.IsNullOrWhiteSpace(details)) 
+
+            if (!string.IsNullOrWhiteSpace(details))
             {
                 parts.Add(details);
             }
-            if (!string.IsNullOrWhiteSpace(oauthErrorDescription)) 
+
+            if (!string.IsNullOrWhiteSpace(oauthErrorDescription))
             {
                 parts.Add(oauthErrorDescription);
             }
-            if (!string.IsNullOrWhiteSpace(url)) 
+
+            if (!string.IsNullOrWhiteSpace(url))
             {
                 parts.Add(url);
             }
 
-            return string.Join(", ",parts);
+            return string.Join(", ", parts);
         }
     }
 }

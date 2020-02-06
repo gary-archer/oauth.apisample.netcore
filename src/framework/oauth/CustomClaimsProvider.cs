@@ -5,7 +5,8 @@
     /*
      * A base class for adding custom claims from within core claims handling code
      */
-    public class CustomClaimsProvider<TClaims> where TClaims : CoreApiClaims, new()
+    public class CustomClaimsProvider<TClaims>
+        where TClaims : CoreApiClaims, new()
     {
         /*
          * This is overridden by base classes

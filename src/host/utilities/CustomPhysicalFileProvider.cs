@@ -7,7 +7,7 @@ namespace SampleApi.Host.Utilities
     /*
      * A custom implementation of file provider than does not emit startup errors when a folder on disk does not exist
      */
-    public class CustomPhysicalFileProvider: IFileProvider
+    public class CustomPhysicalFileProvider : IFileProvider
     {
         private readonly Lazy<PhysicalFileProvider> provider;
 

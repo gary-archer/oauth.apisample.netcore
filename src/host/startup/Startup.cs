@@ -1,14 +1,14 @@
 ﻿namespace SampleApi.Host.Startup
 {
+    using Framework.OAuth;
+    using Framework.Utilities;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;    
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc.Authorization;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using Framework.OAuth;
-    using Framework.Utilities;
     using SampleApi.Host.Authorization;
     using SampleApi.Host.Configuration;
     using SampleApi.Host.Errors;
@@ -42,7 +42,7 @@
                 LoggerRepository = Log4NetHelper.ProductionRepository
             };
             loggerFactory.AddLog4Net(options);*/
-            
+
             // Configure API pre flight requests
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method == "OPTIONS",
@@ -51,7 +51,8 @@
             // Configure API requests to use our framework security and error handling
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method != "OPTIONS",
-                api => {
+                api =>
+                {
                     api.UseAuthentication();
                     api.UseMiddleware<UnhandledExceptionHandler>();
                 });
@@ -96,15 +97,15 @@
                 .AddAuthentication("Bearer")
                 .AddCustomAuthorizationFilter<SampleApiClaims>(new AuthorizationFilterOptions()
                 {
-                    OAuthConfiguration = this.jsonConfig.OAuth
+                    OAuthConfiguration = this.jsonConfig.OAuth,
                 })
                 .WithCustomClaimsProvider<SampleApiClaimsProvider>()
                 .WithServices(services)
-                .WithHttpDebugging(this.jsonConfig.App.useProxy, this.jsonConfig.App.ProxyUrl)
+                .WithHttpDebugging(this.jsonConfig.App.UseProxy, this.jsonConfig.App.ProxyUrl)
                 .Build();
 
             // Apply the above authorization filter to all API requests
-            services.AddMvc(options => 
+            services.AddMvc(options =>
             {
                 options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
             });

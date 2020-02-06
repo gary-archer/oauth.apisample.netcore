@@ -1,15 +1,16 @@
 namespace SampleApi.Host.Configuration
 {
-    using Microsoft.Extensions.Configuration;
     using Framework.Configuration;
+    using Microsoft.Extensions.Configuration;
 
     /*
      * A class to manage our JSON configuration as an object
      */
     public class Configuration
     {
-        public ApplicationConfiguration App {get; private set;}
-        public OAuthConfiguration OAuth {get; private set;}
+        public ApplicationConfiguration App { get; private set; }
+
+        public OAuthConfiguration OAuth { get; private set; }
 
         /*
          * A helper method to load this custom configuration section
@@ -25,7 +26,7 @@ namespace SampleApi.Host.Configuration
             return new Configuration()
             {
                 App = appConfig,
-                OAuth = oauthConfig
+                OAuth = oauthConfig,
             };
         }
     }

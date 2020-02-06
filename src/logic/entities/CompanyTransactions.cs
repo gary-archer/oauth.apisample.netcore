@@ -7,10 +7,10 @@ namespace SampleApi.Logic.Entities
      */
     public class CompanyTransactions
     {
-        public int? Id {get; set;}
+        public int? Id { get; set; }
 
-        public Company Company {get; set;}
+        public Company Company { get; set; }
 
-        public IEnumerable<Transaction> Transactions {get; set;}
+        public IEnumerable<Transaction> Transactions { get; set; }
     }
 }

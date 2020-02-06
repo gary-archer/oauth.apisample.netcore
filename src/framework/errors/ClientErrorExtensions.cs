@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
-
-namespace Framework.Errors
+﻿namespace Framework.Errors
 {
+    using Newtonsoft.Json.Linq;
+
     /*
      * Helper extensions for all client errors
      */
