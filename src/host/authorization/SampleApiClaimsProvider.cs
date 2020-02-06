@@ -1,7 +1,7 @@
 namespace SampleApi.Host.Authorization
 {
     using System.Threading.Tasks;
-    using Framework.Api.Base.OAuth;
+    using Framework.Api.OAuth.Claims;
     using SampleApi.Logic.Entities;
 
     /*

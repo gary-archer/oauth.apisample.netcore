@@ -1,4 +1,4 @@
-namespace Framework.Api.Base.OAuth
+namespace Framework.Api.OAuth.Security
 {
     using System;
     using System.Globalization;
@@ -6,6 +6,7 @@ namespace Framework.Api.Base.OAuth
     using System.Net.Http;
     using System.Threading.Tasks;
     using Framework.Api.Base.Errors;
+    using Framework.Api.OAuth.Claims;
     using Framework.Api.OAuth.Configuration;
     using IdentityModel;
     using IdentityModel.Client;

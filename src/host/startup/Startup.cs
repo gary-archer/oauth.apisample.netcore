@@ -2,8 +2,8 @@
 {
     using Framework.Api.Base.Logging;
     using Framework.Api.Base.Middleware;
-    using Framework.Api.Base.OAuth;
     using Framework.Api.Base.Utilities;
+    using Framework.Api.OAuth.Security;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;

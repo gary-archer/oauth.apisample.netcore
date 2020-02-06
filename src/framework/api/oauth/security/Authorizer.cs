@@ -1,8 +1,9 @@
-namespace Framework.Api.Base.OAuth
+namespace Framework.Api.OAuth.Security
 {
     using System.Linq;
     using System.Threading.Tasks;
     using Framework.Api.Base.Errors;
+    using Framework.Api.OAuth.Claims;
     using Microsoft.AspNetCore.Http;
 
     /*

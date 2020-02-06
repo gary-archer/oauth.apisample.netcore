@@ -1,4 +1,4 @@
-namespace Framework.Api.Base.OAuth
+namespace Framework.Api.OAuth.Security
 {
     using System;
     using System.Collections.Generic;
@@ -8,6 +8,7 @@ namespace Framework.Api.Base.OAuth
     using Framework.Api.Base.Errors;
     using Framework.Api.Base.Logging;
     using Framework.Api.Base.Utilities;
+    using Framework.Api.OAuth.Claims;
     using IdentityModel;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.Extensions.Options;

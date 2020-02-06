@@ -6,8 +6,8 @@
     using System.Linq;
     using System.Runtime.Serialization;
     using System.Security.Claims;
-    using Framework.Api.Base.OAuth;
     using Framework.Api.Base.Utilities;
+    using Framework.Api.OAuth.Claims;
 
     /*
      * Our API overrides the core claims to support additional custom claims

@@ -3,7 +3,6 @@
     using System;
     using System.IO;
     using System.Net;
-    using Framework.Api.Base.Errors;
     using Framework.Api.Base.Middleware;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;

@@ -1,4 +1,4 @@
-namespace Framework.Api.Base.OAuth
+namespace Framework.Api.OAuth.Security
 {
     using System;
     using System.Net.Http;

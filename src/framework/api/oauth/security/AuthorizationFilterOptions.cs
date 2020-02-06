@@ -1,4 +1,4 @@
-namespace Framework.Api.Base.OAuth
+namespace Framework.Api.OAuth.Security
 {
     using Framework.Api.OAuth.Configuration;
     using Microsoft.AspNetCore.Authentication;

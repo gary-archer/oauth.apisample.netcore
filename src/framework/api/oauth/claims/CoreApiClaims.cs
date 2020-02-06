@@ -1,4 +1,4 @@
-namespace Framework.Api.Base.OAuth
+namespace Framework.Api.OAuth.Claims
 {
     using System.Collections.Generic;
     using System.Linq;

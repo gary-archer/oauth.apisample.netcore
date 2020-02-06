@@ -1,4 +1,4 @@
-namespace Framework.Api.Base.OAuth
+namespace Framework.Api.OAuth.Claims
 {
     using System;
     using System.Security.Cryptography;

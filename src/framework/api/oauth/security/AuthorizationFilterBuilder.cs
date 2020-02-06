@@ -1,8 +1,9 @@
-﻿namespace Framework.Api.Base.OAuth
+﻿namespace Framework.Api.OAuth.Security
 {
     using System;
     using System.Net.Http;
     using Framework.Api.Base.Utilities;
+    using Framework.Api.OAuth.Claims;
     using Framework.Api.OAuth.Configuration;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Distributed;

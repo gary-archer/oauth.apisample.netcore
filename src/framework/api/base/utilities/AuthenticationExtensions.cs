@@ -1,6 +1,7 @@
 ﻿namespace Framework.Api.Base.Utilities
 {
-    using Framework.Api.Base.OAuth;
+    using Framework.Api.OAuth.Claims;
+    using Framework.Api.OAuth.Security;
     using Microsoft.AspNetCore.Authentication;
 
     /*
