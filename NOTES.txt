@@ -3,6 +3,8 @@ CodeLens
   Tools / Options / Texxt Editor / All Languages / CodeLens
   File / Preferences / Settings / Text Editor / CodeLens
 
+Open Issues
+-----------
   Non standard Okta introspect error response:
   {
     "errorCode":"invalid_client",
@@ -12,6 +14,9 @@ CodeLens
     "errorCauses":[]
   }
 
-  NEXT
-  ----
-  
+NEXT
+----
+  1. Get classes I have into the correct folder layout
+  2. Classes to migrate as for Node / Java
+  3. Config file to finalise
+  4. Logging to complete
