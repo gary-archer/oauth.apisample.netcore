@@ -16,14 +16,13 @@ Open Issues
 
 NEXT
 ----
-0. Ensure correct checked in files
+1. Read production logging configuration from file and avoid hard coding
 
-1. Avoid recreating the logger factory and get from the container
+2. Avoid recreating the logger factory and get from the container
 
-2. Improve logging data and log the API name
+3. Create proper log entry classes starting with logging the API name
+   Fill in fields
      
-3. Read logging configuration and set up appenders
-
 4. Get rid of data contracts for claims serialization - review principal handling
      
 5. Error abstractions and ErrorCodes source file
@@ -31,5 +30,6 @@ NEXT
 
 6. No exception details for long press
    Make details a JObject
+   Fix Okta response above
 
 7. Support unsecured paths
