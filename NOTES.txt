@@ -18,8 +18,7 @@ NEXT
 ----
 0. Ensure correct checked in files
 
-1. Make a single logger factory available for the whole lifetime
-   Handle startup errors when logging configured and when not (in which case output exception.ToString())
+1. Avoid recreating the logger factory and get from the container
 
 2. Improve logging data and log the API name
      
