@@ -6,7 +6,7 @@
     /*
      * A framework base class for error handling
      */
-    public class BaseErrorHandler
+    public class ErrorUtils
     {
         /*
          * Do error handling and logging, then return an error to the client
@@ -36,9 +36,20 @@
             }
 
             // Unhandled exceptions
-            apiError = BaseErrorHandler.FromException(exception);
+            apiError = ErrorUtils.FromException(exception);
             logEntry.AddApiError(apiError);
             return apiError.ToClientError();
+        }
+
+        /*
+         * Handle unexpected data errors if an expected claim was not found in an OAuth message
+         */
+        public ApiError FromMissingClaim(string claimName)
+        {
+            return new ApiError("claims_failure", "Authorization data not found")
+            {
+                Details = $"An empty value was found for the expected claim {claimName}",
+            };
         }
 
         /*

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Net.Http;
+    using Framework.Api.Base.Claims;
     using Framework.Api.Base.Security;
     using Framework.Api.Base.Utilities;
     using Framework.Api.OAuth.Claims;

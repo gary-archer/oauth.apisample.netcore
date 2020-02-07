@@ -10,7 +10,7 @@ namespace Framework.Api.Base.Middleware
     /*
      * The application exception handler
      */
-    public class UnhandledExceptionMiddleware : BaseErrorHandler
+    public class UnhandledExceptionMiddleware : ErrorUtils
     {
         private readonly RequestDelegate next;
 

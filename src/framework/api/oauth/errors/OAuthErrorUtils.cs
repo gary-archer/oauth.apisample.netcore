@@ -1,14 +1,15 @@
-namespace Framework.Api.Base.Errors
+namespace Framework.Api.OAuth.Errors
 {
     using System;
     using System.Collections.Generic;
+    using Framework.Api.Base.Errors;
     using IdentityModel.Client;
     using Newtonsoft.Json.Linq;
 
     /*
      * Framework specific error handling
      */
-    public sealed class OAuthErrorHandler : BaseErrorHandler
+    public sealed class OAuthErrorUtils
     {
         /*
          * Report metadata lookup failures clearly

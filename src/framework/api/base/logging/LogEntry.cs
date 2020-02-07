@@ -1,7 +1,7 @@
 namespace Framework.Api.Base.Logging
 {
+    using Framework.Api.Base.Claims;
     using Framework.Api.Base.Errors;
-    using Framework.Api.OAuth.Claims;
     using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json.Linq;
 

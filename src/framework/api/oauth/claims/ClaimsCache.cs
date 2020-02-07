@@ -4,6 +4,7 @@ namespace Framework.Api.OAuth.Claims
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
+    using Framework.Api.Base.Claims;
     using Framework.Api.OAuth.Configuration;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.Logging;

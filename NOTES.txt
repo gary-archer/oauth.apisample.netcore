@@ -16,13 +16,14 @@ Open Issues
 
 NEXT
 ----
-  1. Finish header authorizer and missing claims errors
+  1. Configuration file + entities to correct structure, even if logging not used
 
-  2. Move classes to correct frameworks
-     Configuration file and logging to improve
+  2. Read logging data
+
+  3. Populate logging data
     
-  3. Error abstractions and ErrorCodes source file
+  4. Error abstractions and ErrorCodes source file
+
+  5. Base framework classes
     
-  4. Config file to finalise and build logger classes
-     Logging field population to complete
-     Support unsecured paths
+  6. Support unsecured paths

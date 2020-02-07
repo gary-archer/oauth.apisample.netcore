@@ -1,6 +1,5 @@
 namespace Framework.Api.Base.Utilities
 {
-    using System.Net;
     using System.Threading.Tasks;
     using Framework.Api.Base.Errors;
     using Microsoft.AspNetCore.Http;

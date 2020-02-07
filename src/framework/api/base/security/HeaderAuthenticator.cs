@@ -1,8 +1,8 @@
 ﻿namespace Framework.Api.Base.Security
 {
     using System.Threading.Tasks;
+    using Framework.Api.Base.Claims;
     using Framework.Api.Base.Errors;
-    using Framework.Api.OAuth.Claims;
     using Microsoft.AspNetCore.Http;
 
     /*
@@ -45,7 +45,7 @@
                 return request.Headers[name];
             }
 
-            var handler = new OAuthErrorHandler();
+            var handler = new ErrorUtils();
             throw handler.FromMissingClaim(name);
         }
     }

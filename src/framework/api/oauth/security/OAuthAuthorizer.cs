@@ -2,6 +2,7 @@ namespace Framework.Api.OAuth.Security
 {
     using System.Linq;
     using System.Threading.Tasks;
+    using Framework.Api.Base.Claims;
     using Framework.Api.Base.Errors;
     using Framework.Api.Base.Security;
     using Framework.Api.OAuth.Claims;

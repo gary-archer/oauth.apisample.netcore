@@ -5,9 +5,10 @@ namespace Framework.Api.OAuth.Security
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using Framework.Api.Base.Claims;
     using Framework.Api.Base.Errors;
-    using Framework.Api.OAuth.Claims;
     using Framework.Api.OAuth.Configuration;
+    using Framework.Api.OAuth.Errors;
     using IdentityModel;
     using IdentityModel.Client;
     using Microsoft.AspNetCore.Http;
@@ -63,7 +64,7 @@ namespace Framework.Api.OAuth.Security
                 // Handle errors
                 if (response.IsError)
                 {
-                    var handler = new OAuthErrorHandler();
+                    var handler = new OAuthErrorUtils();
                     throw handler.FromIntrospectionError(response, this.metadata.IntrospectionEndpoint);
                 }
 
@@ -109,7 +110,7 @@ namespace Framework.Api.OAuth.Security
                     }
 
                     // Handle technical errors
-                    var handler = new OAuthErrorHandler();
+                    var handler = new OAuthErrorUtils();
                     throw handler.FromUserInfoError(response, this.metadata.UserInfoEndpoint);
                 }
 
@@ -129,7 +130,7 @@ namespace Framework.Api.OAuth.Security
             var value = response.TryGet(name);
             if (value == null)
             {
-                var handler = new OAuthErrorHandler();
+                var handler = new OAuthErrorUtils();
                 throw handler.FromMissingClaim(name);
             }
 
@@ -144,7 +145,7 @@ namespace Framework.Api.OAuth.Security
             var value = response.TryGet(name);
             if (value == null)
             {
-                var handler = new OAuthErrorHandler();
+                var handler = new OAuthErrorUtils();
                 throw handler.FromMissingClaim(name);
             }
 

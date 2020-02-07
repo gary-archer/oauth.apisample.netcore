@@ -3,8 +3,8 @@ namespace Framework.Api.OAuth.Security
     using System;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using Framework.Api.Base.Errors;
     using Framework.Api.OAuth.Configuration;
+    using Framework.Api.OAuth.Errors;
     using IdentityModel.Client;
 
     /*
@@ -49,7 +49,7 @@ namespace Framework.Api.OAuth.Security
                 // Handle errors
                 if (response.IsError)
                 {
-                    var handler = new OAuthErrorHandler();
+                    var handler = new OAuthErrorUtils();
                     throw handler.FromMetadataError(response, this.configuration.Authority);
                 }
 

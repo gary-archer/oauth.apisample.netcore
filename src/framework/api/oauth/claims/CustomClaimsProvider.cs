@@ -1,6 +1,7 @@
 ﻿namespace Framework.Api.OAuth.Claims
 {
     using System.Threading.Tasks;
+    using Framework.Api.Base.Claims;
 
     /*
      * A base class for adding custom claims from within core claims handling code

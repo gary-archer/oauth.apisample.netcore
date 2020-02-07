@@ -82,7 +82,7 @@ namespace Framework.Api.Base.Security
             catch (Exception exception)
             {
                 // If there is an error then log it and we also need to end logging here
-                var handler = new OAuthErrorHandler();
+                var handler = new ErrorUtils();
                 var clientError = handler.HandleError(exception, this.logEntry);
                 this.logEntry.End(this.Response);
 
