@@ -1,6 +1,6 @@
 CodeLens
 --------
-  Tools / Options / Texxt Editor / All Languages / CodeLens
+  Tools / Options / Text Editor / All Languages / CodeLens
   File / Preferences / Settings / Text Editor / CodeLens
 
 Open Issues
@@ -16,7 +16,10 @@ Open Issues
 
 NEXT
 ----
-  1. Get classes I have into the correct folder layout
-  2. Classes to migrate as for Node / Java
-  3. Config file to finalise
-  4. Logging to complete
+  1. Startup handling and framework builders to finish
+     Includes testing of header authorizer
+
+  2. Class layout / name / responsibility refactoring part 1
+
+  3. Config file to finalise and build logger classes
+     Logging field population to complete

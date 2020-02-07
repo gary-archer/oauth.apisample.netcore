@@ -1,9 +1,8 @@
 ﻿namespace SampleApi.Host.Startup
 {
-    using Framework.Api.Base.Logging;
-    using Framework.Api.Base.Middleware;
-    using Framework.Api.Base.Utilities;
+    using Framework.Api.Base.Startup;
     using Framework.Api.OAuth.Security;
+    using Framework.Api.OAuth.Startup;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -39,12 +38,12 @@
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method == "OPTIONS",
                 api => app.UseCors("api"));
 
-            // Configure API .Net middleware
+            // Configure .Net Core middleware for the API
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method != "OPTIONS",
                 api => this.ConfigureApiMiddleware(api));
 
-            // For demo purposes we also serve static content for requests for the below paths
+            // For demo purposes our API also serves web static content for requests for the below paths
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/spa")) ||
                        ctx.Request.Path.StartsWithSegments(new PathString("/desktop")) ||
@@ -75,13 +74,13 @@
                                     .AllowCredentials());
             });
 
-            // Set up base framework handling
+            // Make base framework dependencies injectable
             this.ConfigureApiBaseFrameworkDependencies(services);
 
-            // Set up OAuth handling
+            // Make OAuth framework dependencies injectable
             this.ConfigureApiOAuthFrameworkDependencies(services);
 
-            // Register our API's dependencies, which are per request scoped
+            // Register our API's own dependencies
             this.ConfigureApiDependencies(services);
         }
 
@@ -93,18 +92,16 @@
             // Ensure that authentication middleware is called for API requests
             api.UseAuthentication();
 
-            // Add framework middleware for API cross cutting concerns
-            api.UseMiddleware<LoggerMiddleware>();
-            api.UseMiddleware<UnhandledExceptionMiddleware>();
+            // Add standard framework middleware classes
+            new FrameworkBuilder().AddMiddleware(api);
         }
 
         /*
-         * Add API base framework dependencies
+         * Add standard base API framework dependencies
          */
         private void ConfigureApiBaseFrameworkDependencies(IServiceCollection services)
         {
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped<LogEntry>();
+            new FrameworkBuilder().Register(services);
         }
 
         /*
@@ -112,31 +109,27 @@
          */
         private void ConfigureApiOAuthFrameworkDependencies(IServiceCollection services)
         {
-            // These are prerequisites for our authentication solution
-            services.AddDistributedMemoryCache();
+            // Indicate the type of the .Net Core custom authentication handler
+            string scheme = "Bearer";
+            services.AddAuthentication(scheme)
+                    .AddScheme<CustomAuthenticationFilterOptions, CustomAuthenticationFilter<SampleApiClaims>>(scheme, (o) => { });
 
-            // Add our custom authentication handler, to manage introspection and claims caching
-            services
-                .AddAuthentication("Bearer")
-                .AddCustomAuthorizationFilter<SampleApiClaims>(new AuthorizationFilterOptions()
-                {
-                    OAuthConfiguration = this.jsonConfig.OAuth,
-                })
-                .WithCustomClaimsProvider<SampleApiClaimsProvider>()
-                .WithServices(services)
-                .WithHttpDebugging(this.jsonConfig.App.UseProxy, this.jsonConfig.App.ProxyUrl)
-                .Build();
-
-            // Apply the above authorization filter to all API requests
+            // Indicate that all API requests are authorized, by applying the standard .Net Core filter
             services.AddMvc(options =>
             {
                 options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
             });
+
+            // Build resources that will be injected into the Custom Authentication Filter
+            new OAuthAuthorizerBuilder<SampleApiClaims>(this.jsonConfig.OAuth)
+                .WithCustomClaimsProvider<SampleApiClaimsProvider>()
+                .WithServices(services)
+                .WithHttpDebugging(this.jsonConfig.App.UseProxy, this.jsonConfig.App.ProxyUrl)
+                .Register();
         }
 
         /*
-         * Add the API's own business logic dependencies with a request scope
-         * This ensures that all classes are created fresh on each API request, with no concurrency risks
+         * Add the API's own business logic dependencies with a per request scope
          */
         private void ConfigureApiDependencies(IServiceCollection services)
         {

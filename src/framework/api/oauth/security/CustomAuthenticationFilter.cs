@@ -9,20 +9,21 @@ namespace Framework.Api.OAuth.Security
     using Framework.Api.Base.Logging;
     using Framework.Api.Base.Utilities;
     using Framework.Api.OAuth.Claims;
+    using Framework.Api.OAuth.Startup;
     using IdentityModel;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.Extensions.Options;
 
     /*
-     * An instance of this class is created for every API request and manages Microsoft specific classes
+     * The Microsoft specific class which is created per request and wraps our authorizer
      */
-    public sealed class AuthorizationFilter<TClaims> : AuthenticationHandler<AuthorizationFilterOptions>
+    public sealed class CustomAuthenticationFilter<TClaims> : AuthenticationHandler<CustomAuthenticationFilterOptions>
         where TClaims : CoreApiClaims, new()
     {
         private readonly Authorizer<TClaims> authorizer;
 
-        public AuthorizationFilter(
-            IOptionsMonitor<AuthorizationFilterOptions> options,
+        public CustomAuthenticationFilter(
+            IOptionsMonitor<CustomAuthenticationFilterOptions> options,
             Microsoft.Extensions.Logging.ILoggerFactory loggerFactory,
             UrlEncoder urlEncoder,
             ISystemClock clock,
