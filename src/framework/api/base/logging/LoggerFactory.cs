@@ -1,6 +1,8 @@
 namespace Framework.Api.Base.Logging
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using Framework.Api.Base.Errors;
     using log4net;
     using log4net.Appender;
@@ -62,6 +64,7 @@ namespace Framework.Api.Base.Logging
 
         /*
          * Configure production logging, which works the same in all environments, to log queryable fields
+         * https://blogs.perficient.com/2016/04/20/how-to-programmatically-create-log-instance-by-log4net-library/
          */
         private void ConfigureProductionLogging(ILoggingBuilder builder, JObject loggingConfiguration)
         {
@@ -81,11 +84,9 @@ namespace Framework.Api.Base.Logging
             log4net.Util.LogLog.InternalDebugging = true;
             */
 
-            // Set up log4net appenders
-            // https://blogs.perficient.com/2016/04/20/how-to-programmatically-create-log-instance-by-log4net-library/
-            var consoleAppender = this.CreateConsoleAppender();
-            var fileAppender = this.CreateFileAppender();
-            BasicConfigurator.Configure(repository, consoleAppender, fileAppender);
+            // Create appenders from configuration
+            var appenders = this.CreateProductionAppenders((JArray)loggingConfiguration["appenders"]);
+            BasicConfigurator.Configure(repository, appenders);
         }
 
         /*
@@ -115,9 +116,44 @@ namespace Framework.Api.Base.Logging
         }
 
         /*
+         * Create appenders from configuration
+         */
+        private IAppender[] CreateProductionAppenders(JArray appendersConfiguration)
+        {
+            var appenders = new List<IAppender>();
+
+            if (appendersConfiguration != null)
+            {
+                // Add the console appender if configured
+                var consoleFound = appendersConfiguration.Children<JObject>().FirstOrDefault(a => a["type"] != null && a["type"].ToString() == "console");
+                if (consoleFound != null)
+                {
+                    var consoleAppender = this.CreateProductionConsoleAppender();
+                    if (consoleAppender != null)
+                    {
+                        appenders.Add(consoleAppender);
+                    }
+                }
+
+                // Add the file appender if configured
+                var fileFound = appendersConfiguration.Children<JObject>().FirstOrDefault(a => a["type"] != null && a["type"].ToString() == "file");
+                if (fileFound != null)
+                {
+                    var fileAppender = this.CreateProductionFileAppender();
+                    if (fileAppender != null)
+                    {
+                        appenders.Add(fileAppender);
+                    }
+                }
+            }
+
+            return appenders.ToArray();
+        }
+
+        /*
          * Create a console appender that uses JSON with pretty printing
          */
-        private IAppender CreateConsoleAppender()
+        private IAppender CreateProductionConsoleAppender()
         {
             var jsonLayout = new JsonLayout(true);
             jsonLayout.ActivateOptions();
@@ -132,7 +168,7 @@ namespace Framework.Api.Base.Logging
          * Create a rolling file appender that uses JSON with an object per line
          * We use a new file per day and infinite backups of the form 2020-02-06.1.log
          */
-        private IAppender CreateFileAppender()
+        private IAppender CreateProductionFileAppender()
         {
             var jsonLayout = new JsonLayout(false);
             var fileAppender = new RollingFileAppender();
