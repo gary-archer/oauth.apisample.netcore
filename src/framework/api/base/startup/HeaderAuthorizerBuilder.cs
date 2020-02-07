@@ -10,9 +10,9 @@
         /*
          * Register and return the authorizer
          */
-        public BaseAuthorizer Register()
+        public HeaderAuthorizer Register()
         {
-            return new BaseAuthorizer();
+            return new HeaderAuthorizer();
         }
     }
 }

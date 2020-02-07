@@ -3,24 +3,23 @@ namespace Framework.Api.OAuth.Security
     using System.Linq;
     using System.Threading.Tasks;
     using Framework.Api.Base.Errors;
+    using Framework.Api.Base.Security;
     using Framework.Api.OAuth.Claims;
     using Microsoft.AspNetCore.Http;
 
     /*
-     * The entry point for the processing to validate tokens and return claims
-     * Our approach provides extensible claims to our API and enables high performance
-     * It also takes close control of error responses to our SPA
+     * The technology neutral algorithm for validating access tokens and returning claims
      */
-    public sealed class Authorizer<TClaims>
+    public sealed class OAuthAuthorizer<TClaims> : IAuthorizer
         where TClaims : CoreApiClaims, new()
     {
         private readonly ClaimsCache<TClaims> cache;
-        private readonly Authenticator authenticator;
+        private readonly OAuthAuthenticator authenticator;
         private readonly CustomClaimsProvider<TClaims> customClaimsProvider;
 
-        public Authorizer(
+        public OAuthAuthorizer(
             ClaimsCache<TClaims> cache,
-            Authenticator authenticator,
+            OAuthAuthenticator authenticator,
             CustomClaimsProvider<TClaims> customClaimsProvider)
         {
             this.cache = cache;
@@ -31,7 +30,7 @@ namespace Framework.Api.OAuth.Security
         /*
          * The entry point to populate claims from an access token
          */
-        public async Task<TClaims> Execute(HttpRequest request)
+        public async Task<CoreApiClaims> Execute(HttpRequest request)
         {
             // First handle missing tokens
             var accessToken = this.ReadAccessToken(request);

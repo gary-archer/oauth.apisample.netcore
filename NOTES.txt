@@ -16,10 +16,10 @@ Open Issues
 
 NEXT
 ----
-  1. Startup handling and framework builders to finish
-     Includes testing of header authorizer
+  1. Logging for authorizers and test header authorizer
 
   2. Class layout / name / responsibility refactoring part 1
+     Support unsecured paths
 
   3. Config file to finalise and build logger classes
      Logging field population to complete

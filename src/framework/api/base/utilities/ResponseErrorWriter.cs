@@ -14,7 +14,7 @@ namespace Framework.Api.Base.Utilities
         /*
          * Deliver a controlled 401 response to the caller
          */
-        public static async Task WriteInvalidTokenResponse(HttpRequest request, HttpResponse response)
+        public static async Task WriteInvalidTokenResponse(HttpRequest request, HttpResponse response, ClientError error)
         {
             // Write headers
             response.ContentType = "application/json";
@@ -23,8 +23,7 @@ namespace Framework.Api.Base.Utilities
 
             // Write the body
             response.StatusCode = 401;
-            var clientError = new ClientError(HttpStatusCode.Unauthorized, "unauthorized", "Missing, invalid or expired access token");
-            await response.WriteAsync(clientError.ToResponseFormat().ToString());
+            await response.WriteAsync(error.ToResponseFormat().ToString());
         }
 
         /*

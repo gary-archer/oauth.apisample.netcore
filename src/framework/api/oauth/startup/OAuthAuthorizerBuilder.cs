@@ -2,6 +2,7 @@
 {
     using System;
     using System.Net.Http;
+    using Framework.Api.Base.Security;
     using Framework.Api.Base.Utilities;
     using Framework.Api.OAuth.Claims;
     using Framework.Api.OAuth.Configuration;
@@ -110,8 +111,8 @@
             this.services.AddSingleton(this.httpProxyFactory);
 
             // Register OAuth per request dependencies
-            this.services.AddScoped<Authorizer<TClaims>>();
-            this.services.AddScoped<Authenticator>();
+            this.services.AddScoped<IAuthorizer, OAuthAuthorizer<TClaims>>();
+            this.services.AddScoped<OAuthAuthenticator>();
             this.services.AddScoped(typeof(CustomClaimsProvider<TClaims>), this.customClaimsProviderType);
 
             // The claims middleware populates the TClaims object and sets it against the HTTP context's claims principal

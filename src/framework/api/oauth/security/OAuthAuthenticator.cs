@@ -15,13 +15,13 @@ namespace Framework.Api.OAuth.Security
     /*
      * The class from which OAuth calls are initiated
      */
-    public sealed class Authenticator
+    public sealed class OAuthAuthenticator
     {
         private readonly OAuthConfiguration configuration;
         private readonly DiscoveryDocumentResponse metadata;
         private readonly Func<HttpClientHandler> proxyFactory;
 
-        public Authenticator(OAuthConfiguration configuration, IssuerMetadata issuer, Func<HttpClientHandler> proxyFactory)
+        public OAuthAuthenticator(OAuthConfiguration configuration, IssuerMetadata issuer, Func<HttpClientHandler> proxyFactory)
         {
             this.configuration = configuration;
             this.metadata = issuer.Metadata;

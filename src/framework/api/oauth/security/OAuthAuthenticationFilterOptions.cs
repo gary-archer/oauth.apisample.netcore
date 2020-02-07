@@ -6,7 +6,7 @@ namespace Framework.Api.OAuth.Security
     /*
      * Properties used by our custom .Net Core authentication filter
      */
-    public sealed class CustomAuthenticationFilterOptions : AuthenticationSchemeOptions
+    public sealed class OAuthAuthenticationFilterOptions : AuthenticationSchemeOptions
     {
         public OAuthConfiguration Configuration { get; set; }
     }

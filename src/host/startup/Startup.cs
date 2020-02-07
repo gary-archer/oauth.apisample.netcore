@@ -1,5 +1,6 @@
 ﻿namespace SampleApi.Host.Startup
 {
+    using Framework.Api.Base.Security;
     using Framework.Api.Base.Startup;
     using Framework.Api.OAuth.Security;
     using Framework.Api.OAuth.Startup;
@@ -109,18 +110,18 @@
          */
         private void ConfigureApiOAuthFrameworkDependencies(IServiceCollection services)
         {
-            // Indicate the type of the .Net Core custom authentication handler
+            // Indicate the type of our .Net Core custom authentication handler
             string scheme = "Bearer";
             services.AddAuthentication(scheme)
-                    .AddScheme<CustomAuthenticationFilterOptions, CustomAuthenticationFilter<SampleApiClaims>>(scheme, (o) => { });
+                    .AddScheme<OAuthAuthenticationFilterOptions, CustomAuthenticationFilter<OAuthAuthenticationFilterOptions>>(scheme, (o) => { });
 
-            // Indicate that all API requests are authorized, by applying the standard .Net Core filter
+            // Indicate that all API requests are authorized, by applying the standard .Net Core Authorize Filter
             services.AddMvc(options =>
             {
                 options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
             });
 
-            // Build resources that will be injected into the Custom Authentication Filter
+            // Prepare resources that will be injected into the above custom authentication Filter
             new OAuthAuthorizerBuilder<SampleApiClaims>(this.jsonConfig.OAuth)
                 .WithCustomClaimsProvider<SampleApiClaimsProvider>()
                 .WithServices(services)

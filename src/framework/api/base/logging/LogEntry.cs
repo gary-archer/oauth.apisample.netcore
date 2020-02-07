@@ -1,6 +1,7 @@
 namespace Framework.Api.Base.Logging
 {
     using Framework.Api.Base.Errors;
+    using Framework.Api.OAuth.Claims;
     using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json.Linq;
 
@@ -10,6 +11,7 @@ namespace Framework.Api.Base.Logging
     public class LogEntry
     {
         private string requestPath;
+        private string userId;
         private int statusCode;
         private IClientError clientError;
         private ApiError apiError;
@@ -19,6 +21,7 @@ namespace Framework.Api.Base.Logging
             this.clientError = null;
             this.apiError = null;
             this.requestPath = string.Empty;
+            this.userId = string.Empty;
             this.statusCode = 0;
         }
 
@@ -28,6 +31,14 @@ namespace Framework.Api.Base.Logging
         public void Start(HttpRequest request)
         {
             this.requestPath = request.Path.ToString();
+        }
+
+        /*
+         * Record identity details
+         */
+        public void SetIdentity(CoreApiClaims claims)
+        {
+            this.userId = claims.UserId;
         }
 
         /*
@@ -75,6 +86,11 @@ namespace Framework.Api.Base.Logging
             if (!string.IsNullOrWhiteSpace(this.requestPath))
             {
                 data.requestPath = this.requestPath;
+            }
+
+            if (!string.IsNullOrWhiteSpace(this.userId))
+            {
+                data.userId = this.userId;
             }
 
             if (this.clientError != null)
