@@ -1,4 +1,8 @@
+# General files not checked in
 bin
 obj
 logs
 .DS_Store
+
+# Visual Studio 2019 files
+.vs

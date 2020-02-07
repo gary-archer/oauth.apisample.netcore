@@ -39,17 +39,10 @@
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method == "OPTIONS",
                 api => app.UseCors("api"));
 
+            // Configure API .Net middleware
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method != "OPTIONS",
-                api =>
-                {
-                    // Ensure that authentication middleware is called for API requests
-                    api.UseAuthentication();
-
-                    // Add framework middleware for API cross cutting concerns
-                    api.UseMiddleware<LoggerMiddleware>();
-                    api.UseMiddleware<UnhandledExceptionMiddleware>();
-                });
+                api => this.ConfigureApiMiddleware(api));
 
             // For demo purposes we also serve static content for requests for the below paths
             app.UseWhen(
@@ -58,7 +51,7 @@
                        ctx.Request.Path.StartsWithSegments(new PathString("/mobile")),
                 web => WebStaticContent.Configure(web));
 
-            // Use controller attributes for routing
+            // Use controller attributes for API request routing
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
@@ -82,9 +75,45 @@
                                     .AllowCredentials());
             });
 
+            // Set up base framework handling
+            this.ConfigureApiBaseFrameworkDependencies(services);
+
+            // Set up OAuth handling
+            this.ConfigureApiOAuthFrameworkDependencies(services);
+
+            // Register our API's dependencies, which are per request scoped
+            this.ConfigureApiDependencies(services);
+        }
+
+        /*
+         * Set up the API with cross cutting concerns
+         */
+        private void ConfigureApiMiddleware(IApplicationBuilder api)
+        {
+            // Ensure that authentication middleware is called for API requests
+            api.UseAuthentication();
+
+            // Add framework middleware for API cross cutting concerns
+            api.UseMiddleware<LoggerMiddleware>();
+            api.UseMiddleware<UnhandledExceptionMiddleware>();
+        }
+
+        /*
+         * Add API base framework dependencies
+         */
+        private void ConfigureApiBaseFrameworkDependencies(IServiceCollection services)
+        {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<LogEntry>();
+        }
+
+        /*
+         * Set up the API with cross cutting concerns
+         */
+        private void ConfigureApiOAuthFrameworkDependencies(IServiceCollection services)
+        {
             // These are prerequisites for our authentication solution
             services.AddDistributedMemoryCache();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // Add our custom authentication handler, to manage introspection and claims caching
             services
@@ -103,12 +132,17 @@
             {
                 options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
             });
+        }
 
-            // Register our API's dependencies, which are per request scoped
+        /*
+         * Add the API's own business logic dependencies with a request scope
+         * This ensures that all classes are created fresh on each API request, with no concurrency risks
+         */
+        private void ConfigureApiDependencies(IServiceCollection services)
+        {
             services.AddScoped<JsonReader>();
             services.AddScoped<CompanyRepository>();
             services.AddScoped<CompanyService>();
-            services.AddScoped<LogEntry>();
         }
     }
 }
