@@ -5,16 +5,23 @@
     using Microsoft.AspNetCore.Http;
 
     /*
-     * An authenticator that reads claims from headers
+     * A simpler header authorizer used by private APIs
      */
     public class HeaderAuthorizer : IAuthorizer
     {
+        private readonly HeaderAuthenticator authenticator;
+
+        public HeaderAuthorizer(HeaderAuthenticator authenticator)
+        {
+            this.authenticator = authenticator;
+        }
+
         /*
          * The entry point for implementing authorization
          */
-        public Task<CoreApiClaims> Execute(HttpRequest request)
+        public async Task<CoreApiClaims> Execute(HttpRequest request)
         {
-            return null;
+            return await this.authenticator.AuthorizeRequestAndGetClaims(request);
         }
     }
 }

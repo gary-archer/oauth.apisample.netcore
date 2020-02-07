@@ -67,7 +67,7 @@
         }
 
         /*
-         * Do the work of validating the configuration and finalizing configuration
+         * Prepare objects needed for OAuth Authorization
          */
         public void Register()
         {

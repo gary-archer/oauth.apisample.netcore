@@ -16,10 +16,13 @@ Open Issues
 
 NEXT
 ----
-  1. Logging for authorizers and test header authorizer
+  1. Finish header authorizer and missing claims errors
 
-  2. Class layout / name / responsibility refactoring part 1
-     Support unsecured paths
-
-  3. Config file to finalise and build logger classes
+  2. Move classes to correct frameworks
+     Configuration file and logging to improve
+    
+  3. Error abstractions and ErrorCodes source file
+    
+  4. Config file to finalise and build logger classes
      Logging field population to complete
+     Support unsecured paths
