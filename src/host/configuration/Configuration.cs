@@ -1,32 +1,37 @@
 namespace SampleApi.Host.Configuration
 {
+    using System.IO;
+    using Framework.Api.Base.Configuration;
     using Framework.Api.OAuth.Configuration;
-    using Microsoft.Extensions.Configuration;
+    using Newtonsoft.Json;
 
     /*
      * A class to manage our JSON configuration as an object
      */
     public class Configuration
     {
-        public ApplicationConfiguration App { get; private set; }
+        // The API's own configuration
+        public ApiConfiguration Api { get; private set; }
 
+        // The API base framework configuration
+        public FrameworkConfiguration Framework { get; private set; }
+
+        // The API OAuth framework configuration
         public OAuthConfiguration OAuth { get; private set; }
 
         /*
-         * A helper method to load this custom configuration section
+         * A utility method to load the file and deal with casing
          */
-        public static Configuration Load(IConfiguration configuration)
+        public static Configuration Load(string filePath)
         {
-            var appConfig = new ApplicationConfiguration();
-            configuration.GetSection("application").Bind(appConfig);
-
-            var oauthConfig = new OAuthConfiguration();
-            configuration.GetSection("oauth").Bind(oauthConfig);
+            string text = File.ReadAllText("./api.config.json");
+            dynamic data = JsonConvert.DeserializeObject(text);
 
             return new Configuration()
             {
-                App = appConfig,
-                OAuth = oauthConfig,
+                Api = data.api.ToObject<ApiConfiguration>(),
+                Framework = data.framework.ToObject<FrameworkConfiguration>(),
+                OAuth = data.oauth.ToObject<OAuthConfiguration>(),
             };
         }
     }

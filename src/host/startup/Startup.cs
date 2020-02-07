@@ -69,7 +69,7 @@
             {
                 options.AddPolicy(
                     "api",
-                    policy => policy.WithOrigins(this.jsonConfig.App.TrustedOrigins.ToArray())
+                    policy => policy.WithOrigins(this.jsonConfig.Api.TrustedOrigins.ToArray())
                                     .AllowAnyMethod()
                                     .AllowAnyHeader()
                                     .AllowCredentials());
@@ -125,7 +125,7 @@
             new OAuthAuthorizerBuilder<SampleApiClaims>(this.jsonConfig.OAuth)
                 .WithCustomClaimsProvider<SampleApiClaimsProvider>()
                 .WithServices(services)
-                .WithHttpDebugging(this.jsonConfig.App.UseProxy, this.jsonConfig.App.ProxyUrl)
+                .WithHttpDebugging(this.jsonConfig.Api.UseProxy, this.jsonConfig.Api.ProxyUrl)
                 .Register();
         }
 

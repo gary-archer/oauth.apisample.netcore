@@ -4,29 +4,75 @@ namespace Framework.Api.Base.Logging
     using log4net.Appender;
     using log4net.Config;
     using log4net.Repository.Hierarchy;
+    using Microsoft.Extensions.Logging;
+    using Newtonsoft.Json.Linq;
 
     /*
-     * Set up log4net without a configuration file
+     * The entry point for configuring logging and getting a logger
      */
     public class LoggerFactory
     {
-        public const string InstanceName = "Production";
+        private const string InstanceName = "Production";
 
         /*
-         * Create the log4net setup to support JSON logging
-         * https://blogs.perficient.com/2016/04/20/how-to-programmatically-create-log-instance-by-log4net-library/
+         * The entry point for configuring logging
          */
-        public void ConfigureProductionRepository()
+        public void Configure(ILoggingBuilder builder, JObject loggingConfiguration)
         {
+            this.ConfigureProductionLogging(builder);
+            this.ConfigureDevelopmentTraceLogging(builder);
+        }
+
+        /*
+         * Configure production logging, which works the same in all environments, to log queryable fields
+         */
+        public void ConfigureProductionLogging(ILoggingBuilder builder)
+        {
+            // Tell .Net Core to use log4net
+            var options = new Log4NetProviderOptions
+            {
+                ExternalConfigurationSetup = true,
+                UseWebOrAppConfig = false,
+                LoggerRepository = InstanceName,
+            };
+            builder.AddLog4Net(options);
+
+            // Create a repository for production JSON logging
             var repository = LogManager.CreateRepository($"{InstanceName}Repository", typeof(Hierarchy));
 
             /* Uncomment to view internal messages such as problems creating log files
             log4net.Util.LogLog.InternalDebugging = true;
             */
 
+            // Set up log4net appenders
+            // https://blogs.perficient.com/2016/04/20/how-to-programmatically-create-log-instance-by-log4net-library/
             var consoleAppender = this.CreateConsoleAppender();
             var fileAppender = this.CreateFileAppender();
             BasicConfigurator.Configure(repository, consoleAppender, fileAppender);
+        }
+
+        /*
+         * Use Microsoft .Net Core logging only for developer trace logging, which only ever runs on a developer PC
+         * This logging is off by default
+         */
+        public void ConfigureDevelopmentTraceLogging(ILoggingBuilder builder)
+        {
+            // Log info level except for exceptions
+            builder
+                .SetMinimumLevel(LogLevel.Information);
+
+            // Avoid default noise from Microsoft libraries including base classes of particular classes
+            builder
+                .AddFilter("Microsoft", LogLevel.Warning)
+                .AddFilter("Microsoft.AspNetCore.Server.Kestrel", LogLevel.Error)
+                .AddFilter("Framework.Api.Base.Security.CustomAuthenticationFilter", LogLevel.Error);
+
+            // This can be set to debug level to capture logger per class data
+            builder
+                .AddFilter("Framework.Api.OAuth.Claims.ClaimsCache", LogLevel.Information);
+
+            // Developer trace logging is only output to the console
+            builder.AddConsole();
         }
 
         /*

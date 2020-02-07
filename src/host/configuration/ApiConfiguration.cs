@@ -5,7 +5,7 @@ namespace SampleApi.Host.Configuration
     /*
      * Application specific settings
      */
-    public class ApplicationConfiguration
+    public class ApiConfiguration
     {
         public List<string> TrustedOrigins { get; set; }
 

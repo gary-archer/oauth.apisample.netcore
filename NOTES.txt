@@ -16,14 +16,18 @@ Open Issues
 
 NEXT
 ----
-  1. Configuration file + entities to correct structure, even if logging not used
+0. Ensure correct checked in files
 
-  2. Read logging data
+1. Make a single logger factory available for the whole lifetime
+   Handle startup errors when logging configured and when not (in which case output exception.ToString())
 
-  3. Populate logging data
-    
-  4. Error abstractions and ErrorCodes source file
+2. Improve logging data and log the API name
+     
+3. Read logging configuration and set up appenders
 
-  5. Base framework classes
-    
-  6. Support unsecured paths
+4. Get rid of data contracts for claims serialization - review principal handling
+     
+5. Error abstractions and ErrorCodes source file
+   Base framework classes
+
+6. Support unsecured paths

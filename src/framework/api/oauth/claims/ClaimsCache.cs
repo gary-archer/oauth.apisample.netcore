@@ -27,6 +27,8 @@ namespace Framework.Api.OAuth.Claims
         {
             this.cache = cache;
             this.configuration = configuration;
+
+            // We use developer debug logging of claims caching details
             this.logger = loggerFactory.CreateLogger<ClaimsCache<TClaims>>();
         }
 
