@@ -72,16 +72,16 @@
          */
         public void Register()
         {
-            using (var provider = this.services.BuildServiceProvider())
+            using (var container = this.services.BuildServiceProvider())
             {
                 // Load issuer metadata during startup
                 var issuerMetadata = new IssuerMetadata(this.configuration, this.httpProxyFactory);
                 issuerMetadata.Load().Wait();
 
-                // Create the thread safe claims cache
+                // Create the thread safe claims cache and pass it a container reference
                 this.services.AddDistributedMemoryCache();
-                var cache = provider.GetService<IDistributedCache>();
-                var claimsCache = new ClaimsCache<TClaims>(cache, this.configuration, provider.GetService<ILoggerFactory>());
+                var cache = container.GetService<IDistributedCache>();
+                var claimsCache = new ClaimsCache<TClaims>(cache, this.configuration, container);
 
                 // Create a default injecteable custom claims provider if needed
                 if (this.customClaimsProviderType == null)

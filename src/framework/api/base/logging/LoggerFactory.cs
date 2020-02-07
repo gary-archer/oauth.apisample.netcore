@@ -1,5 +1,7 @@
 namespace Framework.Api.Base.Logging
 {
+    using System;
+    using Framework.Api.Base.Errors;
     using log4net;
     using log4net.Appender;
     using log4net.Config;
@@ -13,6 +15,12 @@ namespace Framework.Api.Base.Logging
     public class LoggerFactory
     {
         private const string InstanceName = "Production";
+        private bool isInitialized = false;
+
+        public LoggerFactory()
+        {
+            this.isInitialized = false;
+        }
 
         /*
          * The entry point for configuring logging
@@ -21,12 +29,41 @@ namespace Framework.Api.Base.Logging
         {
             this.ConfigureProductionLogging(builder);
             this.ConfigureDevelopmentTraceLogging(builder);
+            this.isInitialized = true;
+        }
+
+        /*
+         * Handle errors that prevent startup, such as those downloading metadata or setting up logging
+         */
+        public void LogStartupError(Exception exception)
+        {
+            if (this.isInitialized)
+            {
+                // Use log4net output if we can
+                var handler = new ErrorUtils();
+                var logEntry = new LogEntry();
+                handler.HandleError(exception, logEntry);
+                logEntry.End(null);
+            }
+            else
+            {
+                // If logging is not set up yet use a plain exception dump
+                Console.WriteLine($"STARTUP ERROR : {exception}");
+            }
+        }
+
+        /*
+         * Return the logger to other classes in the framework
+         */
+        public ILog GetProductionLogger()
+        {
+            return LogManager.GetLogger($"{InstanceName}Repository", $"{InstanceName}Logger");
         }
 
         /*
          * Configure production logging, which works the same in all environments, to log queryable fields
          */
-        public void ConfigureProductionLogging(ILoggingBuilder builder)
+        private void ConfigureProductionLogging(ILoggingBuilder builder)
         {
             // Tell .Net Core to use log4net
             var options = new Log4NetProviderOptions
@@ -55,7 +92,7 @@ namespace Framework.Api.Base.Logging
          * Use Microsoft .Net Core logging only for developer trace logging, which only ever runs on a developer PC
          * This logging is off by default
          */
-        public void ConfigureDevelopmentTraceLogging(ILoggingBuilder builder)
+        private void ConfigureDevelopmentTraceLogging(ILoggingBuilder builder)
         {
             // Log info level except for exceptions
             builder
@@ -73,14 +110,6 @@ namespace Framework.Api.Base.Logging
 
             // Developer trace logging is only output to the console
             builder.AddConsole();
-        }
-
-        /*
-         * Return the logger to other classes in the framework
-         */
-        public ILog GetProductionLogger()
-        {
-            return LogManager.GetLogger($"{InstanceName}Repository", $"{InstanceName}Logger");
         }
 
         /*

@@ -3,9 +3,8 @@
     using System;
     using System.IO;
     using System.Net;
-    using Framework.Api.Base.Middleware;
+    using Framework.Api.Base.Logging;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using SampleApi.Host.Configuration;
 
@@ -19,29 +18,24 @@
          */
         public static void Main(string[] args)
         {
-            // First handle configuration
-            IConfigurationRoot config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("api.config.json")
-                .Build();
+            var loggerFactory = new LoggerFactory();
 
             try
             {
                 // Build and run the web host
-                BuildWebHost(config).Run();
+                BuildWebHost(loggerFactory).Run();
             }
             catch (Exception ex)
             {
                 // Report startup errors
-                var handler = new UnhandledExceptionMiddleware();
-                handler.HandleStartupException(ex);
+                loggerFactory.LogStartupError(ex);
             }
         }
 
         /*
          * Build a host to handle HTTP requests
          */
-        private static IWebHost BuildWebHost(IConfigurationRoot configurationRoot)
+        private static IWebHost BuildWebHost(LoggerFactory loggerFactory)
         {
             // Load the configuration file
             var jsonConfig = Configuration.Load("./api.config.json");
@@ -50,19 +44,17 @@
             var webUrl = new Uri(jsonConfig.Api.TrustedOrigins[0]);
             return new WebHostBuilder()
 
-                .UseConfiguration(configurationRoot)
-
-                // Enable our JSON configuration object to be injected into other classes
+                // Inject early objects in the container here
                 .ConfigureServices(services =>
                 {
+                    services.AddSingleton(loggerFactory);
                     services.AddSingleton(jsonConfig);
                 })
 
-                // Configure logging behaviour to work for both development and production
+                // Configure logging behaviour for both production and developer trace logging
                 .ConfigureLogging(loggingBuilder =>
                 {
-                    var factory = new Framework.Api.Base.Logging.LoggerFactory();
-                    factory.Configure(loggingBuilder, jsonConfig.Framework.Logging);
+                    loggerFactory.Configure(loggingBuilder, jsonConfig.Framework.Logging);
                 })
 
                 // Configure the Kestrel web server to listen over SSL

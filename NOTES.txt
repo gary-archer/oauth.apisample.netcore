@@ -30,4 +30,7 @@ NEXT
 5. Error abstractions and ErrorCodes source file
    Base framework classes
 
-6. Support unsecured paths
+6. No exception details for long press
+   Make details a JObject
+
+7. Support unsecured paths

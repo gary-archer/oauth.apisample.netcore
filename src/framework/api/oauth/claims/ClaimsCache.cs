@@ -7,6 +7,7 @@ namespace Framework.Api.OAuth.Claims
     using Framework.Api.Base.Claims;
     using Framework.Api.OAuth.Configuration;
     using Microsoft.Extensions.Caching.Distributed;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
 
@@ -18,18 +19,18 @@ namespace Framework.Api.OAuth.Claims
     {
         private readonly IDistributedCache cache;
         private readonly OAuthConfiguration configuration;
-        private readonly ILogger logger;
+        private readonly ILogger traceLogger;
 
         public ClaimsCache(
             IDistributedCache cache,
             OAuthConfiguration configuration,
-            ILoggerFactory loggerFactory)
+            ServiceProvider container)
         {
             this.cache = cache;
             this.configuration = configuration;
 
-            // We use developer debug logging of claims caching details
-            this.logger = loggerFactory.CreateLogger<ClaimsCache<TClaims>>();
+            // Get a development trace logger for this class
+            this.traceLogger = container.GetService<ILoggerFactory>().CreateLogger<ClaimsCache<TClaims>>();
         }
 
         /*
@@ -45,7 +46,7 @@ namespace Framework.Api.OAuth.Claims
             {
                 // Get the hash and output debug info
                 var hash = Sha256(accessToken);
-                this.logger.LogDebug($"Token to be cached will expire in {secondsToCache} seconds (hash: {hash})");
+                this.traceLogger.LogDebug($"Token to be cached will expire in {secondsToCache} seconds (hash: {hash})");
 
                 // Do not exceed the maximum time we configured
                 var maxDuration = this.configuration.DefaultTokenCacheMinutes;
@@ -64,7 +65,7 @@ namespace Framework.Api.OAuth.Claims
                     AbsoluteExpiration = now.AddSeconds(secondsToCache),
                 };
 
-                this.logger.LogDebug($"Adding token to claims cache for {secondsToCache} seconds (hash: {hash})");
+                this.traceLogger.LogDebug($"Adding token to claims cache for {secondsToCache} seconds (hash: {hash})");
                 await this.cache.SetAsync(hash, bytes, options).ConfigureAwait(false);
             }
         }
@@ -79,12 +80,12 @@ namespace Framework.Api.OAuth.Claims
             var bytes = await this.cache.GetAsync(hash).ConfigureAwait(false);
             if (bytes == null)
             {
-                this.logger.LogDebug($"New token will be added to claims cache (hash: {hash})");
+                this.traceLogger.LogDebug($"New token will be added to claims cache (hash: {hash})");
                 return null;
             }
 
             // Deserialize and return the cached data
-            this.logger.LogDebug($"Found existing token in claims cache (hash: {hash})");
+            this.traceLogger.LogDebug($"Found existing token in claims cache (hash: {hash})");
             var json = Encoding.UTF8.GetString(bytes);
             return JsonConvert.DeserializeObject<TClaims>(json);
         }

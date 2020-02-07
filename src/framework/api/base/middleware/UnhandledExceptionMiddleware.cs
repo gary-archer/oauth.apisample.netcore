@@ -10,7 +10,7 @@ namespace Framework.Api.Base.Middleware
     /*
      * The application exception handler
      */
-    public class UnhandledExceptionMiddleware : ErrorUtils
+    public class UnhandledExceptionMiddleware
     {
         private readonly RequestDelegate next;
 
@@ -31,16 +31,6 @@ namespace Framework.Api.Base.Middleware
         }
 
         /*
-         * Handle errors that prevent startup, such as those downloading metadata
-         */
-        public void HandleStartupException(Exception exception)
-        {
-            var logEntry = new LogEntry();
-            this.HandleError(exception, logEntry);
-            logEntry.End(null);
-        }
-
-        /*
          * Controller exceptions are caught here
          */
         public async Task Invoke(HttpContext context, LogEntry logEntry)
@@ -52,8 +42,11 @@ namespace Framework.Api.Base.Middleware
             }
             catch (Exception exception)
             {
+                // Handle the error
+                var handler = new ErrorUtils();
+                var clientError = handler.HandleError(exception, logEntry);
+
                 // Log full error details and return a less detailed error to the caller
-                var clientError = this.HandleError(exception, logEntry);
                 await ResponseErrorWriter.WriteErrorResponse(
                     context.Request,
                     context.Response,
