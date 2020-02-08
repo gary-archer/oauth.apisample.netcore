@@ -6,7 +6,7 @@ namespace Framework.Api.Base.Logging
     using Newtonsoft.Json.Linq;
 
     /*
-     * An abstraction for the logger factory
+     * A logger factory interface
      */
     public interface ILoggerFactory
     {

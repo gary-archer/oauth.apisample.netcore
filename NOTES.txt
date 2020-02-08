@@ -27,6 +27,7 @@ NEXT
    Review and aim to improve principal handling
      
 4. Coding improvements around error abstractions and ErrorCodes source file
+   Use internal sealed classes
 
 5. Inject claims into controllers only and change service / repository as for other samples
    Create base framework classes to support application error translation

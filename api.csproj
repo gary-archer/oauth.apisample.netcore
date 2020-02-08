@@ -8,7 +8,7 @@
 
     <!-- Our code sample is more readable without the noise of generated doc -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>1592</NoWarn>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
 
   <!-- Ignore these warnings on MacOS: https://github.com/dotnet/roslyn/issues/19640 -->
@@ -31,4 +31,11 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="src\framework\base\" />
+    <Folder Include="src\framework\base\abstractions\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="src\framework\api\base\logging\ILoggerFactory %28copy%29.cs" />
+  </ItemGroup>
 </Project>
