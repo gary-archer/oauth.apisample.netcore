@@ -35,9 +35,14 @@
     <Folder Include="src\framework\base\" />
     <Folder Include="src\framework\base\abstractions\" />
     <Folder Include="src\logic\errors\" />
+    <Folder Include="logs\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="src\framework\api\base\logging\ILoggerFactory %28copy%29.cs" />
     <Compile Remove="src\framework\api\base\errors\ClientErrorExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="logs\api-2020-02-08.log" />
+    <None Remove="logs\2020-02-08.log" />
   </ItemGroup>
 </Project>

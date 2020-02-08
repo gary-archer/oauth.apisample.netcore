@@ -37,7 +37,7 @@ namespace Framework.Api.OAuth.Security
             var accessToken = this.ReadAccessToken(request);
             if (string.IsNullOrWhiteSpace(accessToken))
             {
-                throw ClientErrorImpl.Create401("No access token was received in the bearer header");
+                throw ErrorFactory.Create401Error("No access token was received in the bearer header");
             }
 
             // Bypass validation and use cached results if they exist

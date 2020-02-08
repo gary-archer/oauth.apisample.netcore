@@ -47,8 +47,7 @@
                 return request.Headers[name];
             }
 
-            var handler = new ErrorUtils();
-            throw handler.FromMissingClaim(name);
+            throw ErrorUtils.FromMissingClaim(name);
         }
     }
 }

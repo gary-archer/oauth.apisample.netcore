@@ -1,7 +1,7 @@
 ﻿namespace Framework.Api.Base.Errors
 {
     using System;
-    using Framework.Api.Base.Logging;
+    using Framework.Base.Errors;
 
     /*
      * A framework base class for error handling
@@ -9,75 +9,67 @@
     public class ErrorUtils
     {
         /*
-         * Do error handling and logging, then return an error to the client
+         * Return a known error from a general exception
          */
-        public ClientError HandleError(Exception exception, LogEntry logEntry)
+        public static Exception FromException(Exception exception)
         {
-            // Already handled API errors
-            var apiError = this.TryConvertException<ApiErrorImpl>(exception);
+            // If it is already a known error type then return that
+            var apiError = ErrorUtils.TryConvertException<ApiError>(exception);
             if (apiError != null)
             {
-                // Log the error, which will include technical support details
-                logEntry.SetApiError(apiError);
-
-                // Return a client error to the caller
-                return apiError.ToClientError();
+                return apiError;
             }
 
-            // If the API has thrown a 4xx error using an IClientError derived type then it is logged here
-            var clientError = this.TryConvertException<ClientError>(exception);
+            var clientError = ErrorUtils.TryConvertException<ClientError>(exception);
             if (clientError != null)
             {
-                // Log the error without an id
-                logEntry.SetClientError(clientError);
-
-                // Return the thrown error to the caller
                 return clientError;
             }
 
-            // Unhandled exceptions
-            apiError = ErrorUtils.FromException(exception);
-            logEntry.SetApiError(apiError);
-            return apiError.ToClientError();
+            // Convert any base exceptions thrown from non REST logic to a REST error
+            if (exception is ExtendedException)
+            {
+                return ErrorUtils.FromExtendedException((ExtendedException)exception);
+            }
+
+            // Otherwise create a generic API error
+            return ErrorUtils.CreateApiError(exception, null, null);
+        }
+
+        /*
+         * Create an error from an exception with an error code and message
+         */
+        public static ApiError CreateApiError(Exception exception, string errorCode, string message)
+        {
+            var defaultErrorCode = BaseErrorCodes.ServerError;
+            var defaultMessage = "An unexpected exception occurred in the API";
+
+            // Create a default error and set a default technical message
+            // To customise details instead, application code should use error translation and throw an ApiError
+            var error = ErrorFactory.CreateApiError(
+                    errorCode == null ? defaultErrorCode : errorCode,
+                    message == null ? defaultMessage : message,
+                    exception);
+
+            // Set technical details
+            error.SetDetails(exception.Message);
+            return error;
         }
 
         /*
          * Handle unexpected data errors if an expected claim was not found in an OAuth message
          */
-        public ApiErrorImpl FromMissingClaim(string claimName)
+        public static ApiError FromMissingClaim(string claimName)
         {
-            return new ApiErrorImpl("claims_failure", "Authorization data not found")
-            {
-                Details = $"An empty value was found for the expected claim {claimName}",
-            };
-        }
-
-        /*
-         * A default implementation for creating an API error from an unrecognised exception
-         */
-        protected static ApiErrorImpl FromException(Exception ex)
-        {
-            // Get the exception to use
-            var exception = ex;
-            if (ex is AggregateException)
-            {
-                if (ex.InnerException != null)
-                {
-                    exception = ex.InnerException;
-                }
-            }
-
-            // Create a generic exception API error and note that in .Net the call stack is included in the details
-            return new ApiErrorImpl("server_error", "An unexpected exception occurred in the API")
-            {
-                Details = exception.ToString(),
-            };
+            var error = ErrorFactory.CreateApiError("claims_failure", "Authorization data not found");
+            error.SetDetails($"An empty value was found for the expected claim {claimName}");
+            return error;
         }
 
         /*
          * Try to convert an exception to a known type
          */
-        protected T TryConvertException<T>(Exception exception)
+        private static T TryConvertException<T>(Exception exception)
             where T : class
         {
             if (typeof(T).IsAssignableFrom(exception.GetType()))
@@ -94,6 +86,21 @@
             }
 
             return null;
+        }
+
+        /*
+         * Convert from our custom runtime exception to an API error
+         */
+        private static ApiError FromExtendedException(ExtendedException ex)
+        {
+            var apiError = ErrorFactory.CreateApiError(ex.ErrorCode, ex.Message, ex);
+
+            if (!string.IsNullOrWhiteSpace(ex.Details))
+            {
+                apiError.SetDetails(ex.Details);
+            }
+
+            return apiError;
         }
     }
 }

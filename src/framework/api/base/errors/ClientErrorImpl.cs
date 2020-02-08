@@ -11,6 +11,7 @@ namespace Framework.Api.Base.Errors
         // Mandatory fields for both 4xx and 500 errors
         private readonly HttpStatusCode statusCode;
         private readonly string errorCode;
+        private string logContext;
 
         // Extra fields returned to the client for UI displays of 500 errors
         private string area;
@@ -26,6 +27,7 @@ namespace Framework.Api.Base.Errors
             // Set mandatory fields
             this.statusCode = statusCode;
             this.errorCode = errorCode;
+            this.logContext = string.Empty;
 
             // Initialise 5xx fields
             this.area = string.Empty;
@@ -49,12 +51,12 @@ namespace Framework.Api.Base.Errors
             }
         }
 
-        /*
-         * A helper method to return a 401 error
-         */
-        public static ClientErrorImpl Create401(string reaaon)
+        public string LogContext
         {
-            return new ClientErrorImpl(HttpStatusCode.Unauthorized, "unauthorized", "Missing, invalid or expired access token");
+            set
+            {
+                this.logContext = value;
+            }
         }
 
         /*
@@ -94,6 +96,12 @@ namespace Framework.Api.Base.Errors
             dynamic data = new JObject();
             data.statusCode = this.StatusCode;
             data.body = this.ToResponseFormat();
+
+            if (!string.IsNullOrEmpty(this.logContext))
+            {
+                data.context = this.logContext;
+            }
+
             return data;
         }
     }

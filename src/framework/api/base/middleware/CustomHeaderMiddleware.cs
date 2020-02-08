@@ -32,7 +32,7 @@ namespace Framework.Api.Base.Middleware
             {
                 if (apiToBreak.ToLowerInvariant() == configuration.ApiName.ToLowerInvariant())
                 {
-                    throw new ApiErrorImpl("exception_simulation", "An exception was simulated in the API");
+                    throw ErrorFactory.CreateApiError(BaseErrorCodes.ExceptionSimulation, "An exception was simulated in the API");
                 }
             }
 

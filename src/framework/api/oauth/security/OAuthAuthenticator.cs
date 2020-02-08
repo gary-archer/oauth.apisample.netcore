@@ -89,7 +89,7 @@ namespace Framework.Api.OAuth.Security
                     // Handle invalid or expired tokens
                     if (!response.IsActive)
                     {
-                        throw ClientErrorImpl.Create401("Access token is expired and failed introspection");
+                        throw ErrorFactory.Create401Error("Access token is expired and failed introspection");
                     }
 
                     // Get token claims and use the immutable user id as the subject claim
@@ -127,7 +127,7 @@ namespace Framework.Api.OAuth.Security
                         // Handle a race condition where the access token expires during user info lookup
                         if (response.HttpStatusCode == HttpStatusCode.Unauthorized)
                         {
-                            throw ClientErrorImpl.Create401("Access token is expired and failed user info lookup");
+                            throw ErrorFactory.Create401Error("Access token is expired and failed user info lookup");
                         }
 
                         // Handle technical errors

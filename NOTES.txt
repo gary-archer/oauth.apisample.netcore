@@ -16,38 +16,31 @@ Open Issues
 
 NEXT
 ----
-1. Error abstractions improvements
-
-2. ErrorCodes source files
-
-3. ErrorUtils as a handler feels a little wrong
-   Compare with other tech
-
-4. Application error translation
+1. ERROR STRUCTURE
+   OAuthErrorUtils to improve
+   BusinessError
+   ExtendedException for file read errors and throw via factory
+   Application error translation
    Logic with zero API dependencies
-   ExtendedException to test via ErrorFactory
 
-5. No exception details for long press
-   Make details a JObject or a string, and also for performance threshold
+2. Internal and sealed framework classes
 
-6. Fix up authorizer logging - too many entries and wrong data?
+3. ERROR CONTENT
+   No exception details for long press
+   Make details and log context a JObject or a string, and also for performance threshold
+
+4. AUTHORIZER LOGGING
+   Fix up authorizer logging - too many entries and wrong data?
    Logging during auth failures and check Okta messages further
 
-7. Internal and sealed framework classes
-
-8. Compare framework classes with other samples and consolidate
+5. Compare framework classes with other samples and consolidate all
    Include serverless and deploy it
    Consolidate Okta errors for all samples
    Support unsecured paths?
 
-9. Run load test and Elastic Search
+6. Run load test and Elastic Search
    Log entry consolidation across Node and Java
 
-10. Simplify authentication scheme and get rid of options if possible
-    Can I get rid of data contracts for claims serialization?
-    Review and aim to improve principal handling
-
-IDEAS
------
-Throw 500s via ErrorFactory?
-Performance detail as node
+7. Simplify authentication scheme and get rid of options if possible
+   Can I get rid of data contracts for claims serialization?
+   Review and aim to improve principal handling

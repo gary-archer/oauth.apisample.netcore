@@ -1,5 +1,6 @@
 namespace Framework.Api.Base.Utilities
 {
+    using System.Net;
     using System.Threading.Tasks;
     using Framework.Api.Base.Errors;
     using Microsoft.AspNetCore.Http;
@@ -13,7 +14,7 @@ namespace Framework.Api.Base.Utilities
         /*
          * Deliver a controlled 401 response to the caller
          */
-        public static async Task WriteInvalidTokenResponse(HttpRequest request, HttpResponse response, ClientErrorImpl error)
+        public static async Task WriteInvalidTokenResponse(HttpRequest request, HttpResponse response, ClientError error)
         {
             // Write headers
             response.ContentType = "application/json";
@@ -21,21 +22,25 @@ namespace Framework.Api.Base.Utilities
             AddCorsHeaderForErrorResponse(request, response);
 
             // Write the body
-            response.StatusCode = 401;
+            response.StatusCode = (int)error.StatusCode;
             await response.WriteAsync(error.ToResponseFormat().ToString());
         }
 
         /*
          * Deliver a controlled 500 response to the caller
          */
-        public static async Task WriteErrorResponse(HttpRequest request, HttpResponse response, int statusCode, JObject error)
+        public static async Task WriteErrorResponse(
+            HttpRequest request,
+            HttpResponse response,
+            HttpStatusCode statusCode,
+            JObject error)
         {
             // Write headers
             response.ContentType = "application/json";
             AddCorsHeaderForErrorResponse(request, response);
 
             // Write the body
-            response.StatusCode = statusCode;
+            response.StatusCode = (int)statusCode;
             await response.WriteAsync(error.ToString());
         }
 

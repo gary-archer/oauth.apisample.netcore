@@ -2,11 +2,14 @@ namespace Framework.Api.Base.Security
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
     using System.Security.Claims;
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
+    using Framework.Api.Base.Configuration;
     using Framework.Api.Base.Errors;
     using Framework.Api.Base.Logging;
+    using Framework.Api.Base.Middleware;
     using Framework.Api.Base.Utilities;
     using Framework.Base.Abstractions;
     using IdentityModel;
@@ -26,6 +29,7 @@ namespace Framework.Api.Base.Security
         // Framework objects
         private readonly IAuthorizer authorizer;
         private readonly LogEntry logEntry;
+        private readonly FrameworkConfiguration configuration;
 
         /*
          * The first 4 parmameters are required by Microsoft and of no interest to this sample
@@ -36,10 +40,12 @@ namespace Framework.Api.Base.Security
             UrlEncoder urlEncoder,
             ISystemClock clock,
             IAuthorizer authorizer,
+            FrameworkConfiguration configuration,
             ILogEntry logEntry)
                 : base(options, developmentLoggerFactory, urlEncoder, clock)
         {
             this.authorizer = authorizer;
+            this.configuration = configuration;
             this.logEntry = (LogEntry)logEntry;
         }
 
@@ -69,25 +75,26 @@ namespace Framework.Api.Base.Security
                 var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), this.Scheme.Name);
                 return AuthenticateResult.Success(ticket);
             }
-            catch (ClientErrorImpl clientError)
+            catch (ClientError clientError)
             {
-                // If there is an error then log it and we also need to end logging here
-                this.logEntry.SetClientError(clientError);
-                this.logEntry.End(this.Request, this.Response);
-                this.logEntry.Write();
+                // If there is an error then handle it via the exception handler
+                var handler = new UnhandledExceptionMiddleware();
+                handler.HandleError(clientError, this.configuration, this.logEntry);
 
                 // Store fields for the challenge method which will fire later
-                this.Request.HttpContext.Items.TryAdd(StatusCodeKey, 401);
+                this.Request.HttpContext.Items.TryAdd(StatusCodeKey, clientError.StatusCode);
                 this.Request.HttpContext.Items.TryAdd(ClientErrorKey, clientError);
                 return AuthenticateResult.NoResult();
             }
             catch (Exception exception)
             {
-                // If there is an error then log it and we also need to end logging here
-                var handler = new ErrorUtils();
-                var clientError = handler.HandleError(exception, this.logEntry);
-                this.logEntry.End(this.Request, this.Response);
-                this.logEntry.Write();
+                // If there is an error then handle it via the exception handler
+                var handler = new UnhandledExceptionMiddleware();
+                var clientError = handler.HandleError(exception, this.configuration, this.logEntry);
+
+                // TODO
+                // this.logEntry.End(this.Request, this.Response);
+                // this.logEntry.Write();
 
                 // Store fields for the challenge method which will fire later
                 this.Request.HttpContext.Items.TryAdd(StatusCodeKey, clientError.StatusCode);
@@ -101,22 +108,25 @@ namespace Framework.Api.Base.Security
          */
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
         {
-            var statusCode = this.GetRequestItem<int>(StatusCodeKey);
-            var clientError = this.GetRequestItem<ClientErrorImpl>(ClientErrorKey);
-
-            if (statusCode == 401 && clientError != null)
+            // Retrieve items
+            var statusCode = this.GetRequestItem<HttpStatusCode>(StatusCodeKey);
+            var clientError = this.GetRequestItem<ClientError>(ClientErrorKey);
+            if (clientError != null)
             {
-                // Write 401 responses due to invalid tokens
-                await ResponseErrorWriter.WriteInvalidTokenResponse(this.Request, this.Response, clientError);
-            }
-            else if (statusCode == 500)
-            {
-                // Write 500 responses due to technical errors during authentication
-                await ResponseErrorWriter.WriteErrorResponse(
-                        this.Request,
-                        this.Response,
-                        statusCode,
-                        clientError.ToResponseFormat());
+                if (statusCode == HttpStatusCode.Unauthorized)
+                {
+                    // Write 401 responses due to invalid tokens
+                    await ResponseErrorWriter.WriteInvalidTokenResponse(this.Request, this.Response, clientError);
+                }
+                else if (statusCode == HttpStatusCode.InternalServerError)
+                {
+                    // Write 500 responses due to technical errors during authentication
+                    await ResponseErrorWriter.WriteErrorResponse(
+                            this.Request,
+                            this.Response,
+                            statusCode,
+                            clientError.ToResponseFormat());
+                }
             }
         }
 

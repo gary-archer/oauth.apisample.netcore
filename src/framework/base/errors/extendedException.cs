@@ -7,5 +7,25 @@ namespace Framework.Base.Errors
      */
     public class ExtendedException : Exception
     {
+        /*
+         * The default constructor
+         */
+        public ExtendedException(string errorCode, string userMessage)
+            : this(errorCode, userMessage, null)
+        {
+        }
+
+        /*
+         * The main constructor
+         */
+        public ExtendedException(string errorCode, string userMessage, Exception ex)
+            : base(userMessage, ex)
+        {
+            this.ErrorCode = errorCode;
+        }
+
+        public string ErrorCode { get; private set; }
+
+        public string Details { get; set; }
     }
 }

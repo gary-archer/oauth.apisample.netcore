@@ -14,45 +14,56 @@ namespace Framework.Api.OAuth.Errors
         /*
          * Report metadata lookup failures clearly
          */
-        public ApiErrorImpl FromMetadataError(DiscoveryDocumentResponse response, string url)
+        public ApiError FromMetadataError(DiscoveryDocumentResponse response, string url)
         {
             var data = this.ReadOAuthErrorResponse(response.Json);
-            var apiError = this.CreateOAuthApiError("metadata_lookup_failure", "Metadata lookup failed", data.Item1);
-            apiError.Details = this.GetErrorDetails(data.Item2, response.Error, url);
+            var apiError = this.CreateOAuthApiError(
+                OAuthErrorCodes.MetadataLookupFailure,
+                "Metadata lookup failed",
+                data.Item1);
+
+            apiError.SetDetails(this.GetErrorDetails(data.Item2, response.Error, url));
             return apiError;
         }
 
         /*
          * Report introspection failures clearly
          */
-        public ApiErrorImpl FromIntrospectionError(TokenIntrospectionResponse response, string url)
+        public ApiError FromIntrospectionError(TokenIntrospectionResponse response, string url)
         {
             var data = this.ReadOAuthErrorResponse(response.Json);
-            var apiError = this.CreateOAuthApiError("introspection_failure", "Token validation failed", data.Item1);
-            apiError.Details = this.GetErrorDetails(data.Item2, response.Error, url);
+            var apiError = this.CreateOAuthApiError(
+                OAuthErrorCodes.IntrospectionFailure,
+                "Token validation failed",
+                data.Item1);
+
+            apiError.SetDetails(this.GetErrorDetails(data.Item2, response.Error, url));
             return apiError;
         }
 
         /*
          * Report user info failures clearly
          */
-        public ApiErrorImpl FromUserInfoError(UserInfoResponse response, string url)
+        public ApiError FromUserInfoError(UserInfoResponse response, string url)
         {
             var data = this.ReadOAuthErrorResponse(response.Json);
-            var apiError = this.CreateOAuthApiError("userinfo_failure", "User info lookup failed", data.Item1);
-            apiError.Details = this.GetErrorDetails(data.Item2, response.Error, url);
+            var apiError = this.CreateOAuthApiError(
+                OAuthErrorCodes.UserInfoFailure,
+                "User info lookup failed",
+                data.Item1);
+
+            apiError.SetDetails(this.GetErrorDetails(data.Item2, response.Error, url));
             return apiError;
         }
 
         /*
          * Handle unexpected data errors if an expected claim was not found in an OAuth message
          */
-        public ApiErrorImpl FromMissingClaim(string claimName)
+        public ApiError FromMissingClaim(string claimName)
         {
-            return new ApiErrorImpl("claims_failure", "Authorization data not found")
-            {
-                Details = $"An empty value was found for the expected claim {claimName}",
-            };
+            var error = ErrorFactory.CreateApiError(BaseErrorCodes.ClaimsFailure, "Authorization data not found");
+            error.SetDetails($"An empty value was found for the expected claim {claimName}");
+            return error;
         }
 
         /*
@@ -74,7 +85,7 @@ namespace Framework.Api.OAuth.Errors
         /*
          * Create an error object from an error code and include the OAuth error code in the user message
          */
-        private ApiErrorImpl CreateOAuthApiError(string errorCode, string userMessage, string oauthErrorCode)
+        private ApiError CreateOAuthApiError(string errorCode, string userMessage, string oauthErrorCode)
         {
             string message = userMessage;
             if (!string.IsNullOrWhiteSpace(oauthErrorCode))
@@ -82,7 +93,7 @@ namespace Framework.Api.OAuth.Errors
                 message += $" : {oauthErrorCode}";
             }
 
-            return new ApiErrorImpl(errorCode, message);
+            return ErrorFactory.CreateApiError(errorCode, message);
         }
 
         /*

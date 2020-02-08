@@ -48,10 +48,14 @@ namespace Framework.Api.Base.Logging
         {
             if (this.isInitialized)
             {
-                // Use log4net output if we can
-                var handler = new ErrorUtils();
+                // Get the error into a loggable format
+                var error = (ApiError)ErrorUtils.FromException(exception);
+
+                // Output via log4net
                 var logEntry = new LogEntry(this.apiName, this.GetProductionLogger());
-                handler.HandleError(exception, logEntry);
+                logEntry.SetOperationName("startup");
+                logEntry.SetApiError(error);
+                logEntry.Write();
             }
             else
             {

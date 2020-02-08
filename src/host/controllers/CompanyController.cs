@@ -7,6 +7,7 @@
     using Framework.Api.Base.Errors;
     using Microsoft.AspNetCore.Mvc;
     using SampleApi.Logic.Entities;
+    using SampleApi.Logic.Errors;
     using SampleApi.Logic.Repositories;
 
     /*
@@ -43,7 +44,10 @@
             int idValue;
             if (!int.TryParse(id, NumberStyles.Any, CultureInfo.InvariantCulture, out idValue) || idValue <= 0)
             {
-                throw new ClientErrorImpl(HttpStatusCode.BadRequest, "invalid_company_id", "The company id must be a positive numeric integer");
+                throw ErrorFactory.CreateClientError(
+                    HttpStatusCode.BadRequest,
+                    ErrorCodes.InvalidCompanyId,
+                    "The company id must be a positive numeric integer");
             }
 
             // Forward the numeric id to the service
