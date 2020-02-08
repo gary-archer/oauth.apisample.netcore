@@ -14,7 +14,7 @@ namespace Framework.Api.OAuth.Errors
         /*
          * Report metadata lookup failures clearly
          */
-        public ApiError FromMetadataError(DiscoveryDocumentResponse response, string url)
+        public ApiErrorImpl FromMetadataError(DiscoveryDocumentResponse response, string url)
         {
             var data = this.ReadOAuthErrorResponse(response.Json);
             var apiError = this.CreateOAuthApiError("metadata_lookup_failure", "Metadata lookup failed", data.Item1);
@@ -25,7 +25,7 @@ namespace Framework.Api.OAuth.Errors
         /*
          * Report introspection failures clearly
          */
-        public ApiError FromIntrospectionError(TokenIntrospectionResponse response, string url)
+        public ApiErrorImpl FromIntrospectionError(TokenIntrospectionResponse response, string url)
         {
             var data = this.ReadOAuthErrorResponse(response.Json);
             var apiError = this.CreateOAuthApiError("introspection_failure", "Token validation failed", data.Item1);
@@ -36,7 +36,7 @@ namespace Framework.Api.OAuth.Errors
         /*
          * Report user info failures clearly
          */
-        public ApiError FromUserInfoError(UserInfoResponse response, string url)
+        public ApiErrorImpl FromUserInfoError(UserInfoResponse response, string url)
         {
             var data = this.ReadOAuthErrorResponse(response.Json);
             var apiError = this.CreateOAuthApiError("userinfo_failure", "User info lookup failed", data.Item1);
@@ -47,9 +47,9 @@ namespace Framework.Api.OAuth.Errors
         /*
          * Handle unexpected data errors if an expected claim was not found in an OAuth message
          */
-        public ApiError FromMissingClaim(string claimName)
+        public ApiErrorImpl FromMissingClaim(string claimName)
         {
-            return new ApiError("claims_failure", "Authorization data not found")
+            return new ApiErrorImpl("claims_failure", "Authorization data not found")
             {
                 Details = $"An empty value was found for the expected claim {claimName}",
             };
@@ -74,7 +74,7 @@ namespace Framework.Api.OAuth.Errors
         /*
          * Create an error object from an error code and include the OAuth error code in the user message
          */
-        private ApiError CreateOAuthApiError(string errorCode, string userMessage, string oauthErrorCode)
+        private ApiErrorImpl CreateOAuthApiError(string errorCode, string userMessage, string oauthErrorCode)
         {
             string message = userMessage;
             if (!string.IsNullOrWhiteSpace(oauthErrorCode))
@@ -82,7 +82,7 @@ namespace Framework.Api.OAuth.Errors
                 message += $" : {oauthErrorCode}";
             }
 
-            return new ApiError(errorCode, message);
+            return new ApiErrorImpl(errorCode, message);
         }
 
         /*

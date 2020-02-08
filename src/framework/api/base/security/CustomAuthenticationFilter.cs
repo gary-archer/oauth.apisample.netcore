@@ -69,7 +69,7 @@ namespace Framework.Api.Base.Security
                 var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), this.Scheme.Name);
                 return AuthenticateResult.Success(ticket);
             }
-            catch (ClientError clientError)
+            catch (ClientErrorImpl clientError)
             {
                 // If there is an error then log it and we also need to end logging here
                 this.logEntry.SetClientError(clientError);
@@ -102,7 +102,7 @@ namespace Framework.Api.Base.Security
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
         {
             var statusCode = this.GetRequestItem<int>(StatusCodeKey);
-            var clientError = this.GetRequestItem<ClientError>(ClientErrorKey);
+            var clientError = this.GetRequestItem<ClientErrorImpl>(ClientErrorKey);
 
             if (statusCode == 401 && clientError != null)
             {

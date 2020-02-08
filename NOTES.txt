@@ -16,32 +16,38 @@ Open Issues
 
 NEXT
 ----
-1. Add perf instrumentation and test
-   Then process performance thresholds from config and test with zero configured
+1. Error abstractions improvements
 
-2. Child authorizer
-   Logging during auth failures and check Okta messages further
+2. ErrorCodes source files
 
-3. Inject claims into controllers only and change service / repository as for other samples
-   Do application error translation
+3. ErrorUtils as a handler feels a little wrong
+   Compare with other tech
 
-4. Error abstractions improvements and ErrorCodes source files
+4. Application error translation
    Logic with zero API dependencies
+   ExtendedException to test via ErrorFactory
 
-5. ErrorUtils as a handler feels a little wrong
-   No exception details for long press
+5. No exception details for long press
    Make details a JObject or a string, and also for performance threshold
 
-6. Internal and sealed framework classes
+6. Fix up authorizer logging - too many entries and wrong data?
+   Logging during auth failures and check Okta messages further
 
-7. Compare framework classes with other samples and consolidate
+7. Internal and sealed framework classes
+
+8. Compare framework classes with other samples and consolidate
    Include serverless and deploy it
    Consolidate Okta errors for all samples
    Support unsecured paths?
 
-8. Run load test and Elastic Search
+9. Run load test and Elastic Search
    Log entry consolidation across Node and Java
 
-9. Simplify authentication scheme and get rid of options if possible
-   Can I get rid of data contracts for claims serialization?
-   Review and aim to improve principal handling
+10. Simplify authentication scheme and get rid of options if possible
+    Can I get rid of data contracts for claims serialization?
+    Review and aim to improve principal handling
+
+IDEAS
+-----
+Throw 500s via ErrorFactory?
+Performance detail as node

@@ -43,7 +43,7 @@
             int idValue;
             if (!int.TryParse(id, NumberStyles.Any, CultureInfo.InvariantCulture, out idValue) || idValue <= 0)
             {
-                throw new ClientError(HttpStatusCode.BadRequest, "invalid_company_id", "The company id must be a positive numeric integer");
+                throw new ClientErrorImpl(HttpStatusCode.BadRequest, "invalid_company_id", "The company id must be a positive numeric integer");
             }
 
             // Forward the numeric id to the service

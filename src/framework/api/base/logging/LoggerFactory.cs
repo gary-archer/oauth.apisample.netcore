@@ -3,6 +3,7 @@ namespace Framework.Api.Base.Logging
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Framework.Api.Base.Configuration;
     using Framework.Api.Base.Errors;
     using log4net;
     using log4net.Appender;
@@ -14,25 +15,29 @@ namespace Framework.Api.Base.Logging
     /*
      * The entry point for configuring logging and getting a logger
      */
-    public class LoggerFactory : Framework.Api.Base.Logging.ILoggerFactory
+    public class LoggerFactory : ILoggerFactory
     {
         private const string InstanceName = "Production";
         private string apiName;
         private bool isInitialized = false;
+        private int defaultPerformanceThresholdMilliseconds;
+        private IList<PerformanceThreshold> thresholdOverrides;
 
         public LoggerFactory()
         {
             this.apiName = string.Empty;
             this.isInitialized = false;
+            this.defaultPerformanceThresholdMilliseconds = 0;
+            this.thresholdOverrides = new List<PerformanceThreshold>();
         }
 
         /*
          * The entry point for configuring logging
          */
-        public void Configure(ILoggingBuilder builder, JObject loggingConfiguration)
+        public void Configure(ILoggingBuilder builder, FrameworkConfiguration configuration)
         {
-            this.ConfigureProductionLogging(builder, (JObject)loggingConfiguration["production"]);
-            this.ConfigureDevelopmentTraceLogging(builder, (JObject)loggingConfiguration["development"]);
+            this.ConfigureProductionLogging(builder, (JObject)configuration.Logging["production"]);
+            this.ConfigureDevelopmentTraceLogging(builder, (JObject)configuration.Logging["development"]);
             this.isInitialized = true;
         }
 
@@ -56,11 +61,11 @@ namespace Framework.Api.Base.Logging
         }
 
         /*
-         * Return the logger to other classes in the framework
+         * Create the log entry and initialise it with data
          */
-        public ILog GetProductionLogger()
+        public LogEntry CreateLogEntry()
         {
-            return LogManager.GetLogger($"{InstanceName}Repository", $"{InstanceName}Logger");
+            return new LogEntry(this.apiName, this.GetProductionLogger(), this.GetPerformanceThreshold);
         }
 
         /*
@@ -89,6 +94,17 @@ namespace Framework.Api.Base.Logging
             // Create appenders from configuration
             var appenders = this.CreateProductionAppenders((JArray)loggingConfiguration["appenders"]);
             BasicConfigurator.Configure(repository, appenders);
+
+            // Load performance threshold data
+            this.LoadPerformanceThresholds((JObject)loggingConfiguration["performanceThresholdsMilliseconds"]);
+        }
+
+        /*
+         * The production log4net logger
+         */
+        private ILog GetProductionLogger()
+        {
+            return LogManager.GetLogger($"{InstanceName}Repository", $"{InstanceName}Logger");
         }
 
         /*
@@ -206,6 +222,45 @@ namespace Framework.Api.Base.Logging
             }
 
             return LogLevel.Information;
+        }
+
+        /*
+         * Read any performance overrides into objects
+         */
+        private void LoadPerformanceThresholds(JObject thresholdData)
+        {
+            // Read the default
+            this.defaultPerformanceThresholdMilliseconds = thresholdData["default"].ToObject<int>();
+
+            // Process any overrides
+            var operationOverrides = (JObject)thresholdData["operationOverrides"];
+            if (operationOverrides != null)
+            {
+                foreach (var operationOverride in operationOverrides)
+                {
+                    var thresholdOverride = new PerformanceThreshold
+                    {
+                        Name = operationOverride.Key.ToString(),
+                        Milliseconds = operationOverride.Value.ToObject<int>(),
+                    };
+
+                    this.thresholdOverrides.Add(thresholdOverride);
+                }
+            }
+        }
+
+        /*
+         * Look up a performance threshold for an operation name
+         */
+        private int GetPerformanceThreshold(string operationName)
+        {
+            var found = this.thresholdOverrides.FirstOrDefault(o => o.Name.ToLowerInvariant() == operationName.ToLowerInvariant());
+            if (found != null)
+            {
+                return found.Milliseconds;
+            }
+
+            return this.defaultPerformanceThresholdMilliseconds;
         }
     }
 }

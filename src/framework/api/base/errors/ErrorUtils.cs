@@ -11,10 +11,10 @@
         /*
          * Do error handling and logging, then return an error to the client
          */
-        public IClientError HandleError(Exception exception, LogEntry logEntry)
+        public ClientError HandleError(Exception exception, LogEntry logEntry)
         {
             // Already handled API errors
-            var apiError = this.TryConvertException<ApiError>(exception);
+            var apiError = this.TryConvertException<ApiErrorImpl>(exception);
             if (apiError != null)
             {
                 // Log the error, which will include technical support details
@@ -25,7 +25,7 @@
             }
 
             // If the API has thrown a 4xx error using an IClientError derived type then it is logged here
-            var clientError = this.TryConvertException<IClientError>(exception);
+            var clientError = this.TryConvertException<ClientError>(exception);
             if (clientError != null)
             {
                 // Log the error without an id
@@ -44,9 +44,9 @@
         /*
          * Handle unexpected data errors if an expected claim was not found in an OAuth message
          */
-        public ApiError FromMissingClaim(string claimName)
+        public ApiErrorImpl FromMissingClaim(string claimName)
         {
-            return new ApiError("claims_failure", "Authorization data not found")
+            return new ApiErrorImpl("claims_failure", "Authorization data not found")
             {
                 Details = $"An empty value was found for the expected claim {claimName}",
             };
@@ -55,7 +55,7 @@
         /*
          * A default implementation for creating an API error from an unrecognised exception
          */
-        protected static ApiError FromException(Exception ex)
+        protected static ApiErrorImpl FromException(Exception ex)
         {
             // Get the exception to use
             var exception = ex;
@@ -68,7 +68,7 @@
             }
 
             // Create a generic exception API error and note that in .Net the call stack is included in the details
-            return new ApiError("server_error", "An unexpected exception occurred in the API")
+            return new ApiErrorImpl("server_error", "An unexpected exception occurred in the API")
             {
                 Details = exception.ToString(),
             };

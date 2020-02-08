@@ -7,7 +7,7 @@ namespace Framework.Api.Base.Errors
     /*
      * Our standard representation of an API error, including how it is logged and translated to a client error
      */
-    public sealed class ApiError : Exception
+    public sealed class ApiErrorImpl : Exception
     {
         // A range for random error ids
         private const int MinErrorId = 10000;
@@ -21,7 +21,7 @@ namespace Framework.Api.Base.Errors
         private readonly string utcTime;
         private string details;
 
-        public ApiError(string errorCode, string userMessage)
+        public ApiErrorImpl(string errorCode, string userMessage)
             : base(userMessage)
         {
             this.errorCode = errorCode;
@@ -73,9 +73,9 @@ namespace Framework.Api.Base.Errors
         /*
          * Translate to a confidential error that is returned to the API caller, with a reference to the logged details
          */
-        public ClientError ToClientError()
+        public ClientErrorImpl ToClientError()
         {
-            var error = new ClientError(this.statusCode, this.errorCode, this.Message);
+            var error = new ClientErrorImpl(this.statusCode, this.errorCode, this.Message);
             error.SetExceptionDetails(this.area, this.instanceId, this.utcTime);
             return error;
         }

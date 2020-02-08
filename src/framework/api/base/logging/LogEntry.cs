@@ -2,8 +2,6 @@ namespace Framework.Api.Base.Logging
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using Framework.Api.Base.Claims;
     using Framework.Api.Base.Errors;
     using Framework.Api.Base.Utilities;
@@ -18,43 +16,44 @@ namespace Framework.Api.Base.Logging
      */
     public class LogEntry : ILogEntry
     {
-        // The place to write the log
         private readonly ILog productionLogger;
-
-        // Data logged
-        private LogEntryData data;
-        private IList<LogEntryData> children;
+        private readonly Func<string, int> performanceThresholdCallback;
+        private readonly LogEntryData data;
+        private readonly IList<LogEntryData> children;
         private LogEntryData activeChild;
-
-        // A flag to avoid repeated logging
         private bool started;
 
-        // Performance details
-        private int defaultThresholdMilliseconds;
-        private IEnumerable<PerformanceThreshold> performanceThresholdOverrides;
+        /*
+         * The default constructor
+         */
+        public LogEntry(
+            string apiName,
+            ILog productionLogger)
+                : this(apiName, productionLogger, null)
+        {
+        }
 
         /*
-         * A log entry is created once per API request
+         * The main constructor
          */
-        public LogEntry(string apiName, ILog productionLogger)
+        public LogEntry(
+            string apiName,
+            ILog productionLogger,
+            Func<string, int> performanceThresholdCallback)
         {
+            // Store the logger reference
             this.productionLogger = productionLogger;
+            this.performanceThresholdCallback = performanceThresholdCallback;
+
+            // Initialise data
             this.data = new LogEntryData();
             this.data.ApiName = apiName;
             this.data.HostName = Environment.MachineName;
             this.children = new List<LogEntryData>();
             this.activeChild = null;
-            this.started = false;
-        }
 
-        /*
-         * Set default performance details after creation
-         */
-        public void SetPerformanceThresholds(int defaultMilliseconds, IEnumerable<PerformanceThreshold> overrides)
-        {
-            this.defaultThresholdMilliseconds = defaultMilliseconds;
-            this.data.PerformanceThresholdMilliseconds = this.defaultThresholdMilliseconds;
-            this.performanceThresholdOverrides = overrides;
+            // Set a flag to prevent re-entrancy
+            this.started = false;
         }
 
         /*
@@ -76,11 +75,6 @@ namespace Framework.Api.Base.Logging
                 if (request.QueryString.HasValue)
                 {
                     this.data.RequestPath += request.QueryString.Value;
-                }
-
-                foreach (var route in request.RouteValues)
-                {
-                    Console.WriteLine("FOUND ROUTE IN START HANDLER: " + route.Key);
                 }
 
                 // Our callers can supply a custom header so that we can keep track of who is calling each API
@@ -107,11 +101,6 @@ namespace Framework.Api.Base.Logging
                 {
                     this.data.SessionId = sessionId;
                 }
-
-                // TODO
-                // Record the operation name and also ensure that the correct performance threshold is used
-                // this.data.operationName = metadata.operationName;
-                // this.data.performanceThresholdMilliseconds = this._getPerformanceThreshold(this.data.operationName);
             }
         }
 
@@ -146,7 +135,7 @@ namespace Framework.Api.Base.Logging
         /*
         * Add error details after they have been processed by the exception handler, including denormalised fields
         */
-        public void SetApiError(ApiError error)
+        public void SetApiError(ApiErrorImpl error)
         {
             this.Current().ErrorData = error.ToLogFormat(this.data.ApiName);
             this.Current().ErrorCode = error.ErrorCode;
@@ -156,7 +145,7 @@ namespace Framework.Api.Base.Logging
         /*
         * Add error details after they have been processed by the exception handler, including denormalised fields
         */
-        public void SetClientError(IClientError error)
+        public void SetClientError(ClientError error)
         {
             this.Current().ErrorData = error.ToLogFormat();
             this.Current().ErrorCode = error.ErrorCode;
@@ -181,13 +170,14 @@ namespace Framework.Api.Base.Logging
                 throw new Exception("The previous child operation must be completed before a new child can be started");
             }
 
-            // Initialise the child
             this.activeChild = new LogEntryData();
-            this.activeChild.PerformanceThresholdMilliseconds = this.GetPerformanceThreshold(name);
             this.activeChild.OperationName = name;
-            this.activeChild.Performance.Start();
+            if (this.performanceThresholdCallback != null)
+            {
+                this.activeChild.PerformanceThresholdMilliseconds = this.performanceThresholdCallback(name);
+            }
 
-            // Add to the parent and return an object to simplify disposal
+            this.activeChild.Performance.Start();
             this.children.Add(this.activeChild);
             return new ChildLogEntry(this);
         }
@@ -256,6 +246,12 @@ namespace Framework.Api.Base.Logging
             if (operationName != null)
             {
                 this.data.OperationName = operationName.ToString();
+
+                // Look up the performance threshold for the operation
+                if (this.performanceThresholdCallback != null)
+                {
+                    this.data.PerformanceThresholdMilliseconds = this.performanceThresholdCallback(this.data.OperationName);
+                }
             }
 
             // Capture template ids in URL path segments
@@ -292,21 +288,6 @@ namespace Framework.Api.Base.Logging
             {
                 return this.data;
             }
-        }
-
-        /*
-        * Given an operation name, find its performance threshold
-        */
-        private int GetPerformanceThreshold(string name)
-        {
-            var found = this.performanceThresholdOverrides.FirstOrDefault(
-                o => o.Name.ToLowerInvariant() == name.ToLowerInvariant());
-            if (found != null)
-            {
-                return found.Milliseconds;
-            }
-
-            return this.defaultThresholdMilliseconds;
         }
 
         /*

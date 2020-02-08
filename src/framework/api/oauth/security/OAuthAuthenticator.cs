@@ -7,8 +7,10 @@ namespace Framework.Api.OAuth.Security
     using System.Threading.Tasks;
     using Framework.Api.Base.Claims;
     using Framework.Api.Base.Errors;
+    using Framework.Api.Base.Logging;
     using Framework.Api.OAuth.Configuration;
     using Framework.Api.OAuth.Errors;
+    using Framework.Base.Abstractions;
     using IdentityModel;
     using IdentityModel.Client;
     using Microsoft.AspNetCore.Http;
@@ -21,12 +23,18 @@ namespace Framework.Api.OAuth.Security
         private readonly OAuthConfiguration configuration;
         private readonly DiscoveryDocumentResponse metadata;
         private readonly Func<HttpClientHandler> proxyFactory;
+        private readonly LogEntry logEntry;
 
-        public OAuthAuthenticator(OAuthConfiguration configuration, IssuerMetadata issuer, Func<HttpClientHandler> proxyFactory)
+        public OAuthAuthenticator(
+            OAuthConfiguration configuration,
+            IssuerMetadata issuer,
+            Func<HttpClientHandler> proxyFactory,
+            ILogEntry logEntry)
         {
             this.configuration = configuration;
             this.metadata = issuer.Metadata;
             this.proxyFactory = proxyFactory;
+            this.logEntry = (LogEntry)logEntry;
         }
 
         /*
@@ -34,11 +42,19 @@ namespace Framework.Api.OAuth.Security
          */
         public async Task<int> AuthenticateAndSetClaims(string accessToken, HttpRequest httpRequest, CoreApiClaims claims)
         {
+            // TODO
+            // Create a child log entry for authentication related work
+            // This ensures that any errors and performances in this area are reported separately to business logic
+            // var authorizationLogEntry = this.logEntry.CreateChild("authorizer");
+
             // Our implementation introspects the token to get token claims
             var expiry = await this.IntrospectTokenAndSetTokenClaims(accessToken, claims);
 
             // It then adds user info claims
             await this.SetCentralUserInfoClaims(accessToken, claims);
+
+            // Finish logging here, and note that on exception the logging framework disposes the child
+            // authorizationLogEntry.Dispose();
 
             // Return the expiry, used for claims caching
             return expiry;
@@ -49,39 +65,42 @@ namespace Framework.Api.OAuth.Security
          */
         private async Task<int> IntrospectTokenAndSetTokenClaims(string accessToken, CoreApiClaims claims)
         {
-            using (var client = new HttpClient(this.proxyFactory()))
+            using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
-                // Send the request
-                var request = new TokenIntrospectionRequest
+                using (var client = new HttpClient(this.proxyFactory()))
                 {
-                    Address = this.metadata.IntrospectionEndpoint,
-                    ClientId = this.configuration.ClientId,
-                    ClientSecret = this.configuration.ClientSecret,
-                    Token = accessToken,
-                };
-                var response = await client.IntrospectTokenAsync(request);
+                    // Send the request
+                    var request = new TokenIntrospectionRequest
+                    {
+                        Address = this.metadata.IntrospectionEndpoint,
+                        ClientId = this.configuration.ClientId,
+                        ClientSecret = this.configuration.ClientSecret,
+                        Token = accessToken,
+                    };
+                    var response = await client.IntrospectTokenAsync(request);
 
-                // Handle errors
-                if (response.IsError)
-                {
-                    var handler = new OAuthErrorUtils();
-                    throw handler.FromIntrospectionError(response, this.metadata.IntrospectionEndpoint);
+                    // Handle errors
+                    if (response.IsError)
+                    {
+                        var handler = new OAuthErrorUtils();
+                        throw handler.FromIntrospectionError(response, this.metadata.IntrospectionEndpoint);
+                    }
+
+                    // Handle invalid or expired tokens
+                    if (!response.IsActive)
+                    {
+                        throw ClientErrorImpl.Create401("Access token is expired and failed introspection");
+                    }
+
+                    // Get token claims and use the immutable user id as the subject claim
+                    string userId = this.GetIntrospectionClaim(response, "uid");
+                    string clientId = this.GetIntrospectionClaim(response, JwtClaimTypes.ClientId);
+                    string scope = this.GetIntrospectionClaim(response, JwtClaimTypes.Scope);
+                    claims.SetTokenInfo(userId, clientId, scope.Split(' '));
+
+                    // Indicate success and return the token expiry
+                    return Convert.ToInt32(this.GetIntrospectionClaim(response, JwtClaimTypes.Expiration), CultureInfo.InvariantCulture);
                 }
-
-                // Handle invalid or expired tokens
-                if (!response.IsActive)
-                {
-                    throw ClientError.Create401("Access token is expired and failed introspection");
-                }
-
-                // Get token claims and use the immutable user id as the subject claim
-                string userId = this.GetIntrospectionClaim(response, "uid");
-                string clientId = this.GetIntrospectionClaim(response, JwtClaimTypes.ClientId);
-                string scope = this.GetIntrospectionClaim(response, JwtClaimTypes.Scope);
-                claims.SetTokenInfo(userId, clientId, scope.Split(' '));
-
-                // Indicate success and return the token expiry
-                return Convert.ToInt32(this.GetIntrospectionClaim(response, JwtClaimTypes.Expiration), CultureInfo.InvariantCulture);
             }
         }
 
@@ -90,35 +109,38 @@ namespace Framework.Api.OAuth.Security
          */
         private async Task SetCentralUserInfoClaims(string accessToken, CoreApiClaims claims)
         {
-            using (var client = new HttpClient(this.proxyFactory()))
+            using (this.logEntry.CreatePerformanceBreakdown("userInfoLookup"))
             {
-                // Send the request
-                var request = new UserInfoRequest
+                using (var client = new HttpClient(this.proxyFactory()))
                 {
-                    Address = this.metadata.UserInfoEndpoint,
-                    Token = accessToken,
-                };
-                var response = await client.GetUserInfoAsync(request);
-
-                // Handle errors
-                if (response.IsError)
-                {
-                    // Handle a race condition where the access token expires during user info lookup
-                    if (response.HttpStatusCode == HttpStatusCode.Unauthorized)
+                    // Send the request
+                    var request = new UserInfoRequest
                     {
-                        throw ClientError.Create401("Access token is expired and failed user info lookup");
+                        Address = this.metadata.UserInfoEndpoint,
+                        Token = accessToken,
+                    };
+                    var response = await client.GetUserInfoAsync(request);
+
+                    // Handle errors
+                    if (response.IsError)
+                    {
+                        // Handle a race condition where the access token expires during user info lookup
+                        if (response.HttpStatusCode == HttpStatusCode.Unauthorized)
+                        {
+                            throw ClientErrorImpl.Create401("Access token is expired and failed user info lookup");
+                        }
+
+                        // Handle technical errors
+                        var handler = new OAuthErrorUtils();
+                        throw handler.FromUserInfoError(response, this.metadata.UserInfoEndpoint);
                     }
 
-                    // Handle technical errors
-                    var handler = new OAuthErrorUtils();
-                    throw handler.FromUserInfoError(response, this.metadata.UserInfoEndpoint);
+                    // Get token claims and use the immutable user id as the subject claim
+                    string givenName = this.GetUserInfoClaim(response, JwtClaimTypes.GivenName);
+                    string familyName = this.GetUserInfoClaim(response, JwtClaimTypes.FamilyName);
+                    string email = this.GetUserInfoClaim(response, JwtClaimTypes.Email);
+                    claims.SetCentralUserInfo(givenName, familyName, email);
                 }
-
-                // Get token claims and use the immutable user id as the subject claim
-                string givenName = this.GetUserInfoClaim(response, JwtClaimTypes.GivenName);
-                string familyName = this.GetUserInfoClaim(response, JwtClaimTypes.FamilyName);
-                string email = this.GetUserInfoClaim(response, JwtClaimTypes.Email);
-                claims.SetCentralUserInfo(givenName, familyName, email);
             }
         }
 

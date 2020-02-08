@@ -13,7 +13,7 @@ namespace Framework.Api.Base.Utilities
         /*
          * Deliver a controlled 401 response to the caller
          */
-        public static async Task WriteInvalidTokenResponse(HttpRequest request, HttpResponse response, ClientError error)
+        public static async Task WriteInvalidTokenResponse(HttpRequest request, HttpResponse response, ClientErrorImpl error)
         {
             // Write headers
             response.ContentType = "application/json";

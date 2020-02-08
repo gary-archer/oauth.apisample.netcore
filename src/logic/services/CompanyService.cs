@@ -57,13 +57,13 @@ namespace SampleApi.Logic.Repositories
         /*
          * Return 404 for both not found items and also those that are not authorized
          */
-        private ClientError UnauthorizedError(int companyId)
+        private ClientErrorImpl UnauthorizedError(int companyId)
         {
             var message = $"Transactions for company {companyId} were not found for this user";
 
             // TODO
             // return new BusinessError("company_not_found", message);
-            return new ClientError(HttpStatusCode.NotFound, "company_not_found", message);
+            return new ClientErrorImpl(HttpStatusCode.NotFound, "company_not_found", message);
         }
     }
 }

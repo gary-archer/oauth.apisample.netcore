@@ -38,5 +38,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="src\framework\api\base\logging\ILoggerFactory %28copy%29.cs" />
+    <Compile Remove="src\framework\api\base\errors\ClientErrorExtensions.cs" />
   </ItemGroup>
 </Project>

@@ -13,12 +13,12 @@
     public class FrameworkBuilder
     {
         private readonly FrameworkConfiguration configuration;
-        private readonly ILoggerFactory loggerFactory;
+        private readonly LoggerFactory loggerFactory;
 
         public FrameworkBuilder(FrameworkConfiguration configuration, ILoggerFactory loggerFactory)
         {
             this.configuration = configuration;
-            this.loggerFactory = loggerFactory;
+            this.loggerFactory = (LoggerFactory)loggerFactory;
         }
 
         /*
@@ -41,10 +41,10 @@
             services.AddSingleton(this.configuration);
 
             // The log entry is scoped to the current request and created via this factory method
-            services.AddScoped<ILogEntry, LogEntry>(
+            services.AddScoped<ILogEntry>(
                 ctx =>
                 {
-                    return new LogEntry(this.configuration.ApiName, this.loggerFactory.GetProductionLogger());
+                    return this.loggerFactory.CreateLogEntry();
                 });
         }
     }
