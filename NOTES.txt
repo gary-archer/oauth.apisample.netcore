@@ -16,26 +16,23 @@ Open Issues
 
 NEXT
 ----
-1. Finish reading production logging configuration from file and test
-
-2. Avoid recreating the logger factory and get from the container
-
-3. Create proper log entry classes starting with logging the API name
+1. Avoid recreating the logger factory and get from the container
+   Create proper log entry classes starting with logging the API name
    Fill in fields to a fairly good level
      
-4. Performance thresholds from configuration
+2. Performance thresholds from configuration
    Complete logging including child authorizer, Elastic Search flow and load test
 
-5. Can I get rid of data contracts for claims serialization?
+3. Can I get rid of data contracts for claims serialization?
    Review and aim to improve principal handling
      
-6. Coding improvements around error abstractions and ErrorCodes source file
+4. Coding improvements around error abstractions and ErrorCodes source file
 
-7. Inject claims into controllers only and change service / repository as for other samples
+5. Inject claims into controllers only and change service / repository as for other samples
    Create base framework classes to support application error translation
 
-8. No exception details for long press
+6. No exception details for long press
    Make details a JObject
    Fix Okta response above
 
-9. Support unsecured paths
+7. Support unsecured paths

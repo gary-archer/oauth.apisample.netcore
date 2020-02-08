@@ -7,6 +7,7 @@ namespace Framework.Api.Base.Logging
     using log4net;
     using log4net.Appender;
     using log4net.Config;
+    using log4net.Core;
     using log4net.Repository.Hierarchy;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json.Linq;
@@ -78,7 +79,8 @@ namespace Framework.Api.Base.Logging
             builder.AddLog4Net(options);
 
             // Create a repository for production JSON logging
-            var repository = LogManager.CreateRepository($"{InstanceName}Repository", typeof(Hierarchy));
+            var repository = (Hierarchy)LogManager.CreateRepository($"{InstanceName}Repository", typeof(Hierarchy));
+            repository.Root.Level = repository.LevelMap[loggingConfiguration["level"].ToString()];
 
             /* Uncomment to view internal messages such as problems creating log files
             log4net.Util.LogLog.InternalDebugging = true;
@@ -99,6 +101,8 @@ namespace Framework.Api.Base.Logging
             var level = this.ReadDevelopmentLogLevel(loggingConfiguration["level"].ToString());
             builder.SetMinimumLevel(level);
 
+            System.Console.WriteLine("DEFAULT: " + level);
+
             // Process override levels
             var overrideLevels = (JObject)loggingConfiguration["overrideLevels"];
             if (overrideLevels != null)
@@ -108,6 +112,7 @@ namespace Framework.Api.Base.Logging
                     var className = overrideLevel.Key.ToString();
                     var classLevel = this.ReadDevelopmentLogLevel(overrideLevel.Value.ToString());
                     builder.AddFilter(className, classLevel);
+                    System.Console.WriteLine(className + " : " + classLevel);
                 }
             }
 
@@ -125,8 +130,8 @@ namespace Framework.Api.Base.Logging
             if (appendersConfiguration != null)
             {
                 // Add the console appender if configured
-                var consoleFound = appendersConfiguration.Children<JObject>().FirstOrDefault(a => a["type"] != null && a["type"].ToString() == "console");
-                if (consoleFound != null)
+                var consoleConfig = appendersConfiguration.Children<JObject>().FirstOrDefault(a => a["type"] != null && a["type"].ToString() == "console");
+                if (consoleConfig != null)
                 {
                     var consoleAppender = this.CreateProductionConsoleAppender();
                     if (consoleAppender != null)
@@ -136,10 +141,10 @@ namespace Framework.Api.Base.Logging
                 }
 
                 // Add the file appender if configured
-                var fileFound = appendersConfiguration.Children<JObject>().FirstOrDefault(a => a["type"] != null && a["type"].ToString() == "file");
-                if (fileFound != null)
+                var fileConfig = appendersConfiguration.Children<JObject>().FirstOrDefault(a => a["type"] != null && a["type"].ToString() == "file");
+                if (fileConfig != null)
                 {
-                    var fileAppender = this.CreateProductionFileAppender();
+                    var fileAppender = this.CreateProductionFileAppender(fileConfig);
                     if (fileAppender != null)
                     {
                         appenders.Add(fileAppender);
@@ -168,26 +173,32 @@ namespace Framework.Api.Base.Logging
          * Create a rolling file appender that uses JSON with an object per line
          * We use a new file per day and infinite backups of the form 2020-02-06.1.log
          */
-        private IAppender CreateProductionFileAppender()
+        private IAppender CreateProductionFileAppender(JObject fileConfiguration)
         {
+            // Get values
+            var prefix = fileConfiguration["filePrefix"].ToString();
+            var folder = fileConfiguration["dirName"].ToString();
+            var maxSize = fileConfiguration["maxSize"].ToString();
+            var maxFiles = fileConfiguration["maxFiles"].ToObject<int>();
+
             var jsonLayout = new JsonLayout(false);
             var fileAppender = new RollingFileAppender();
-            fileAppender.File = $"./logs/";
+            fileAppender.File = folder;
             fileAppender.StaticLogFileName = false;
-            fileAppender.DatePattern = "yyyy-MM-dd'.log'";
+            fileAppender.DatePattern = $"{prefix}-yyyy-MM-dd'.log'";
             fileAppender.AppendToFile = true;
             fileAppender.PreserveLogFileNameExtension = true;
             fileAppender.Layout = jsonLayout;
             fileAppender.LockingModel = new FileAppender.MinimalLock();
-            fileAppender.MaximumFileSize = "1GB";
-            fileAppender.MaxSizeRollBackups = -1;
+            fileAppender.MaximumFileSize = maxSize;
+            fileAppender.MaxSizeRollBackups = maxFiles;
             fileAppender.RollingStyle = RollingFileAppender.RollingMode.Composite;
             fileAppender.ActivateOptions();
             return fileAppender;
         }
 
         /*
-         * Parse a log level from the configuration file
+         * Parse a log level that uses Microsoft logging
          */
         private LogLevel ReadDevelopmentLogLevel(string textValue)
         {

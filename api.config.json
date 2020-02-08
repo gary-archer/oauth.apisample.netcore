@@ -12,16 +12,16 @@
     "apiName": "SampleApi",
     "logging": {
       "development": {
-        "level": "Information",
+        "level": "Info",
         "overrideLevels": {
           "Microsoft": "Warning",
           "Microsoft.AspNetCore.Server.Kestrel": "Error",
           "Framework.Api.Base.Security.CustomAuthenticationFilter": "Error",
-          "Framework.Api.OAuth.ClaimsCache": "Information"
+          "Framework.Api.OAuth.Claims.ClaimsCache": "Info"
         }
       },
       "production": {
-        "level": "info",
+        "level": "Info",
         "appenders": [
           {
             "type": "console"
@@ -29,7 +29,7 @@
           {
             "type": "file",
             "filePrefix": "api",
-            "dirname": "./logs",
+            "dirName": "./logs/",
             "maxSize": "10MB",
             "maxFiles": "100"
           }
