@@ -1,8 +1,10 @@
 namespace Framework.Api.Base.Middleware
 {
     using System.Threading.Tasks;
+    using Framework.Api.Base.Configuration;
     using Framework.Api.Base.Errors;
     using Framework.Api.Base.Logging;
+    using Framework.Api.Base.Utilities;
     using Microsoft.AspNetCore.Http;
 
     /*
@@ -23,13 +25,16 @@ namespace Framework.Api.Base.Middleware
         /*
          * Handle any special custom headers
          */
-        public async Task Invoke(HttpContext context, LogEntry logEntry)
+        public async Task Invoke(HttpContext context, FrameworkConfiguration configuration, LogEntry logEntry)
         {
             // Cause a 500 error if a special header is received
-            var key = "x-mycompany-test-exception";
-            if (context.Request.Headers.ContainsKey(key))
+            var apiToBreak = context.Request.GetHeader("x-mycompany-test-exception");
+            if (!string.IsNullOrWhiteSpace(apiToBreak))
             {
-                throw new ApiError("exception_simulation", "An exception was simulated in the API");
+                if (apiToBreak.ToLowerInvariant() == configuration.ApiName.ToLowerInvariant())
+                {
+                    throw new ApiError("exception_simulation", "An exception was simulated in the API");
+                }
             }
 
             // Run subsequent handlers including the controller operation

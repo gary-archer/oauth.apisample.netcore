@@ -3,6 +3,7 @@
     using System.Threading.Tasks;
     using Framework.Api.Base.Claims;
     using Framework.Api.Base.Errors;
+    using Framework.Api.Base.Utilities;
     using Microsoft.AspNetCore.Http;
 
     /*
@@ -12,10 +13,10 @@
     {
         /*
          * The entry point for implementing authorization
+         * We ignore the async not required warning since it is needed by other implementations
          */
         #pragma warning disable CS1998
         public async Task<CoreApiClaims> AuthorizeRequestAndGetClaims(HttpRequest request)
-        #pragma warning restore CS1998
         {
             var claims = new CoreApiClaims();
 
@@ -40,7 +41,8 @@
          */
         private string GetHeaderClaim(HttpRequest request, string name)
         {
-            if (request.Headers.ContainsKey(name))
+            var header = request.GetHeader(name);
+            if (!string.IsNullOrWhiteSpace(header))
             {
                 return request.Headers[name];
             }

@@ -47,7 +47,7 @@
                 // Inject early objects in the container here
                 .ConfigureServices(services =>
                 {
-                    services.AddSingleton(loggerFactory);
+                    services.AddSingleton<ILoggerFactory>(loggerFactory);
                     services.AddSingleton(jsonConfig);
                 })
 

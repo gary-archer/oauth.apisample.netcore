@@ -42,6 +42,14 @@ namespace Framework.Api.Base.Errors
             }
         }
 
+        public string ErrorCode
+        {
+            get
+            {
+                return this.errorCode;
+            }
+        }
+
         /*
          * A helper method to return a 401 error
          */

@@ -99,7 +99,7 @@
         public PerformanceBreakdown Performance { get; private set;  }
 
         // An object containing error data, written for failed requests
-        public JObject ErrorData { get; private set; }
+        public JObject ErrorData { get; set; }
 
         // Can be populated in scenarios when extra text is useful
         public JArray InfoData { get; private set; }

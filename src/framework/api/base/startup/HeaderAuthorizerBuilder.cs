@@ -1,6 +1,8 @@
 ﻿namespace Framework.Api.Base.Startup
 {
+    using Framework.Api.Base.Claims;
     using Framework.Api.Base.Security;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
 
     /*
@@ -25,9 +27,21 @@
          */
         public void Register()
         {
+            // Add singleton dependencies
+            this.services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             // Register OAuth per request dependencies
             this.services.AddScoped<IAuthorizer, HeaderAuthorizer>();
             this.services.AddScoped<HeaderAuthenticator>();
+
+            // Claims are injected with request scope via this factory method
+            this.services.AddScoped(
+                ctx =>
+                {
+                    var claims = new CoreApiClaims();
+                    claims.Load(ctx.GetService<IHttpContextAccessor>().HttpContext.User);
+                    return claims;
+                });
         }
     }
 }

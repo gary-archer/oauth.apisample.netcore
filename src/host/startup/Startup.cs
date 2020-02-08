@@ -94,7 +94,7 @@
             api.UseAuthentication();
 
             // Add standard framework middleware classes
-            new FrameworkBuilder().AddMiddleware(api);
+            new FrameworkBuilder(this.jsonConfig.Framework).AddMiddleware(api);
         }
 
         /*
@@ -102,7 +102,7 @@
          */
         private void ConfigureApiBaseFrameworkDependencies(IServiceCollection services)
         {
-            new FrameworkBuilder().Register(services);
+            new FrameworkBuilder(this.jsonConfig.Framework).Register(services);
         }
 
         /*

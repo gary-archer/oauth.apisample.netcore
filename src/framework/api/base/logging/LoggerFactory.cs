@@ -17,10 +17,12 @@ namespace Framework.Api.Base.Logging
     public class LoggerFactory : Framework.Api.Base.Logging.ILoggerFactory
     {
         private const string InstanceName = "Production";
+        private string apiName;
         private bool isInitialized = false;
 
         public LoggerFactory()
         {
+            this.apiName = string.Empty;
             this.isInitialized = false;
         }
 
@@ -43,9 +45,9 @@ namespace Framework.Api.Base.Logging
             {
                 // Use log4net output if we can
                 var handler = new ErrorUtils();
-                var logEntry = new LogEntry();
+                var logEntry = new LogEntry(this.apiName);
                 handler.HandleError(exception, logEntry);
-                logEntry.End(null);
+                logEntry.End(null, this.GetProductionLogger());
             }
             else
             {

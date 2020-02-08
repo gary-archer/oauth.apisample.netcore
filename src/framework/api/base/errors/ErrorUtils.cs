@@ -18,7 +18,7 @@
             if (apiError != null)
             {
                 // Log the error, which will include technical support details
-                logEntry.AddApiError(apiError);
+                logEntry.SetApiError(apiError);
 
                 // Return a client error to the caller
                 return apiError.ToClientError();
@@ -29,7 +29,7 @@
             if (clientError != null)
             {
                 // Log the error without an id
-                logEntry.AddClientError(clientError);
+                logEntry.SetClientError(clientError);
 
                 // Return the thrown error to the caller
                 return clientError;
@@ -37,7 +37,7 @@
 
             // Unhandled exceptions
             apiError = ErrorUtils.FromException(exception);
-            logEntry.AddApiError(apiError);
+            logEntry.SetApiError(apiError);
             return apiError.ToClientError();
         }
 

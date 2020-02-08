@@ -32,6 +32,22 @@ namespace Framework.Api.Base.Errors
             this.details = string.Empty;
         }
 
+        public string ErrorCode
+        {
+            get
+            {
+                return this.errorCode;
+            }
+        }
+
+        public int InstanceId
+        {
+            get
+            {
+                return this.instanceId;
+            }
+        }
+
         public string Details
         {
             set
@@ -43,7 +59,7 @@ namespace Framework.Api.Base.Errors
         /*
          * Return a dynamic object that can be serialized by calling toString
          */
-        public JObject ToLogFormat()
+        public JObject ToLogFormat(string apiName)
         {
             dynamic data = new JObject();
             data.statusCode = this.statusCode;

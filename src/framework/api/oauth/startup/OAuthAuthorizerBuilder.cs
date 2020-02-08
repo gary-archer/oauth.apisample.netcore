@@ -11,7 +11,6 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
 
     /*
      * Build an authorizer filter for OAuth token validation and claims caching
@@ -110,14 +109,14 @@
             this.services.AddSingleton(issuerMetadata);
             this.services.AddSingleton(cache);
             this.services.AddSingleton(this.httpProxyFactory);
+            this.services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // Register OAuth per request dependencies
             this.services.AddScoped<IAuthorizer, OAuthAuthorizer<TClaims>>();
             this.services.AddScoped<OAuthAuthenticator>();
             this.services.AddScoped(typeof(CustomClaimsProvider<TClaims>), this.customClaimsProviderType);
 
-            // The claims middleware populates the TClaims object and sets it against the HTTP context's claims principal
-            // When controller operations execute they access the HTTP context and extract the claims
+            // Claims are injected with request scope via this factory method
             this.services.AddScoped(
                 ctx =>
                 {

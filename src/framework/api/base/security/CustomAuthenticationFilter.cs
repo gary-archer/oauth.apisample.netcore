@@ -25,21 +25,24 @@ namespace Framework.Api.Base.Security
         // Framework objects
         private readonly IAuthorizer authorizer;
         private readonly LogEntry logEntry;
+        private readonly ILoggerFactory loggerFactory;
 
         /*
-         * Receive and forward the Microsoft plumbing classes and also our authorizer
+         * The first 4 parmameters are required by Microsoft and of no interest to this sample
          */
         public CustomAuthenticationFilter(
             IOptionsMonitor<T> options,
-            Microsoft.Extensions.Logging.ILoggerFactory loggerFactory,
+            Microsoft.Extensions.Logging.ILoggerFactory developmentLoggerFactory,
             UrlEncoder urlEncoder,
             ISystemClock clock,
             IAuthorizer authorizer,
-            LogEntry logEntry)
-                : base(options, loggerFactory, urlEncoder, clock)
+            LogEntry logEntry,
+            ILoggerFactory loggerFactory)
+                : base(options, developmentLoggerFactory, urlEncoder, clock)
         {
             this.authorizer = authorizer;
             this.logEntry = logEntry;
+            this.loggerFactory = loggerFactory;
         }
 
         /*
@@ -71,8 +74,8 @@ namespace Framework.Api.Base.Security
             catch (ClientError clientError)
             {
                 // If there is an error then log it and we also need to end logging here
-                this.logEntry.AddClientError(clientError);
-                this.logEntry.End(this.Response);
+                this.logEntry.SetClientError(clientError);
+                this.logEntry.End(this.Response, this.loggerFactory.GetProductionLogger());
 
                 // Store fields for the challenge method which will fire later
                 this.Request.HttpContext.Items.TryAdd(StatusCodeKey, 401);
@@ -84,7 +87,7 @@ namespace Framework.Api.Base.Security
                 // If there is an error then log it and we also need to end logging here
                 var handler = new ErrorUtils();
                 var clientError = handler.HandleError(exception, this.logEntry);
-                this.logEntry.End(this.Response);
+                this.logEntry.End(this.Response, this.loggerFactory.GetProductionLogger());
 
                 // Store fields for the challenge method which will fire later
                 this.Request.HttpContext.Items.TryAdd(StatusCodeKey, clientError.StatusCode);

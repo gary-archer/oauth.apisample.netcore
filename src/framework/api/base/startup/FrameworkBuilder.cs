@@ -1,9 +1,9 @@
 ﻿namespace Framework.Api.Base.Startup
 {
+    using Framework.Api.Base.Configuration;
     using Framework.Api.Base.Logging;
     using Framework.Api.Base.Middleware;
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
 
     /*
@@ -11,6 +11,13 @@
      */
     public class FrameworkBuilder
     {
+        private readonly FrameworkConfiguration configuration;
+
+        public FrameworkBuilder(FrameworkConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
+
         /*
          * Add standard framework .Net Core middleware classes
          */
@@ -25,11 +32,17 @@
         /*
          * Add framework dependencies to the container
          */
-        public FrameworkBuilder Register(IServiceCollection services)
+        public void Register(IServiceCollection services)
         {
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped<LogEntry>();
-            return this;
+            // Register singletons
+            services.AddSingleton(this.configuration);
+
+            // The log entry is scoped to the current request and created via this factory method
+            services.AddScoped(
+                ctx =>
+                {
+                    return new LogEntry(this.configuration.ApiName);
+                });
         }
     }
 }

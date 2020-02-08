@@ -16,24 +16,27 @@ Open Issues
 
 NEXT
 ----
-1. Avoid recreating the logger factory and get from the container
-   Create proper log entry classes starting with logging the API name
-   Fill in fields to a fairly good level
-     
-2. Performance thresholds from configuration
-   Complete logging including child authorizer, Elastic Search flow and load test
+1. Read performance thresholds from configuration
+   Get startup error reporting
+   Get the sample working again
 
-3. Can I get rid of data contracts for claims serialization?
-   Review and aim to improve principal handling
+2. Logger factory usage to improve in line with other samples
+   Fill in all fields
      
+3. Run load test and Elastic Search
+   Log entry consolidation across Node and Java
+
 4. Coding improvements around error abstractions and ErrorCodes source file
    Use internal sealed classes
 
-5. Inject claims into controllers only and change service / repository as for other samples
+5. Can I get rid of data contracts for claims serialization?
+   Review and aim to improve principal handling
+
+6. Inject claims into controllers only and change service / repository as for other samples
    Create base framework classes to support application error translation
 
-6. No exception details for long press
-   Make details a JObject
-   Fix Okta response above
+7. No exception details for long press
+   Make details a JObject or a string, and also for performance threshold
 
-7. Support unsecured paths
+7. Fix Okta response above
+   Support unsecured paths
