@@ -59,7 +59,7 @@ namespace Framework.Api.Base.Security
         {
             try
             {
-                // Start logging of secure requests here
+                // For secured requests we start logging here
                 this.logEntry.Start(this.Request);
 
                 // Do the authentication work

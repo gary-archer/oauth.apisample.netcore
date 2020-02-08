@@ -57,8 +57,8 @@ namespace Framework.Api.Base.Logging
         }
 
         /*
-        * Start collecting data before calling the API's business logic
-        */
+         * Start collecting data before calling the API's business logic
+         */
         public void Start(HttpRequest request)
         {
             // Start is called by both the authorizer and the logger middleware so only add start data once
@@ -105,8 +105,8 @@ namespace Framework.Api.Base.Logging
         }
 
         /*
-        * Add identity details for secured requests
-        */
+         * Add identity details for secured requests
+         */
         public void SetIdentity(CoreApiClaims claims)
         {
             this.data.ClientId = claims.ClientId;
@@ -115,16 +115,16 @@ namespace Framework.Api.Base.Logging
         }
 
         /*
-        * An internal method for setting the operation name
-        */
+         * An internal method for setting the operation name
+         */
         public void SetOperationName(string name)
         {
             this.data.OperationName = name;
         }
 
         /*
-        * Create a child performance breakdown when requested
-        */
+         * Create a child performance breakdown when requested
+         */
         public IPerformanceBreakdown CreatePerformanceBreakdown(string name)
         {
             var child = this.Current().Performance.CreateChild(name);
@@ -133,8 +133,8 @@ namespace Framework.Api.Base.Logging
         }
 
         /*
-        * Add error details after they have been processed by the exception handler, including denormalised fields
-        */
+         * Add error details after they have been processed by the exception handler, including denormalised fields
+         */
         public void SetApiError(ApiError error)
         {
             this.Current().ErrorData = error.ToLogFormat(this.data.ApiName);
@@ -143,8 +143,8 @@ namespace Framework.Api.Base.Logging
         }
 
         /*
-        * Add error details after they have been processed by the exception handler, including denormalised fields
-        */
+         * Add error details after they have been processed by the exception handler, including denormalised fields
+         */
         public void SetClientError(ClientError error)
         {
             this.Current().ErrorData = error.ToLogFormat();
@@ -152,9 +152,17 @@ namespace Framework.Api.Base.Logging
         }
 
         /*
-        * Enable free text to be added to production logs, though this should be avoided in most cases
-        */
-        public void AddInfo(JObject info)
+         * Enable arbitrary text data to be added
+         */
+        public void AddInfo(string info)
+        {
+            this.Current().InfoData.Add(info);
+        }
+
+        /*
+         * Enable arbitrary data to be added
+         */
+        public void AddInfo(JToken info)
         {
             this.Current().InfoData.Add(info);
         }

@@ -12,8 +12,11 @@
         // Create a performance breakdown for business logic
         IPerformanceBreakdown CreatePerformanceBreakdown(string name);
 
-        // Add text logging from business logic (not recommended)
-        void AddInfo(JObject info);
+        // Add arbitrary text
+        void AddInfo(string info);
+
+        // Add arbitrary object data
+        void AddInfo(JToken info);
 
         // Our sample logs OAuth authorization as a child log entry
         IDisposable CreateChild(string name);

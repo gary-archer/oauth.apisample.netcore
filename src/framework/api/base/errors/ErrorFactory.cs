@@ -2,6 +2,7 @@
 {
     using System;
     using System.Net;
+    using Newtonsoft.Json.Linq;
 
     /*
      * An error factory class that returns the interface rather than the concrete type
@@ -39,10 +40,21 @@
             HttpStatusCode statusCode,
             string errorCode,
             string userMessage,
+            JToken logContext)
+        {
+            var error = new ClientErrorImpl(statusCode, errorCode, userMessage);
+            error.SetLogContext(logContext);
+            return error;
+        }
+
+        public static ClientError CreateClientErrorWithContext(
+            HttpStatusCode statusCode,
+            string errorCode,
+            string userMessage,
             string logContext)
         {
             var error = new ClientErrorImpl(statusCode, errorCode, userMessage);
-            error.LogContext = logContext;
+            error.SetLogContext(logContext);
             return error;
         }
 
@@ -55,7 +67,7 @@
                     HttpStatusCode.Unauthorized,
                     BaseErrorCodes.UnauthorizedRequest,
                     "Missing, invalid or expired access token");
-            error.LogContext = reason;
+            error.SetLogContext(reason);
             return error;
         }
     }

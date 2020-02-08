@@ -8,6 +8,16 @@
      */
     public abstract class ApiError : Exception
     {
+        public ApiError()
+            : base()
+        {
+        }
+
+        public ApiError(string message)
+            : base(message)
+        {
+        }
+
         public ApiError(string message, Exception inner)
             : base(message, inner)
         {
@@ -23,7 +33,7 @@
         public abstract void SetDetails(string details);
 
         // Set details from an object node
-        public abstract void SetDetails(JObject details);
+        public abstract void SetDetails(JToken details);
 
         // Return the log format
         public abstract JObject ToLogFormat(string apiName);

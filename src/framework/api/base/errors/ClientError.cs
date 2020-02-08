@@ -9,8 +9,18 @@
      */
     public abstract class ClientError : Exception
     {
+        public ClientError()
+            : base()
+        {
+        }
+
         public ClientError(string message)
             : base(message)
+        {
+        }
+
+        public ClientError(string message, Exception inner)
+            : base(message, inner)
         {
         }
 

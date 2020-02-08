@@ -18,7 +18,7 @@ namespace Framework.Api.Base.Errors
         private readonly HttpStatusCode statusCode;
         private readonly int instanceId;
         private readonly string utcTime;
-        private JObject details;
+        private JToken details;
 
         /*
          * The default constructor
@@ -59,12 +59,10 @@ namespace Framework.Api.Base.Errors
 
         public override void SetDetails(string details)
         {
-            dynamic data = new JObject();
-            data.details = details;
-            this.details = data;
+            this.details = new JValue(details);
         }
 
-        public override void SetDetails(JObject details)
+        public override void SetDetails(JToken details)
         {
             this.details = details;
         }
@@ -79,7 +77,27 @@ namespace Framework.Api.Base.Errors
             data.clientError = this.ToClientError(apiName).ToResponseFormat();
             data.serviceError = new JObject();
             data.serviceError.errorCode = this.errorCode;
-            data.serviceError.details = this.details;
+
+            if (this.details != null)
+            {
+                data.serviceError.details = this.details;
+            }
+
+            // Output the stack trace of the original error
+            var stack = this.GetOriginalException().StackTrace;
+            if (stack != null)
+            {
+                var frames = stack.Split('\n');
+                if (frames.Length > 0)
+                {
+                    data.serviceError.stack = new JArray();
+                    foreach (var frame in frames)
+                    {
+                        data.serviceError.stack.Add(frame.Trim());
+                    }
+                }
+            }
+
             return data;
         }
 
@@ -91,6 +109,25 @@ namespace Framework.Api.Base.Errors
             var error = ErrorFactory.CreateClientError(this.statusCode, this.errorCode, this.Message);
             error.SetExceptionDetails(apiName, this.instanceId, this.utcTime);
             return error;
+        }
+
+        /*
+         * Get an exception's original cause for call stack reporting
+         */
+        private Exception GetOriginalException()
+        {
+            Exception ex = this;
+            Exception inner = this;
+            while (inner != null)
+            {
+                inner = inner.InnerException;
+                if (inner != null)
+                {
+                    ex = inner;
+                }
+            }
+
+            return ex;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Framework.Api.Base.Errors
         // Mandatory fields for both 4xx and 500 errors
         private readonly HttpStatusCode statusCode;
         private readonly string errorCode;
-        private string logContext;
+        private JToken logContext;
 
         // Extra fields returned to the client for UI displays of 500 errors
         private string area;
@@ -27,7 +27,7 @@ namespace Framework.Api.Base.Errors
             // Set mandatory fields
             this.statusCode = statusCode;
             this.errorCode = errorCode;
-            this.logContext = string.Empty;
+            this.logContext = null;
 
             // Initialise 5xx fields
             this.area = string.Empty;
@@ -51,12 +51,14 @@ namespace Framework.Api.Base.Errors
             }
         }
 
-        public string LogContext
+        public void SetLogContext(string value)
         {
-            set
-            {
-                this.logContext = value;
-            }
+            this.logContext = new JValue(value);
+        }
+
+        public void SetLogContext(JToken value)
+        {
+            this.logContext = value;
         }
 
         /*
@@ -97,7 +99,7 @@ namespace Framework.Api.Base.Errors
             data.statusCode = this.StatusCode;
             data.body = this.ToResponseFormat();
 
-            if (!string.IsNullOrEmpty(this.logContext))
+            if (this.logContext != null)
             {
                 data.context = this.logContext;
             }

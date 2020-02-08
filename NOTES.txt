@@ -5,17 +5,14 @@ CodeLens
 
 NEXT
 ----
-1. No exception details for long press
-   Make details and log context a JObject or a string, and also for performance threshold
-
-2. Run load test and Elastic Search
-   Log entry consolidation across Node and Java
-
-3. Compare framework classes with other samples and consolidate all
-   LoggerFactory and LogEntry
-   Also update serverless and deploy latest to AWS
-   Support unsecured paths?
-
-4. Simplify authentication scheme and get rid of options if possible
+1. Simplify authentication scheme and get rid of options if possible
    Can I get rid of data contracts for claims serialization?
    Review and aim to improve principal handling
+   Support unsecured paths?
+
+2. Compare framework classes with other samples including Serverless and consolidate all
+   LoggerFactory / LogEntry / ExceptionMiddleware have all been improved
+   Also a default ApplicationExceptionHandler and CustomClaimsProvider
+   Check file by file
+
+

@@ -12,7 +12,7 @@
     {
         private readonly string name;
         private Stopwatch stopWatch;
-        private string details;
+        private JToken details;
         private IList<PerformanceBreakdown> children;
 
         public PerformanceBreakdown(string name)
@@ -21,7 +21,7 @@
             this.stopWatch = new Stopwatch();
             this.children = new List<PerformanceBreakdown>();
             this.MillisecondsTaken = 0;
-            this.details = string.Empty;
+            this.details = null;
         }
 
         /*
@@ -30,20 +30,24 @@
         public int MillisecondsTaken { get; set; }
 
         /*
-        * Start a performance measurement after creation
-        */
+         * Start a performance measurement after creation
+         */
         public void Start()
         {
             this.stopWatch.Start();
         }
 
         /*
-        * Set details to associate with the performance breakdown
-        * One use case would be to log SQL with input parameters
+        * Set details to associate with the performance breakdown, such as SQL and parameters
         */
-        public void SetDetails(string value)
+        public void SetDetails(JToken value)
         {
             this.details = value;
+        }
+
+        public void SetDetails(string value)
+        {
+            this.details = new JValue(value);
         }
 
         /*
@@ -64,7 +68,7 @@
             data.name = this.name;
             data.millisecondsTaken = this.MillisecondsTaken;
 
-            if (this.details.Length > 0)
+            if (this.details != null)
             {
                 data.details = this.details;
             }
