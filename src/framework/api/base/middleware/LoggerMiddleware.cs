@@ -22,7 +22,7 @@ namespace Framework.Api.Base.Middleware
         /*
          * Log the request and response
          */
-        public async Task Invoke(HttpContext context, LogEntry logEntry, ILoggerFactory loggerFactory)
+        public async Task Invoke(HttpContext context, LogEntry logEntry)
         {
             // Start logging request details
             logEntry.Start(context.Request);
@@ -31,7 +31,8 @@ namespace Framework.Api.Base.Middleware
             await this.next(context);
 
             // Log response details before exiting
-            logEntry.End(context.Response, loggerFactory.GetProductionLogger());
+            logEntry.End(context.Request, context.Response);
+            logEntry.Write();
         }
     }
 }

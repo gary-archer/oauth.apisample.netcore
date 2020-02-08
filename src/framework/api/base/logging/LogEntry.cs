@@ -3,18 +3,24 @@ namespace Framework.Api.Base.Logging
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
     using Framework.Api.Base.Claims;
     using Framework.Api.Base.Errors;
     using Framework.Api.Base.Utilities;
+    using Framework.Base.Abstractions;
     using log4net;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Routing;
     using Newtonsoft.Json.Linq;
 
     /*
      * A basic log entry object with a per request scope
      */
-    public class LogEntry
+    public class LogEntry : ILogEntry
     {
+        // The place to write the log
+        private readonly ILog productionLogger;
+
         // Data logged
         private LogEntryData data;
         private IList<LogEntryData> children;
@@ -30,8 +36,9 @@ namespace Framework.Api.Base.Logging
         /*
          * A log entry is created once per API request
          */
-        public LogEntry(string apiName)
+        public LogEntry(string apiName, ILog productionLogger)
         {
+            this.productionLogger = productionLogger;
             this.data = new LogEntryData();
             this.data.ApiName = apiName;
             this.data.HostName = Environment.MachineName;
@@ -63,7 +70,18 @@ namespace Framework.Api.Base.Logging
                 // Read request details
                 this.data.Performance.Start();
                 this.data.RequestVerb = request.Method;
+
+                // Include the query in the path if applicable
                 this.data.RequestPath = request.Path;
+                if (request.QueryString.HasValue)
+                {
+                    this.data.RequestPath += request.QueryString.Value;
+                }
+
+                foreach (var route in request.RouteValues)
+                {
+                    Console.WriteLine("FOUND ROUTE IN START HANDLER: " + route.Key);
+                }
 
                 // Our callers can supply a custom header so that we can keep track of who is calling each API
                 var callingApplicationName = request.GetHeader("x-mycompany-api-client");
@@ -90,21 +108,10 @@ namespace Framework.Api.Base.Logging
                     this.data.SessionId = sessionId;
                 }
 
-                /*
-                // Calculate the operation name from request.route, which is not available at the start of the request
-                if (this._routeMetadataHandler) {
-                    const metadata = this._routeMetadataHandler.getOperationRouteInfo(request);
-                    if (metadata) {
-
-                        // Record the operation name and also ensure that the correct performance threshold is used
-                        this.data.operationName = metadata.operationName;
-                        this.data.performanceThresholdMilliseconds = this._getPerformanceThreshold(this.data.operationName);
-
-                        // Also log URL path segments for resource ids
-                        this.data.resourceId = metadata.resourceIds.join('/');
-                    }
-                }
-                */
+                // TODO
+                // Record the operation name and also ensure that the correct performance threshold is used
+                // this.data.operationName = metadata.operationName;
+                // this.data.performanceThresholdMilliseconds = this._getPerformanceThreshold(this.data.operationName);
             }
         }
 
@@ -115,7 +122,7 @@ namespace Framework.Api.Base.Logging
         {
             this.data.ClientId = claims.ClientId;
             this.data.UserId = claims.UserId;
-            this.data.UserName = $"{claims.GivenName} ${claims.FamilyName}";
+            this.data.UserName = $"{claims.GivenName} {claims.FamilyName}";
         }
 
         /*
@@ -129,7 +136,7 @@ namespace Framework.Api.Base.Logging
         /*
         * Create a child performance breakdown when requested
         */
-        public PerformanceBreakdown CreatePerformanceBreakdown(string name)
+        public IPerformanceBreakdown CreatePerformanceBreakdown(string name)
         {
             var child = this.Current().Performance.CreateChild(name);
             child.Start();
@@ -200,46 +207,76 @@ namespace Framework.Api.Base.Logging
         /*
         * Finish collecting data at the end of the API request
         */
-        public void End(HttpResponse response, ILog logger)
+        public void End(HttpRequest request, HttpResponse response)
         {
-            if (response != null)
+            // Fill in route details that are not available until now
+            this.ProcessRouteValues(request.RouteValues);
+
+            // If an active child operation needs ending (due to exceptions) then we do it here
+            this.EndChildOperation();
+
+            // Finish performance measurements
+            this.data.Performance.Dispose();
+
+            // Record response details
+            this.data.StatusCode = response.StatusCode;
+
+            // Finalise this log entry
+            this.data.Finalise();
+
+            // Finalise data related to child log entries, to copy data points between parent and children
+            foreach (var child in this.children)
             {
-                // If an active child operation needs ending (due to exceptions) then we do it here
-                this.EndChildOperation();
-
-                // Finish performance measurements
-                this.data.Performance.Dispose();
-
-                // Record response details
-                this.data.StatusCode = response.StatusCode;
-
-                // Finalise this log entry
-                this.data.Finalise();
-
-                // Finalise data related to child log entries, to copy data points between parent and children
-                foreach (var child in this.children)
-                {
-                    child.Finalise();
-                    child.UpdateFromParent(this.data);
-                    this.data.UpdateFromChild(child);
-                }
+                child.Finalise();
+                child.UpdateFromParent(this.data);
+                this.data.UpdateFromChild(child);
             }
-
-            // Finally output the data
-            this.Write(logger);
         }
 
         /*
-        * Output any child data and then the parent data
-        */
-        private void Write(ILog logger)
+         * Output any child data and then the parent data
+         */
+        public void Write()
         {
             foreach (var child in this.children)
             {
-                this.WriteDataItem(child, logger);
+                this.WriteDataItem(child);
             }
 
-            this.WriteDataItem(this.data, logger);
+            this.WriteDataItem(this.data);
+        }
+
+        /*
+         * Derive the resource id and operation name from route details
+         */
+        private void ProcessRouteValues(RouteValueDictionary routes)
+        {
+            // Set the name of the operation being called
+            var operationName = routes["action"];
+            if (operationName != null)
+            {
+                this.data.OperationName = operationName.ToString();
+            }
+
+            // Capture template ids in URL path segments
+            var ids = new List<string>();
+            foreach (var route in routes)
+            {
+                if (route.Key != "action" && route.Key != "controller")
+                {
+                    var id = route.Value.ToString();
+                    if (!string.IsNullOrWhiteSpace(id))
+                    {
+                        ids.Add(id);
+                    }
+                }
+            }
+
+            // Set them as the resource id
+            if (ids.Count > 0)
+            {
+                this.data.ResourceId = string.Join('/', ids);
+            }
         }
 
         /*
@@ -275,7 +312,7 @@ namespace Framework.Api.Base.Logging
         /*
         * Write a single data item
         */
-        private void WriteDataItem(LogEntryData item, ILog logger)
+        private void WriteDataItem(LogEntryData item)
         {
             // Get the object to log
             var logData = item.ToLogFormat();
@@ -283,11 +320,11 @@ namespace Framework.Api.Base.Logging
             // Output it
             if (item.ErrorData != null)
             {
-                logger.Error(logData);
+                this.productionLogger.Error(logData);
             }
             else
             {
-                logger.Info(logData);
+                this.productionLogger.Info(logData);
             }
         }
     }

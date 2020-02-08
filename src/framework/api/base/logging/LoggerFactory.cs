@@ -45,9 +45,8 @@ namespace Framework.Api.Base.Logging
             {
                 // Use log4net output if we can
                 var handler = new ErrorUtils();
-                var logEntry = new LogEntry(this.apiName);
+                var logEntry = new LogEntry(this.apiName, this.GetProductionLogger());
                 handler.HandleError(exception, logEntry);
-                logEntry.End(null, this.GetProductionLogger());
             }
             else
             {

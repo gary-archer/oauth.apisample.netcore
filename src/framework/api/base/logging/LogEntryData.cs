@@ -218,7 +218,7 @@
         {
             if (this.Performance.MillisecondsTaken >= this.PerformanceThresholdMilliseconds || this.ErrorId > 0)
             {
-                output.Performance = this.Performance.GetData();
+                output.performance = this.Performance.GetData();
             }
         }
 
@@ -229,7 +229,7 @@
         {
             if (this.ErrorData != null)
             {
-                output.ErrorData = this.ErrorData;
+                output.errorData = this.ErrorData;
             }
         }
 
@@ -240,7 +240,7 @@
         {
             if (this.InfoData.Count > 0)
             {
-                data.InfoData = this.InfoData;
+                data.infoData = this.InfoData;
             }
         }
     }

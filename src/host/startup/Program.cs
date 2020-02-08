@@ -18,7 +18,7 @@
          */
         public static void Main(string[] args)
         {
-            var loggerFactory = new LoggerFactory();
+            var loggerFactory = LoggerFactoryBuilder.Create();
 
             try
             {
@@ -35,7 +35,7 @@
         /*
          * Build a host to handle HTTP requests
          */
-        private static IWebHost BuildWebHost(LoggerFactory loggerFactory)
+        private static IWebHost BuildWebHost(ILoggerFactory loggerFactory)
         {
             // Load the configuration file
             var jsonConfig = Configuration.Load("./api.config.json");

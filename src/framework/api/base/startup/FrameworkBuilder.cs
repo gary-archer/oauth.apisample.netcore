@@ -12,10 +12,12 @@
     public class FrameworkBuilder
     {
         private readonly FrameworkConfiguration configuration;
+        private readonly ILoggerFactory loggerFactory;
 
-        public FrameworkBuilder(FrameworkConfiguration configuration)
+        public FrameworkBuilder(FrameworkConfiguration configuration, ILoggerFactory loggerFactory)
         {
             this.configuration = configuration;
+            this.loggerFactory = loggerFactory;
         }
 
         /*
@@ -41,7 +43,7 @@
             services.AddScoped(
                 ctx =>
                 {
-                    return new LogEntry(this.configuration.ApiName);
+                    return new LogEntry(this.configuration.ApiName, this.loggerFactory.GetProductionLogger());
                 });
         }
     }

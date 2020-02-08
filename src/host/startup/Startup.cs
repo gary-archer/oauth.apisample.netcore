@@ -1,5 +1,6 @@
 ﻿namespace SampleApi.Host.Startup
 {
+    using Framework.Api.Base.Logging;
     using Framework.Api.Base.Security;
     using Framework.Api.Base.Startup;
     using Framework.Api.OAuth.Security;
@@ -23,10 +24,12 @@
     public class Startup
     {
         private readonly Configuration jsonConfig;
+        private readonly FrameworkBuilder frameworkBuilder;
 
-        public Startup(Configuration jsonConfig)
+        public Startup(Configuration jsonConfig, ILoggerFactory loggerFactory)
         {
             this.jsonConfig = jsonConfig;
+            this.frameworkBuilder = new FrameworkBuilder(this.jsonConfig.Framework, loggerFactory);
         }
 
         /*
@@ -94,7 +97,7 @@
             api.UseAuthentication();
 
             // Add standard framework middleware classes
-            new FrameworkBuilder(this.jsonConfig.Framework).AddMiddleware(api);
+            this.frameworkBuilder.AddMiddleware(api);
         }
 
         /*
@@ -102,7 +105,7 @@
          */
         private void ConfigureApiBaseFrameworkDependencies(IServiceCollection services)
         {
-            new FrameworkBuilder(this.jsonConfig.Framework).Register(services);
+            this.frameworkBuilder.Register(services);
         }
 
         /*

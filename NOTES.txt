@@ -16,18 +16,23 @@ Open Issues
 
 NEXT
 ----
-1. Read performance thresholds from configuration
-   Get startup error reporting
-   Get the sample working again
+1. Compare startup errors to other samples
+   Read and apply performance thresholds from configuration, to complete code
+   Test both forms of startup error reporting
 
-2. Logger factory usage to improve in line with other samples
-   Fill in all fields
+2. Simplify authentication scheme and get rid of options if possible
+
+3. Fill in all fields and implement a child authorizer to complete the logging implementation
+   Test logging during auth failures
      
-3. Run load test and Elastic Search
-   Log entry consolidation across Node and Java
-
 4. Coding improvements around error abstractions and ErrorCodes source file
    Use internal sealed classes
+
+5. Run load test and Elastic Search
+   Log entry consolidation across Node and Java
+
+6. Merge to master
+   Make calls to logEntry consistent across all API stacks including serverless
 
 5. Can I get rid of data contracts for claims serialization?
    Review and aim to improve principal handling
