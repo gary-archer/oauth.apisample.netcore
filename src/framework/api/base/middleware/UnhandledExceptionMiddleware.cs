@@ -5,6 +5,7 @@ namespace Framework.Api.Base.Middleware
     using Framework.Api.Base.Errors;
     using Framework.Api.Base.Logging;
     using Framework.Api.Base.Utilities;
+    using Framework.Base.Abstractions;
     using Microsoft.AspNetCore.Http;
 
     /*
@@ -33,7 +34,7 @@ namespace Framework.Api.Base.Middleware
         /*
          * Controller exceptions are caught here
          */
-        public async Task Invoke(HttpContext context, LogEntry logEntry)
+        public async Task Invoke(HttpContext context, ILogEntry logEntryParam)
         {
             try
             {
@@ -43,6 +44,7 @@ namespace Framework.Api.Base.Middleware
             catch (Exception exception)
             {
                 // Handle the error
+                var logEntry = (LogEntry)logEntryParam;
                 var handler = new ErrorUtils();
                 var clientError = handler.HandleError(exception, logEntry);
 

@@ -2,6 +2,7 @@ namespace Framework.Api.Base.Middleware
 {
     using System.Threading.Tasks;
     using Framework.Api.Base.Logging;
+    using Framework.Base.Abstractions;
     using Microsoft.AspNetCore.Http;
 
     /*
@@ -22,9 +23,10 @@ namespace Framework.Api.Base.Middleware
         /*
          * Log the request and response
          */
-        public async Task Invoke(HttpContext context, LogEntry logEntry)
+        public async Task Invoke(HttpContext context, ILogEntry logEntryParam)
         {
             // Start logging request details
+            var logEntry = (LogEntry)logEntryParam;
             logEntry.Start(context.Request);
 
             // Run subsequent handlers including the controller operation

@@ -8,6 +8,7 @@ namespace Framework.Api.Base.Security
     using Framework.Api.Base.Errors;
     using Framework.Api.Base.Logging;
     using Framework.Api.Base.Utilities;
+    using Framework.Base.Abstractions;
     using IdentityModel;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.Extensions.Options;
@@ -35,11 +36,11 @@ namespace Framework.Api.Base.Security
             UrlEncoder urlEncoder,
             ISystemClock clock,
             IAuthorizer authorizer,
-            LogEntry logEntry)
+            ILogEntry logEntry)
                 : base(options, developmentLoggerFactory, urlEncoder, clock)
         {
             this.authorizer = authorizer;
-            this.logEntry = logEntry;
+            this.logEntry = (LogEntry)logEntry;
         }
 
         /*

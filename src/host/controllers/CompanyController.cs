@@ -16,10 +16,12 @@
     public class CompanyController : Controller
     {
         private readonly CompanyService service;
+        private readonly SampleApiClaims claims;
 
-        public CompanyController(CompanyService service)
+        public CompanyController(CompanyService service, SampleApiClaims claims)
         {
             this.service = service;
+            this.claims = claims;
         }
 
         /*
@@ -28,7 +30,7 @@
         [HttpGet("")]
         public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
-            return await this.service.GetCompanyListAsync();
+            return await this.service.GetCompanyListAsync(this.claims.RegionsCovered);
         }
 
         /*
@@ -45,7 +47,7 @@
             }
 
             // Forward the numeric id to the service
-            return await this.service.GetCompanyTransactionsAsync(idValue);
+            return await this.service.GetCompanyTransactionsAsync(idValue, this.claims.RegionsCovered);
         }
     }
 }

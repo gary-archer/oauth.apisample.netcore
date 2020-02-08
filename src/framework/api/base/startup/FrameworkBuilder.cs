@@ -3,6 +3,7 @@
     using Framework.Api.Base.Configuration;
     using Framework.Api.Base.Logging;
     using Framework.Api.Base.Middleware;
+    using Framework.Base.Abstractions;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -40,7 +41,7 @@
             services.AddSingleton(this.configuration);
 
             // The log entry is scoped to the current request and created via this factory method
-            services.AddScoped(
+            services.AddScoped<ILogEntry, LogEntry>(
                 ctx =>
                 {
                     return new LogEntry(this.configuration.ApiName, this.loggerFactory.GetProductionLogger());

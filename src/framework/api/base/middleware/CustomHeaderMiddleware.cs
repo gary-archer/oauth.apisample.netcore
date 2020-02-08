@@ -3,7 +3,6 @@ namespace Framework.Api.Base.Middleware
     using System.Threading.Tasks;
     using Framework.Api.Base.Configuration;
     using Framework.Api.Base.Errors;
-    using Framework.Api.Base.Logging;
     using Framework.Api.Base.Utilities;
     using Microsoft.AspNetCore.Http;
 
@@ -25,7 +24,7 @@ namespace Framework.Api.Base.Middleware
         /*
          * Handle any special custom headers
          */
-        public async Task Invoke(HttpContext context, FrameworkConfiguration configuration, LogEntry logEntry)
+        public async Task Invoke(HttpContext context, FrameworkConfiguration configuration)
         {
             // Cause a 500 error if a special header is received
             var apiToBreak = context.Request.GetHeader("x-mycompany-test-exception");

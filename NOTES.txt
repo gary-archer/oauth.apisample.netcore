@@ -26,20 +26,22 @@ NEXT
    Do application error translation
 
 4. Error abstractions improvements and ErrorCodes source files
-   ErrorUtils as a handler feels a little wrong
+   Logic with zero API dependencies
+
+5. ErrorUtils as a handler feels a little wrong
    No exception details for long press
    Make details a JObject or a string, and also for performance threshold
 
-5. Internal and sealed framework classes
+6. Internal and sealed framework classes
 
-6. Compare framework classes with other samples and consolidate
+7. Compare framework classes with other samples and consolidate
    Include serverless and deploy it
    Consolidate Okta errors for all samples
    Support unsecured paths?
 
-7. Run load test and Elastic Search
+8. Run load test and Elastic Search
    Log entry consolidation across Node and Java
 
-8. Simplify authentication scheme and get rid of options if possible
+9. Simplify authentication scheme and get rid of options if possible
    Can I get rid of data contracts for claims serialization?
    Review and aim to improve principal handling
