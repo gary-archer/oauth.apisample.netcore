@@ -42,10 +42,9 @@ namespace Framework.Api.OAuth.Security
          */
         public async Task<int> AuthenticateAndSetClaims(string accessToken, HttpRequest httpRequest, CoreApiClaims claims)
         {
-            // TODO
             // Create a child log entry for authentication related work
             // This ensures that any errors and performances in this area are reported separately to business logic
-            // var authorizationLogEntry = this.logEntry.CreateChild("authorizer");
+            var authorizationLogEntry = this.logEntry.CreateChild("authorizer");
 
             // Our implementation introspects the token to get token claims
             var expiry = await this.IntrospectTokenAndSetTokenClaims(accessToken, claims);
@@ -54,7 +53,7 @@ namespace Framework.Api.OAuth.Security
             await this.SetCentralUserInfoClaims(accessToken, claims);
 
             // Finish logging here, and note that on exception the logging framework disposes the child
-            // authorizationLogEntry.Dispose();
+            authorizationLogEntry.Dispose();
 
             // Return the expiry, used for claims caching
             return expiry;
