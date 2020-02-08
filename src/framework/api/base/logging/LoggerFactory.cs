@@ -36,6 +36,7 @@ namespace Framework.Api.Base.Logging
          */
         public void Configure(ILoggingBuilder builder, FrameworkConfiguration configuration)
         {
+            this.apiName = configuration.ApiName;
             this.ConfigureProductionLogging(builder, (JObject)configuration.Logging["production"]);
             this.ConfigureDevelopmentTraceLogging(builder, (JObject)configuration.Logging["development"]);
             this.isInitialized = true;

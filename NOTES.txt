@@ -3,17 +3,6 @@ CodeLens
   Tools / Options / Text Editor / All Languages / CodeLens
   File / Preferences / Settings / Text Editor / CodeLens
 
-Open Issues
------------
-  Non standard Okta introspect error response:
-  {
-    "errorCode":"invalid_client",
-    "errorSummary":"Invalid value for 'client_id' parameter.",
-    "errorLink":"invalid_client",
-    "errorId":"oaeiwRKEkpxRtefQlw8elwKZA",
-    "errorCauses":[]
-  }
-
 NEXT
 ----
 1. ERROR STRUCTURE
@@ -29,18 +18,14 @@ NEXT
    No exception details for long press
    Make details and log context a JObject or a string, and also for performance threshold
 
-4. AUTHORIZER LOGGING
-   Fix up authorizer logging - too many entries and wrong data?
-   Logging during auth failures and check Okta messages further
-
-5. Compare framework classes with other samples and consolidate all
+4. Compare framework classes with other samples and consolidate all
    Include serverless and deploy it
    Consolidate Okta errors for all samples
    Support unsecured paths?
 
-6. Run load test and Elastic Search
+5. Run load test and Elastic Search
    Log entry consolidation across Node and Java
 
-7. Simplify authentication scheme and get rid of options if possible
+6. Simplify authentication scheme and get rid of options if possible
    Can I get rid of data contracts for claims serialization?
    Review and aim to improve principal handling
