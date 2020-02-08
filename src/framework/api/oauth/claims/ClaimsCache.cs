@@ -31,8 +31,6 @@ namespace Framework.Api.OAuth.Claims
 
             // Get a development trace logger for this class
             this.traceLogger = container.GetService<ILoggerFactory>().CreateLogger<ClaimsCache<TClaims>>();
-
-            System.Console.WriteLine("CLASS NAME IS " + this.GetType().FullName);
         }
 
         /*
