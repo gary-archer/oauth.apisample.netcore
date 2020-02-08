@@ -36,6 +36,7 @@
     <Folder Include="src\framework\base\abstractions\" />
     <Folder Include="src\logic\errors\" />
     <Folder Include="logs\" />
+    <Folder Include="src\host\errors\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="src\framework\api\base\logging\ILoggerFactory %28copy%29.cs" />

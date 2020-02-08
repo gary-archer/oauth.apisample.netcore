@@ -9,7 +9,7 @@ namespace Framework.Api.OAuth.Errors
     /*
      * Framework specific error handling
      */
-    public sealed class OAuthErrorUtils
+    internal sealed class OAuthErrorUtils
     {
         /*
          * Report metadata lookup failures clearly

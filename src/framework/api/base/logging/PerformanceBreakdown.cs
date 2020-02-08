@@ -8,7 +8,7 @@
     /*
      * The full implementation class is private to the framework and excluded from the index.ts file
      */
-    public class PerformanceBreakdown : IPerformanceBreakdown
+    internal sealed class PerformanceBreakdown : IPerformanceBreakdown
     {
         private readonly string name;
         private Stopwatch stopWatch;

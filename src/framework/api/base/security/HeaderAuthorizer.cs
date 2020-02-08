@@ -7,7 +7,7 @@
     /*
      * A simpler header authorizer used by private APIs
      */
-    public class HeaderAuthorizer : IAuthorizer
+    internal sealed class HeaderAuthorizer : IAuthorizer
     {
         private readonly HeaderAuthenticator authenticator;
 

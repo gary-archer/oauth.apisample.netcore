@@ -5,7 +5,7 @@ namespace Framework.Base.Errors
     /*
      * An extended error class so that all unexpected errors have an error code, short message and details
      */
-    public class ExtendedException : Exception
+    public sealed class ExtendedException : Exception
     {
         /*
          * The default constructor

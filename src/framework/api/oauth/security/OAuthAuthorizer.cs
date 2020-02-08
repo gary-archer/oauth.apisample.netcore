@@ -11,7 +11,7 @@ namespace Framework.Api.OAuth.Security
     /*
      * The technology neutral algorithm for validating access tokens and returning claims
      */
-    public sealed class OAuthAuthorizer<TClaims> : IAuthorizer
+    internal sealed class OAuthAuthorizer<TClaims> : IAuthorizer
         where TClaims : CoreApiClaims, new()
     {
         private readonly ClaimsCache<TClaims> cache;

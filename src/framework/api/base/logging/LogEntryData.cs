@@ -7,7 +7,7 @@
      * Each API request writes a structured log entry containing fields we will query by
      * It also writes JSON blobs whose fields are not designed to be queried
      */
-    public class LogEntryData
+    internal sealed class LogEntryData
     {
         public LogEntryData()
         {

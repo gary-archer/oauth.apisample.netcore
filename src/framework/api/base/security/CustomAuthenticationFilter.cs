@@ -30,6 +30,7 @@ namespace Framework.Api.Base.Security
         private readonly IAuthorizer authorizer;
         private readonly LogEntry logEntry;
         private readonly FrameworkConfiguration configuration;
+        private readonly ApplicationExceptionHandler applicationHandler;
 
         /*
          * The first 4 parmameters are required by Microsoft and of no interest to this sample
@@ -41,12 +42,14 @@ namespace Framework.Api.Base.Security
             ISystemClock clock,
             IAuthorizer authorizer,
             FrameworkConfiguration configuration,
-            ILogEntry logEntry)
+            ILogEntry logEntry,
+            ApplicationExceptionHandler applicationHandler)
                 : base(options, developmentLoggerFactory, urlEncoder, clock)
         {
             this.authorizer = authorizer;
             this.configuration = configuration;
             this.logEntry = (LogEntry)logEntry;
+            this.applicationHandler = applicationHandler;
         }
 
         /*
@@ -79,7 +82,7 @@ namespace Framework.Api.Base.Security
             {
                 // If there is an error then handle it via the exception handler
                 var handler = new UnhandledExceptionMiddleware();
-                handler.HandleError(clientError, this.configuration, this.logEntry);
+                handler.HandleError(clientError, this.configuration, this.logEntry, this.applicationHandler);
 
                 // Store fields for the challenge method which will fire later
                 this.Request.HttpContext.Items.TryAdd(StatusCodeKey, clientError.StatusCode);
@@ -90,11 +93,7 @@ namespace Framework.Api.Base.Security
             {
                 // If there is an error then handle it via the exception handler
                 var handler = new UnhandledExceptionMiddleware();
-                var clientError = handler.HandleError(exception, this.configuration, this.logEntry);
-
-                // TODO
-                // this.logEntry.End(this.Request, this.Response);
-                // this.logEntry.Write();
+                var clientError = handler.HandleError(exception, this.configuration, this.logEntry, this.applicationHandler);
 
                 // Store fields for the challenge method which will fire later
                 this.Request.HttpContext.Items.TryAdd(StatusCodeKey, clientError.StatusCode);

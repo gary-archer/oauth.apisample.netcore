@@ -2,9 +2,7 @@ namespace SampleApi.Logic.Repositories
 {
     using System.Collections.Generic;
     using System.Linq;
-    using System.Net;
     using System.Threading.Tasks;
-    using Framework.Api.Base.Errors;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Errors;
 
@@ -57,13 +55,10 @@ namespace SampleApi.Logic.Repositories
         /*
          * Return 404 for both not found items and also those that are not authorized
          */
-        private ClientError UnauthorizedError(int companyId)
+        private BusinessError UnauthorizedError(int companyId)
         {
             var message = $"Transactions for company {companyId} were not found for this user";
-            return ErrorFactory.CreateClientError(HttpStatusCode.NotFound, ErrorCodes.CompanyNotFound, message);
-
-            // TODO
-            // return new BusinessError("company_not_found", message);
+            return new BusinessError("company_not_found", message);
         }
     }
 }

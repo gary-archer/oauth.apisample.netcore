@@ -10,7 +10,7 @@ namespace Framework.Api.Base.Logging
     /*
      * A JSON layout without any log4net generated fields
      */
-    public class JsonLayout : LayoutSkeleton
+    internal sealed class JsonLayout : LayoutSkeleton
     {
         private readonly bool prettyPrint;
 

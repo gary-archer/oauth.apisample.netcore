@@ -7,7 +7,7 @@ namespace Framework.Api.Base.Errors
     /*
      * Our standard representation of an API error, including how it is logged and translated to a client error
      */
-    public sealed class ApiErrorImpl : ApiError
+    internal sealed class ApiErrorImpl : ApiError
     {
         // A range for random error ids
         private const int MinErrorId = 10000;
@@ -81,8 +81,6 @@ namespace Framework.Api.Base.Errors
             data.serviceError.errorCode = this.errorCode;
             data.serviceError.details = this.details;
             return data;
-
-            // TODO: Call stack
         }
 
         /*

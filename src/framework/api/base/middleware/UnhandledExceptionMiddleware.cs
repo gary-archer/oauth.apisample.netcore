@@ -12,7 +12,7 @@ namespace Framework.Api.Base.Middleware
     /*
      * The unhandled exception handler, primarily called when an ASP.Net request fails
      */
-    public class UnhandledExceptionMiddleware
+    internal sealed class UnhandledExceptionMiddleware
     {
         private readonly RequestDelegate next;
 
@@ -38,7 +38,8 @@ namespace Framework.Api.Base.Middleware
         public async Task Invoke(
             HttpContext context,
             FrameworkConfiguration configuration,
-            ILogEntry logEntryParam)
+            ILogEntry logEntryParam,
+            ApplicationExceptionHandler applicationHandler)
         {
             try
             {
@@ -49,7 +50,11 @@ namespace Framework.Api.Base.Middleware
             {
                 // Process the entry
                 var logEntry = (LogEntry)logEntryParam;
-                var clientError = this.HandleError(exception, configuration, logEntry);
+                var clientError = this.HandleError(
+                    exception,
+                    configuration,
+                    logEntry,
+                    applicationHandler);
 
                 // Write the error response to the client
                 await ResponseErrorWriter.WriteErrorResponse(
@@ -63,7 +68,11 @@ namespace Framework.Api.Base.Middleware
         /*
          * A shared routine also called for authentication errors
          */
-        public ClientError HandleError(Exception exception, FrameworkConfiguration configuration, LogEntry logEntry)
+        public ClientError HandleError(
+            Exception exception,
+            FrameworkConfiguration configuration,
+            LogEntry logEntry,
+            ApplicationExceptionHandler applicationHandler)
         {
             // Move past aggregate exceptions
             var exceptionToHandle = exception;
@@ -75,14 +84,11 @@ namespace Framework.Api.Base.Middleware
                 }
             }
 
-            /*
             // Allow the application to implement its own error logic if required
-            IApplicationExceptionHandler applicationHandler
             if (applicationHandler != null)
             {
                 exceptionToHandle = applicationHandler.Translate(exceptionToHandle);
             }
-            */
 
             // Get the error into a known object
             var error = ErrorUtils.FromException(exceptionToHandle);

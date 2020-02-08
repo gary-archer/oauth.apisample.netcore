@@ -8,7 +8,7 @@ namespace Framework.Api.Base.Middleware
     /*
      * Middleware to do framework request logging
      */
-    public class LoggerMiddleware
+    internal sealed class LoggerMiddleware
     {
         private readonly RequestDelegate next;
 

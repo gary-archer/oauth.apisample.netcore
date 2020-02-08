@@ -4,7 +4,7 @@
     using Framework.Api.Base.Claims;
 
     /*
-     * A base class for adding custom claims from within core claims handling code
+     * A base class for enabling custom claims to be included in the cache after OAuth processing
      */
     public class CustomClaimsProvider<TClaims>
         where TClaims : CoreApiClaims, new()

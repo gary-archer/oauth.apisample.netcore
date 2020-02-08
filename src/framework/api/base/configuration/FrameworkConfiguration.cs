@@ -5,7 +5,7 @@
     /*
      * Framework configuration settings
      */
-    public class FrameworkConfiguration
+    public sealed class FrameworkConfiguration
     {
         // The name of the API
         public string ApiName { get; set; }

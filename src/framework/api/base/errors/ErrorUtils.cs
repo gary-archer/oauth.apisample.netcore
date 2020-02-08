@@ -6,7 +6,7 @@
     /*
      * A framework base class for error handling
      */
-    public class ErrorUtils
+    internal class ErrorUtils
     {
         /*
          * Return a known error from a general exception

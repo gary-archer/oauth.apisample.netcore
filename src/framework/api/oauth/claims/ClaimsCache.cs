@@ -14,7 +14,7 @@ namespace Framework.Api.OAuth.Claims
     /*
      * Encapsulate getting and setting claims from the cache
      */
-    public sealed class ClaimsCache<TClaims>
+    internal sealed class ClaimsCache<TClaims>
         where TClaims : CoreApiClaims
     {
         private readonly IDistributedCache cache;

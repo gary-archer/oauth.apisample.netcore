@@ -15,7 +15,7 @@ namespace Framework.Api.Base.Logging
     /*
      * The entry point for configuring logging and getting a logger
      */
-    public class LoggerFactory : ILoggerFactory
+    internal sealed class LoggerFactory : ILoggerFactory
     {
         private const string InstanceName = "Production";
         private string apiName;

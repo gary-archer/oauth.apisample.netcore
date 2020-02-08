@@ -9,7 +9,7 @@
     /*
      * An alternative authenticator for private APIs that reads headers supplied by a public API
      */
-    public class HeaderAuthenticator
+    internal sealed class HeaderAuthenticator
     {
         /*
          * The entry point for implementing authorization

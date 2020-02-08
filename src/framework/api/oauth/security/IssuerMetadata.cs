@@ -10,7 +10,7 @@ namespace Framework.Api.OAuth.Security
     /*
      * A class to download Open Id Connect metadata at application startup
      */
-    public sealed class IssuerMetadata
+    internal sealed class IssuerMetadata
     {
         private readonly OAuthConfiguration configuration;
         private readonly Func<HttpClientHandler> proxyFactory;

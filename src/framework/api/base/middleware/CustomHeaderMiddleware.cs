@@ -9,7 +9,7 @@ namespace Framework.Api.Base.Middleware
     /*
      * A class to process custom headers to enable testers to control non functional behaviour
      */
-    public class CustomHeaderMiddleware
+    internal sealed class CustomHeaderMiddleware
     {
         private readonly RequestDelegate next;
 

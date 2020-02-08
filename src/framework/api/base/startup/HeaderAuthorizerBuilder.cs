@@ -8,7 +8,7 @@
     /*
      * Build a simple authorizer for receiving claims via headers
      */
-    public class HeaderAuthorizerBuilder
+    public sealed class HeaderAuthorizerBuilder
     {
         // The ASP.Net Core services we will configure
         private IServiceCollection services;

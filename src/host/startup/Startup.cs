@@ -13,6 +13,7 @@
     using Microsoft.Extensions.DependencyInjection;
     using SampleApi.Host.Authorization;
     using SampleApi.Host.Configuration;
+    using SampleApi.Host.Errors;
     using SampleApi.Host.Utilities;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Repositories;
@@ -105,7 +106,9 @@
          */
         private void ConfigureApiBaseFrameworkDependencies(IServiceCollection services)
         {
-            this.frameworkBuilder.Register(services);
+            this.frameworkBuilder
+                .WithApplicationExceptionHandler(new RestErrorTranslator())
+                .Register(services);
         }
 
         /*

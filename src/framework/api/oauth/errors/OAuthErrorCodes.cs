@@ -3,7 +3,7 @@
     /*
      * Error codes owned by the OAuth framework
      */
-    public class OAuthErrorCodes
+    public static class OAuthErrorCodes
     {
         public const string MetadataLookupFailure = "metadata_lookup_failure";
 

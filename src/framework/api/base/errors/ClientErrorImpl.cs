@@ -6,7 +6,7 @@ namespace Framework.Api.Base.Errors
     /*
      * The error type for an incorrect client request
      */
-    public sealed class ClientErrorImpl : ClientError
+    internal sealed class ClientErrorImpl : ClientError
     {
         // Mandatory fields for both 4xx and 500 errors
         private readonly HttpStatusCode statusCode;

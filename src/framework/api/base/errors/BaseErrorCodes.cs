@@ -3,7 +3,7 @@
     /*
      * Error codes owned by the base API framework
      */
-    public class BaseErrorCodes
+    public static class BaseErrorCodes
     {
         public const string UnauthorizedRequest = "unauthorized";
 

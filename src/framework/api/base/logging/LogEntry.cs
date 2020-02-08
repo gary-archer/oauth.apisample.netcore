@@ -14,7 +14,7 @@ namespace Framework.Api.Base.Logging
     /*
      * A basic log entry object with a per request scope
      */
-    public class LogEntry : ILogEntry
+    internal sealed class LogEntry : ILogEntry
     {
         private readonly ILog productionLogger;
         private readonly Func<string, int> performanceThresholdCallback;

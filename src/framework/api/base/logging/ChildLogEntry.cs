@@ -5,7 +5,7 @@ namespace Framework.Api.Base.Logging
     /*
      * A helper to support the dispose pattern for child operations
      */
-    public class ChildLogEntry : IDisposable
+    internal sealed class ChildLogEntry : IDisposable
     {
         private readonly LogEntry logEntry;
 

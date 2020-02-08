@@ -18,7 +18,7 @@ namespace Framework.Api.OAuth.Security
     /*
      * The class from which OAuth calls are initiated
      */
-    public sealed class OAuthAuthenticator
+    internal sealed class OAuthAuthenticator
     {
         private readonly OAuthConfiguration configuration;
         private readonly DiscoveryDocumentResponse metadata;
