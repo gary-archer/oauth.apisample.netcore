@@ -7,7 +7,6 @@ namespace Framework.Api.Base.Logging
     using log4net;
     using log4net.Appender;
     using log4net.Config;
-    using log4net.Core;
     using log4net.Repository.Hierarchy;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json.Linq;
@@ -101,8 +100,6 @@ namespace Framework.Api.Base.Logging
             var level = this.ReadDevelopmentLogLevel(loggingConfiguration["level"].ToString());
             builder.SetMinimumLevel(level);
 
-            System.Console.WriteLine("DEFAULT: " + level);
-
             // Process override levels
             var overrideLevels = (JObject)loggingConfiguration["overrideLevels"];
             if (overrideLevels != null)
@@ -112,7 +109,6 @@ namespace Framework.Api.Base.Logging
                     var className = overrideLevel.Key.ToString();
                     var classLevel = this.ReadDevelopmentLogLevel(overrideLevel.Value.ToString());
                     builder.AddFilter(className, classLevel);
-                    System.Console.WriteLine(className + " : " + classLevel);
                 }
             }
 

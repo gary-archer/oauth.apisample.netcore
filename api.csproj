@@ -6,11 +6,15 @@
 
   <PropertyGroup>
 
-    <!-- Our code sample is more readable without the noise of generated doc
-         The 1701 suppression works around to MacOS Visual Studio bugs -->
+    <!-- Our code sample is more readable without the noise of generated doc -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>1591, 1701</NoWarn>
+    <NoWarn>1592</NoWarn>
   </PropertyGroup>
+
+  <!-- Ignore these warnings on MacOS: https://github.com/dotnet/roslyn/issues/19640 -->
+  <PropertyGroup> 
+    <NoWarn>$(NoWarn);1701;1702</NoWarn> 
+  </PropertyGroup> 
 
   <ItemGroup>
     <!-- OAuth security -->
