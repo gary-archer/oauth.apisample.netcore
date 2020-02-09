@@ -127,7 +127,7 @@
                 options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
             });
 
-            // Prepare resources that will be injected into the above custom authentication Filter
+            // Prepare resources that will be injected into the above custom authentication handler
             new OAuthAuthorizerBuilder<SampleApiClaims>(this.jsonConfig.OAuth)
                 .WithCustomClaimsProvider<SampleApiClaimsProvider>()
                 .WithServices(services)
