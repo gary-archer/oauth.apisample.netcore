@@ -2,7 +2,7 @@ namespace SampleApi.Host.Authorization
 {
     using System.Threading.Tasks;
     using Framework.Api.OAuth.Claims;
-    using SampleApi.Logic.Entities;
+    using SampleApi.Host.Claims;
 
     /*
      * A custom claims provider to include extra domain specific claims in the claims cache

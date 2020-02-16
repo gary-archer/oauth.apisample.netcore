@@ -12,10 +12,10 @@
     using Microsoft.AspNetCore.Mvc.Authorization;
     using Microsoft.Extensions.DependencyInjection;
     using SampleApi.Host.Authorization;
+    using SampleApi.Host.Claims;
     using SampleApi.Host.Configuration;
     using SampleApi.Host.Errors;
     using SampleApi.Host.Utilities;
-    using SampleApi.Logic.Entities;
     using SampleApi.Logic.Repositories;
     using SampleApi.Logic.Utilities;
 
@@ -124,7 +124,8 @@
             // Indicate that all API requests are authorized, by applying the standard .Net Core Authorize Filter
             services.AddMvc(options =>
             {
-                options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+                options.Filters.Add(new AuthorizeFilter(
+                    new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
             });
 
             // Prepare resources that will be injected into the above custom authentication handler

@@ -1,4 +1,4 @@
-namespace SampleApi.Logic.Entities
+namespace SampleApi.Host.Claims
 {
     /*
      * User claims returned to the UI by this API

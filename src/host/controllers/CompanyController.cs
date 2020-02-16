@@ -6,6 +6,7 @@
     using System.Threading.Tasks;
     using Framework.Api.Base.Errors;
     using Microsoft.AspNetCore.Mvc;
+    using SampleApi.Host.Claims;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Errors;
     using SampleApi.Logic.Repositories;

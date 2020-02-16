@@ -1,7 +1,7 @@
 namespace SampleApi.Host.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using SampleApi.Logic.Entities;
+    using SampleApi.Host.Claims;
 
     /*
      * A simple API controller to return user info

@@ -1,4 +1,4 @@
-﻿namespace SampleApi.Logic.Entities
+﻿namespace SampleApi.Host.Claims
 {
     using Framework.Api.Base.Claims;
 
