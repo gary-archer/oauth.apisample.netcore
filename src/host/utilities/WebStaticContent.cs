@@ -11,7 +11,8 @@ namespace SampleApi.Host.Utilities
     {
         // Root locations of UI code samples that contain web content to serve
         private const string SpaRoot = "../authguidance.websample.final/spa";
-        private const string DesktopRoot = "../authguidance.desktopsample1/web";
+        private const string LoopbackRoot = "../authguidance.desktopsample1/web";
+        private const string DesktopRoot = "../authguidance.desktopsample.final/web";
         private const string MobileRoot = "../authguidance.mobilesample.android/web";
 
         /*
@@ -37,6 +38,13 @@ namespace SampleApi.Host.Utilities
             });
 
             // Serve post login HTML pages used by our first desktop sample
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new CustomPhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), LoopbackRoot)),
+                RequestPath = "/loopback",
+            });
+
+            // Serve post login HTML pages used by our final desktop sample
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new CustomPhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), DesktopRoot)),
