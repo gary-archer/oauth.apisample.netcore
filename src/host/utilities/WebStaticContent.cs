@@ -23,7 +23,7 @@ namespace SampleApi.Host.Utilities
             // Handle custom file resolution when serving static files for the SPA
             app.UseMiddleware<WebStaticContentFileResolver>();
 
-            // This will serve the SPA#s index.html as the default document
+            // This will serve the SPA's index.html as the default document
             app.UseDefaultFiles(new DefaultFilesOptions
             {
                 FileProvider = new CustomPhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), SpaRoot)),

@@ -51,6 +51,7 @@
             // For demo purposes our API also serves web static content for requests for the below paths
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/spa")) ||
+                       ctx.Request.Path.StartsWithSegments(new PathString("/loopback")) ||
                        ctx.Request.Path.StartsWithSegments(new PathString("/desktop")) ||
                        ctx.Request.Path.StartsWithSegments(new PathString("/mobile")),
                 web => WebStaticContent.Configure(web));
