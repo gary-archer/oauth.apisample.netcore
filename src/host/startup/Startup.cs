@@ -143,8 +143,8 @@
         private void ConfigureApiDependencies(IServiceCollection services)
         {
             services.AddScoped<JsonReader>();
-            services.AddScoped<CompanyRepository>();
-            services.AddScoped<CompanyService>();
+            services.AddTransient<CompanyRepository>();
+            services.AddTransient<CompanyService>();
         }
     }
 }

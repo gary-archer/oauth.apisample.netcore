@@ -44,7 +44,7 @@ namespace Framework.Api.OAuth.Security
         {
             // Create a child log entry for authentication related work
             // This ensures that any errors and performances in this area are reported separately to business logic
-            var authorizationLogEntry = this.logEntry.CreateChild("authorizer");
+            var authorizationLogEntry = this.logEntry.CreateChild("Authorizer");
 
             // Our implementation introspects the token to get token claims
             var expiry = await this.IntrospectTokenAndSetTokenClaims(accessToken, claims);
