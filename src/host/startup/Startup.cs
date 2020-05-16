@@ -53,7 +53,8 @@
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/spa")) ||
                        ctx.Request.Path.StartsWithSegments(new PathString("/loopback")) ||
                        ctx.Request.Path.StartsWithSegments(new PathString("/desktop")) ||
-                       ctx.Request.Path.StartsWithSegments(new PathString("/mobile")),
+                       ctx.Request.Path.StartsWithSegments(new PathString("/android")) ||
+                       ctx.Request.Path.StartsWithSegments(new PathString("/ios")),
                 web => WebStaticContent.Configure(web));
 
             // Use controller attributes for API request routing

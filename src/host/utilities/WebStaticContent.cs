@@ -13,7 +13,8 @@ namespace SampleApi.Host.Utilities
         private const string SpaRoot = "../authguidance.websample.final/spa";
         private const string LoopbackRoot = "../authguidance.desktopsample1/web";
         private const string DesktopRoot = "../authguidance.desktopsample.final/web";
-        private const string MobileRoot = "../authguidance.mobilesample.android/web";
+        private const string AndroidRoot = "../authguidance.mobilesample.android/web";
+        private const string IosRoot = "../authguidance.mobilesample.ios/web";
 
         /*
          * Define the rules around serving web static content
@@ -51,11 +52,18 @@ namespace SampleApi.Host.Utilities
                 RequestPath = "/desktop",
             });
 
-            // Serve post login and logout HTML pages used by our Android sample to prevent Chrome Custom Tabs hangs
+            // Serve post login and logout interstitial web pages used by our Android sample
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new CustomPhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), MobileRoot)),
-                RequestPath = "/mobile",
+                FileProvider = new CustomPhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), AndroidRoot)),
+                RequestPath = "/android",
+            });
+
+            // Serve post login and logout interstitial web pages used by our iOS sample
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new CustomPhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), IosRoot)),
+                RequestPath = "/ios",
             });
         }
     }
