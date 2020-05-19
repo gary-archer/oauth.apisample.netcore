@@ -1,6 +1,5 @@
-1. Start with DI as for Java
+1. Update configuration --> done
 
-2. Review injected configuration objects
-   Find out how to inject a string for API name
+2. Populate plumbing folder gradually
 
-3. Update injected configuration as for Java
+3. Get startup code revamped early, with a CompositionRoot class
