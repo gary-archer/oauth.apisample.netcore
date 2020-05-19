@@ -30,7 +30,7 @@
         public Startup(Configuration jsonConfig, ILoggerFactory loggerFactory)
         {
             this.jsonConfig = jsonConfig;
-            this.frameworkBuilder = new FrameworkBuilder(this.jsonConfig.Framework, loggerFactory);
+            this.frameworkBuilder = new FrameworkBuilder(this.jsonConfig.Logging, loggerFactory);
         }
 
         /*

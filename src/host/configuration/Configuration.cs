@@ -14,7 +14,7 @@ namespace SampleApi.Host.Configuration
         public ApiConfiguration Api { get; private set; }
 
         // The API base framework configuration
-        public FrameworkConfiguration Framework { get; private set; }
+        public LoggingConfiguration Logging { get; private set; }
 
         // The API OAuth framework configuration
         public OAuthConfiguration OAuth { get; private set; }
@@ -30,7 +30,7 @@ namespace SampleApi.Host.Configuration
             return new Configuration()
             {
                 Api = data.api.ToObject<ApiConfiguration>(),
-                Framework = data.framework.ToObject<FrameworkConfiguration>(),
+                Logging = data.logging.ToObject<LoggingConfiguration>(),
                 OAuth = data.oauth.ToObject<OAuthConfiguration>(),
             };
         }

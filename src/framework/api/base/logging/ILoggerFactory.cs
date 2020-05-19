@@ -10,7 +10,7 @@ namespace Framework.Api.Base.Logging
     public interface ILoggerFactory
     {
         // The entry point for configuring logging
-        void Configure(ILoggingBuilder builder, FrameworkConfiguration configuration);
+        void Configure(ILoggingBuilder builder, LoggingConfiguration configuration);
 
         // Handle errors that prevent startup
         void LogStartupError(Exception exception);

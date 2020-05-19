@@ -13,11 +13,11 @@
      */
     public sealed class FrameworkBuilder
     {
-        private readonly FrameworkConfiguration configuration;
+        private readonly LoggingConfiguration configuration;
         private readonly LoggerFactory loggerFactory;
         private ApplicationExceptionHandler applicationExceptionHandler;
 
-        public FrameworkBuilder(FrameworkConfiguration configuration, ILoggerFactory loggerFactory)
+        public FrameworkBuilder(LoggingConfiguration configuration, ILoggerFactory loggerFactory)
         {
             this.configuration = configuration;
             this.loggerFactory = (LoggerFactory)loggerFactory;

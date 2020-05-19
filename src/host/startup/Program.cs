@@ -54,7 +54,7 @@
                 // Configure logging behaviour for both production and developer trace logging
                 .ConfigureLogging(loggingBuilder =>
                 {
-                    loggerFactory.Configure(loggingBuilder, jsonConfig.Framework);
+                    loggerFactory.Configure(loggingBuilder, jsonConfig.Logging);
                 })
 
                 // Configure the Kestrel web server to listen over SSL

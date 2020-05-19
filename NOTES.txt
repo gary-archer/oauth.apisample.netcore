@@ -1,0 +1,6 @@
+1. Start with DI as for Java
+
+2. Review injected configuration objects
+   Find out how to inject a string for API name
+
+3. Update injected configuration as for Java

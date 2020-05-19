@@ -34,11 +34,11 @@ namespace Framework.Api.Base.Logging
         /*
          * The entry point for configuring logging
          */
-        public void Configure(ILoggingBuilder builder, FrameworkConfiguration configuration)
+        public void Configure(ILoggingBuilder builder, LoggingConfiguration configuration)
         {
             this.apiName = configuration.ApiName;
-            this.ConfigureProductionLogging(builder, (JObject)configuration.Logging["production"]);
-            this.ConfigureDevelopmentTraceLogging(builder, (JObject)configuration.Logging["development"]);
+            this.ConfigureProductionLogging(builder, configuration.Production);
+            this.ConfigureDevelopmentTraceLogging(builder, configuration.Development);
             this.isInitialized = true;
         }
 

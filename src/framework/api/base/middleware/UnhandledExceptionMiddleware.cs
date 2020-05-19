@@ -63,7 +63,7 @@ namespace Framework.Api.Base.Middleware
         {
             // Resolve dependencies used for error processing
             var logEntry = (LogEntry)context.RequestServices.GetService(typeof(ILogEntry));
-            var configuration = (FrameworkConfiguration)context.RequestServices.GetService(typeof(FrameworkConfiguration));
+            var configuration = (LoggingConfiguration)context.RequestServices.GetService(typeof(LoggingConfiguration));
             var applicationHandler = (ApplicationExceptionHandler)context.RequestServices.GetService(typeof(ApplicationExceptionHandler));
 
             // Allow the application to do its own translation if required

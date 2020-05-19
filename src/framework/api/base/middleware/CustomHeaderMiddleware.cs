@@ -24,7 +24,7 @@ namespace Framework.Api.Base.Middleware
         /*
          * Handle any special custom headers
          */
-        public async Task Invoke(HttpContext context, FrameworkConfiguration configuration)
+        public async Task Invoke(HttpContext context, LoggingConfiguration configuration)
         {
             // Cause a 500 error if a special header is received
             var apiToBreak = context.Request.GetHeader("x-mycompany-test-exception");
