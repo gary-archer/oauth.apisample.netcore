@@ -11,6 +11,7 @@
     using SampleApi.Host.Claims;
     using SampleApi.Host.Configuration;
     using SampleApi.Host.Plumbing.Logging;
+    using SampleApi.Host.Plumbing.Middleware;
     using SampleApi.Host.Plumbing.OAuth;
     using SampleApi.Host.Utilities;
     using SampleApi.Logic.Repositories;
@@ -22,12 +23,15 @@
     public class Startup
     {
         private readonly Configuration jsonConfig;
-        private readonly FrameworkBuilder frameworkBuilder;
+        private readonly ILoggerFactory loggerFactory;
 
+        /*
+         * Store references to injected dependencies
+         */
         public Startup(Configuration jsonConfig, ILoggerFactory loggerFactory)
         {
             this.jsonConfig = jsonConfig;
-            this.frameworkBuilder = new FrameworkBuilder(this.jsonConfig.Logging, loggerFactory);
+            this.loggerFactory = loggerFactory;
         }
 
         /*
@@ -78,13 +82,7 @@
                                     .AllowCredentials());
             });
 
-            // Make base dependencies injectable
-            this.ConfigureApiBaseDependencies(services);
-
-            // Make OAuth dependencies injectable
-            this.ConfigureApiOAuthDependencies(services);
-
-            // Register our API's own dependencies
+            // Register our API's dependencies
             this.ConfigureApiDependencies(services);
         }
 
@@ -96,23 +94,30 @@
             // Ensure that authentication middleware is called for API requests
             api.UseAuthentication();
 
-            // Add standard middleware classes
-            this.frameworkBuilder.AddMiddleware(api);
+            // Add our own middleware classes
+            api.UseMiddleware<LoggerMiddleware>();
+            api.UseMiddleware<UnhandledExceptionMiddleware>();
+            api.UseMiddleware<CustomHeaderMiddleware>();
         }
 
         /*
-         * Add standard base API framework dependencies
+         * Set up API dependencies
          */
-        private void ConfigureApiBaseDependencies(IServiceCollection services)
+        private void ConfigureApiDependencies(IServiceCollection services)
         {
-            this.frameworkBuilder
-                .Register(services);
+            // Configure common code
+            this.ConfigureCoreDependencies(services);
+
+            // Register dependencies specific to this service
+            services.AddScoped<JsonReader>();
+            services.AddTransient<CompanyRepository>();
+            services.AddTransient<CompanyService>();
         }
 
         /*
-         * Set up the API with cross cutting concerns
+         * Configure dependencies needed to manage cross cutting concerns
          */
-        private void ConfigureApiOAuthDependencies(IServiceCollection services)
+        private void ConfigureCoreDependencies(IServiceCollection services)
         {
             // Indicate the type of our .Net Core custom authentication handler
             string scheme = "Bearer";
@@ -127,21 +132,11 @@
             });
 
             // Prepare resources that will be injected into the above custom authentication handler
-            new OAuthAuthorizerBuilder<SampleApiClaims>(this.jsonConfig.OAuth)
-                .WithCustomClaimsProvider<SampleApiClaimsProvider>()
+            new CompositionRoot<SampleApiClaims>(this.jsonConfig, this.loggerFactory)
                 .WithServices(services)
                 .WithHttpDebugging(this.jsonConfig.Api.UseProxy, this.jsonConfig.Api.ProxyUrl)
+                .WithCustomClaimsProvider<SampleApiClaimsProvider>()
                 .Register();
-        }
-
-        /*
-         * Add the API's own business logic dependencies with a per request scope
-         */
-        private void ConfigureApiDependencies(IServiceCollection services)
-        {
-            services.AddScoped<JsonReader>();
-            services.AddTransient<CompanyRepository>();
-            services.AddTransient<CompanyService>();
         }
     }
 }
