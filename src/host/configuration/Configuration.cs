@@ -1,22 +1,21 @@
 namespace SampleApi.Host.Configuration
 {
     using System.IO;
-    using Framework.Api.Base.Configuration;
-    using Framework.Api.OAuth.Configuration;
     using Newtonsoft.Json;
+    using SampleApi.Host.Plumbing.Configuration;
 
     /*
      * A class to manage our JSON configuration as an object
      */
     public class Configuration
     {
-        // The API's own configuration
+        // The API's specific configuration
         public ApiConfiguration Api { get; private set; }
 
-        // The API base framework configuration
+        // API logging configuration
         public LoggingConfiguration Logging { get; private set; }
 
-        // The API OAuth framework configuration
+        // OAuth configuration
         public OAuthConfiguration OAuth { get; private set; }
 
         /*

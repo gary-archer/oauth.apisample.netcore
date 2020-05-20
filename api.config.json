@@ -21,8 +21,8 @@
       "overrideLevels": {
         "Microsoft": "Warning",
         "Microsoft.AspNetCore.Server.Kestrel": "Error",
-        "Framework.Api.Base.Security.CustomAuthenticationFilter": "Error",
-        "Framework.Api.OAuth.Claims.ClaimsCache": "Info"
+        "Sample.Host.Plumbing.OAuth.CustomAuthenticationFilter": "Error",
+        "Sample.Host.Plumbing.Claims.ClaimsCache": "Info"
       }
     },
     "production": {

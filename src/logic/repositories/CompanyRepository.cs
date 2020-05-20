@@ -3,7 +3,7 @@ namespace SampleApi.Logic.Repositories
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Framework.Base.Abstractions;
+    using SampleApi.Host.Plumbing.Logging;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Utilities;
 

@@ -4,9 +4,9 @@
     using System.Globalization;
     using System.Net;
     using System.Threading.Tasks;
-    using Framework.Api.Base.Errors;
     using Microsoft.AspNetCore.Mvc;
     using SampleApi.Host.Claims;
+    using SampleApi.Host.Plumbing.Errors;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Errors;
     using SampleApi.Logic.Repositories;
@@ -47,7 +47,7 @@
             {
                 throw ErrorFactory.CreateClientError(
                     HttpStatusCode.BadRequest,
-                    ErrorCodes.InvalidCompanyId,
+                    SampleErrorCodes.InvalidCompanyId,
                     "The company id must be a positive numeric integer");
             }
 

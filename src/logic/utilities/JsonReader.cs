@@ -3,8 +3,8 @@ namespace SampleApi.Logic.Utilities
     using System;
     using System.IO;
     using System.Threading.Tasks;
-    using Framework.Base.Errors;
     using Newtonsoft.Json;
+    using SampleApi.Host.Plumbing.Errors;
     using SampleApi.Logic.Errors;
 
     /*
@@ -25,8 +25,11 @@ namespace SampleApi.Logic.Utilities
             catch (Exception ex)
             {
                 // Report the error including an error code and exception details
-                var error = new ExtendedException(ErrorCodes.FileReadError, "Problem encountered reading data", ex);
-                error.Details = ex.Message;
+                var error = ErrorFactory.CreateApiError(
+                    SampleErrorCodes.FileReadError,
+                    "Problem encountered reading data",
+                    ex);
+                error.SetDetails(ex.Message);
                 throw error;
             }
         }

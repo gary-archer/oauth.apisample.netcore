@@ -3,10 +3,10 @@
     using System;
     using System.IO;
     using System.Net;
-    using Framework.Api.Base.Logging;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.DependencyInjection;
     using SampleApi.Host.Configuration;
+    using SampleApi.Host.Plumbing.Logging;
 
     /*
      * Our entry point class

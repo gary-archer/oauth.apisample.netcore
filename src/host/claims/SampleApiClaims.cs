@@ -1,6 +1,6 @@
 ﻿namespace SampleApi.Host.Claims
 {
-    using Framework.Api.Base.Claims;
+    using SampleApi.Host.Plumbing.Claims;
 
     /*
      * Our API overrides the core claims to support additional custom claims

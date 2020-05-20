@@ -1,9 +1,5 @@
 ﻿namespace SampleApi.Host.Startup
 {
-    using Framework.Api.Base.Logging;
-    using Framework.Api.Base.Security;
-    using Framework.Api.Base.Startup;
-    using Framework.Api.OAuth.Startup;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
@@ -14,7 +10,8 @@
     using SampleApi.Host.Authorization;
     using SampleApi.Host.Claims;
     using SampleApi.Host.Configuration;
-    using SampleApi.Host.Errors;
+    using SampleApi.Host.Plumbing.Logging;
+    using SampleApi.Host.Plumbing.OAuth;
     using SampleApi.Host.Utilities;
     using SampleApi.Logic.Repositories;
     using SampleApi.Logic.Utilities;
@@ -81,11 +78,11 @@
                                     .AllowCredentials());
             });
 
-            // Make base framework dependencies injectable
-            this.ConfigureApiBaseFrameworkDependencies(services);
+            // Make base dependencies injectable
+            this.ConfigureApiBaseDependencies(services);
 
-            // Make OAuth framework dependencies injectable
-            this.ConfigureApiOAuthFrameworkDependencies(services);
+            // Make OAuth dependencies injectable
+            this.ConfigureApiOAuthDependencies(services);
 
             // Register our API's own dependencies
             this.ConfigureApiDependencies(services);
@@ -99,24 +96,23 @@
             // Ensure that authentication middleware is called for API requests
             api.UseAuthentication();
 
-            // Add standard framework middleware classes
+            // Add standard middleware classes
             this.frameworkBuilder.AddMiddleware(api);
         }
 
         /*
          * Add standard base API framework dependencies
          */
-        private void ConfigureApiBaseFrameworkDependencies(IServiceCollection services)
+        private void ConfigureApiBaseDependencies(IServiceCollection services)
         {
             this.frameworkBuilder
-                .WithApplicationExceptionHandler(new RestErrorTranslator())
                 .Register(services);
         }
 
         /*
          * Set up the API with cross cutting concerns
          */
-        private void ConfigureApiOAuthFrameworkDependencies(IServiceCollection services)
+        private void ConfigureApiOAuthDependencies(IServiceCollection services)
         {
             // Indicate the type of our .Net Core custom authentication handler
             string scheme = "Bearer";
