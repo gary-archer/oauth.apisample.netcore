@@ -5,8 +5,8 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
-    using SampleApi.Host.Configuration;
     using SampleApi.Host.Plumbing.Claims;
+    using SampleApi.Host.Plumbing.Configuration;
     using SampleApi.Host.Plumbing.Logging;
     using SampleApi.Host.Plumbing.OAuth;
     using SampleApi.Host.Plumbing.Utilities;
@@ -18,7 +18,8 @@
         where TClaims : CoreApiClaims, new()
     {
         // Injected items
-        private readonly Configuration configuration;
+        private readonly LoggingConfiguration loggingConfiguration;
+        private readonly OAuthConfiguration oauthConfiguration;
         private readonly LoggerFactory loggerFactory;
 
         // The ASP.Net Core services we will configure
@@ -33,9 +34,13 @@
         /*
          * Create our builder and receive our options
          */
-        public CompositionRoot(Configuration configuration, ILoggerFactory loggerFactory)
+        public CompositionRoot(
+            LoggingConfiguration loggingConfiguration,
+            OAuthConfiguration oauthConfiguration,
+            ILoggerFactory loggerFactory)
         {
-            this.configuration = configuration;
+            this.loggingConfiguration = loggingConfiguration;
+            this.oauthConfiguration = oauthConfiguration;
             this.loggerFactory = (LoggerFactory)loggerFactory;
         }
 
@@ -68,20 +73,20 @@
         }
 
         /*
-         * Prepare objects needed for OAuth Authorization
+         * Prepare and register objects
          */
         public void Register()
         {
             using (var container = this.services.BuildServiceProvider())
             {
                 // Load issuer metadata during startup
-                var issuerMetadata = new IssuerMetadata(this.configuration.OAuth, this.httpProxyFactory);
+                var issuerMetadata = new IssuerMetadata(this.oauthConfiguration, this.httpProxyFactory);
                 issuerMetadata.Load().Wait();
 
                 // Create the thread safe claims cache and pass it a container reference
                 this.services.AddDistributedMemoryCache();
                 var cache = container.GetService<IDistributedCache>();
-                var claimsCache = new ClaimsCache<TClaims>(cache, this.configuration.OAuth, container);
+                var claimsCache = new ClaimsCache<TClaims>(cache, this.oauthConfiguration, container);
 
                 // Create a default injecteable custom claims provider if needed
                 if (this.customClaimsProviderType == null)
@@ -107,7 +112,7 @@
         private void RegisterBaseDependencies()
         {
             // The log entry is scoped to the current request and created via this factory method
-            this.services.AddSingleton(this.configuration.Logging);
+            this.services.AddSingleton(this.loggingConfiguration);
             this.services.AddScoped<ILogEntry>(
                 ctx =>
                 {
@@ -125,7 +130,7 @@
         private void RegisterOAuthDependencies(IssuerMetadata issuerMetadata, ClaimsCache<TClaims> cache)
         {
             // Register singletons
-            this.services.AddSingleton(this.configuration.OAuth);
+            this.services.AddSingleton(this.oauthConfiguration);
             this.services.AddSingleton(issuerMetadata);
             this.services.AddSingleton(cache);
 

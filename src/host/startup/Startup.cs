@@ -132,7 +132,7 @@
             });
 
             // Prepare resources that will be injected into the above custom authentication handler
-            new CompositionRoot<SampleApiClaims>(this.jsonConfig, this.loggerFactory)
+            new CompositionRoot<SampleApiClaims>(this.jsonConfig.Logging, this.jsonConfig.OAuth, this.loggerFactory)
                 .WithServices(services)
                 .WithHttpDebugging(this.jsonConfig.Api.UseProxy, this.jsonConfig.Api.ProxyUrl)
                 .WithCustomClaimsProvider<SampleApiClaimsProvider>()
