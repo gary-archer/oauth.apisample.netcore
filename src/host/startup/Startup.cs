@@ -10,12 +10,12 @@
     using SampleApi.Host.Authorization;
     using SampleApi.Host.Claims;
     using SampleApi.Host.Configuration;
-    using SampleApi.Host.Plumbing.Logging;
-    using SampleApi.Host.Plumbing.Middleware;
-    using SampleApi.Host.Plumbing.OAuth;
     using SampleApi.Host.Utilities;
     using SampleApi.Logic.Repositories;
     using SampleApi.Logic.Utilities;
+    using SampleApi.Plumbing.Logging;
+    using SampleApi.Plumbing.Middleware;
+    using SampleApi.Plumbing.OAuth;
 
     /*
      * The application startup class

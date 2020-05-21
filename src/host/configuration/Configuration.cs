@@ -2,7 +2,7 @@ namespace SampleApi.Host.Configuration
 {
     using System.IO;
     using Newtonsoft.Json;
-    using SampleApi.Host.Plumbing.Configuration;
+    using SampleApi.Plumbing.Configuration;
 
     /*
      * A class to manage our JSON configuration as an object

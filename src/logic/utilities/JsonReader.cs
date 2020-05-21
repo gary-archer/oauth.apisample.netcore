@@ -4,8 +4,8 @@ namespace SampleApi.Logic.Utilities
     using System.IO;
     using System.Threading.Tasks;
     using Newtonsoft.Json;
-    using SampleApi.Host.Plumbing.Errors;
     using SampleApi.Logic.Errors;
+    using SampleApi.Plumbing.Errors;
 
     /*
      * A utility reader class

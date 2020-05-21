@@ -6,10 +6,10 @@
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using SampleApi.Host.Claims;
-    using SampleApi.Host.Plumbing.Errors;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Errors;
     using SampleApi.Logic.Repositories;
+    using SampleApi.Plumbing.Errors;
 
     /*
      * A controller for our company resources

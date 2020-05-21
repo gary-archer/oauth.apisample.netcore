@@ -4,9 +4,9 @@ namespace SampleApi.Logic.Repositories
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
-    using SampleApi.Host.Plumbing.Errors;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Errors;
+    using SampleApi.Plumbing.Errors;
 
     /*
      * The entry point to service logic

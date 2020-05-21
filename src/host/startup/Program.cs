@@ -6,7 +6,7 @@
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.DependencyInjection;
     using SampleApi.Host.Configuration;
-    using SampleApi.Host.Plumbing.Logging;
+    using SampleApi.Plumbing.Logging;
 
     /*
      * Our entry point class
