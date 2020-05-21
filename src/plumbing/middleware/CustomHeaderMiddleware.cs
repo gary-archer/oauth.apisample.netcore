@@ -32,7 +32,7 @@ namespace SampleApi.Plumbing.Middleware
             {
                 if (apiToBreak.ToLowerInvariant() == configuration.ApiName.ToLowerInvariant())
                 {
-                    throw ErrorFactory.CreateApiError(ErrorCodes.ExceptionSimulation, "An exception was simulated in the API");
+                    throw ErrorFactory.CreateServerError(ErrorCodes.ExceptionSimulation, "An exception was simulated in the API");
                 }
             }
 

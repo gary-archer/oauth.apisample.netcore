@@ -25,7 +25,7 @@ namespace SampleApi.Logic.Utilities
             catch (Exception ex)
             {
                 // Report the error including an error code and exception details
-                var error = ErrorFactory.CreateApiError(
+                var error = ErrorFactory.CreateServerError(
                     SampleErrorCodes.FileReadError,
                     "Problem encountered reading data",
                     ex);

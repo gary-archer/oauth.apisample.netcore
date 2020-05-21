@@ -12,7 +12,7 @@
         /*
          * Create an error indicating a server error
          */
-        public static ApiError CreateApiError(string errorCode, string userMessage)
+        public static ApiError CreateServerError(string errorCode, string userMessage)
         {
             return new ApiErrorImpl(errorCode, userMessage);
         }
@@ -20,7 +20,7 @@
         /*
          * Create a server error from a caught exception
          */
-        public static ApiError CreateApiError(string errorCode, string userMessage, Exception inner)
+        public static ApiError CreateServerError(string errorCode, string userMessage, Exception inner)
         {
             return new ApiErrorImpl(errorCode, userMessage, inner);
         }

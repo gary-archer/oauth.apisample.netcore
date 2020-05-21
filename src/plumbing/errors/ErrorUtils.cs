@@ -29,20 +29,20 @@
             }
 
             // Otherwise create a generic API error
-            return ErrorUtils.CreateApiError(exception, null, null);
+            return ErrorUtils.CreateServerError(exception, null, null);
         }
 
         /*
          * Create an error from an exception with an error code and message
          */
-        public static ApiError CreateApiError(Exception exception, string errorCode, string message)
+        public static ApiError CreateServerError(Exception exception, string errorCode, string message)
         {
             var defaultErrorCode = ErrorCodes.ServerError;
             var defaultMessage = "An unexpected exception occurred in the API";
 
             // Create a default error and set a default technical message
             // To customise details instead, application code should use error translation and throw an ApiError
-            var error = ErrorFactory.CreateApiError(
+            var error = ErrorFactory.CreateServerError(
                     errorCode == null ? defaultErrorCode : errorCode,
                     message == null ? defaultMessage : message,
                     exception);
@@ -102,7 +102,7 @@
          */
         public static ApiError FromMissingClaim(string claimName)
         {
-            var error = ErrorFactory.CreateApiError("claims_failure", "Authorization data not found");
+            var error = ErrorFactory.CreateServerError("claims_failure", "Authorization data not found");
             error.SetDetails($"An empty value was found for the expected claim {claimName}");
             return error;
         }
@@ -185,7 +185,7 @@
                 message += $" : {oauthErrorCode}";
             }
 
-            return ErrorFactory.CreateApiError(errorCode, message);
+            return ErrorFactory.CreateServerError(errorCode, message);
         }
 
         /*
