@@ -5,9 +5,9 @@ namespace SampleApi.Plumbing.Errors
     using Newtonsoft.Json.Linq;
 
     /*
-     * Our standard representation of an API error, including how it is logged and translated to a client error
+     * A default representation of a server error, including how it is logged and translated to a client error
      */
-    internal sealed class ApiErrorImpl : ApiError
+    internal sealed class ServerErrorImpl : ServerError
     {
         // A range for random error ids
         private const int MinErrorId = 10000;
@@ -23,7 +23,7 @@ namespace SampleApi.Plumbing.Errors
         /*
          * The default constructor
          */
-        public ApiErrorImpl(string errorCode, string userMessage)
+        public ServerErrorImpl(string errorCode, string userMessage)
             : this(errorCode, userMessage, null)
         {
         }
@@ -31,7 +31,7 @@ namespace SampleApi.Plumbing.Errors
         /*
          * The main constructor
          */
-        public ApiErrorImpl(string errorCode, string userMessage, Exception inner)
+        public ServerErrorImpl(string errorCode, string userMessage, Exception inner)
             : base(userMessage, inner)
         {
             this.errorCode = errorCode;

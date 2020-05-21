@@ -16,10 +16,10 @@
         public static Exception FromException(Exception exception)
         {
             // If it is already a known error type then return that
-            var apiError = ErrorUtils.TryConvertToApiError(exception);
-            if (apiError != null)
+            var serverError = ErrorUtils.TryConvertToServerError(exception);
+            if (serverError != null)
             {
-                return apiError;
+                return serverError;
             }
 
             var clientError = ErrorUtils.TryConvertToClientError(exception);
@@ -28,24 +28,23 @@
                 return clientError;
             }
 
-            // Otherwise create a generic API error
+            // Otherwise create a generic server error
             return ErrorUtils.CreateServerError(exception, null, null);
         }
 
         /*
          * Create an error from an exception with an error code and message
          */
-        public static ApiError CreateServerError(Exception exception, string errorCode, string message)
+        public static ServerError CreateServerError(Exception exception, string errorCode, string message)
         {
             var defaultErrorCode = ErrorCodes.ServerError;
             var defaultMessage = "An unexpected exception occurred in the API";
 
             // Create a default error and set a default technical message
-            // To customise details instead, application code should use error translation and throw an ApiError
             var error = ErrorFactory.CreateServerError(
-                    errorCode == null ? defaultErrorCode : errorCode,
-                    message == null ? defaultMessage : message,
-                    exception);
+                errorCode == null ? defaultErrorCode : errorCode,
+                message == null ? defaultMessage : message,
+                exception);
 
             // Set technical details
             error.SetDetails(exception.Message);
@@ -55,52 +54,52 @@
         /*
          * Report metadata lookup failures clearly
          */
-        public static ApiError FromMetadataError(DiscoveryDocumentResponse response, string url)
+        public static ServerError FromMetadataError(DiscoveryDocumentResponse response, string url)
         {
             var data = ErrorUtils.ReadOAuthErrorResponse(response.Json);
-            var apiError = ErrorUtils.CreateOAuthApiError(
+            var error = ErrorUtils.CreateOAuthServerError(
                 ErrorCodes.MetadataLookupFailure,
                 "Metadata lookup failed",
                 data.Item1);
 
-            apiError.SetDetails(ErrorUtils.GetOAuthErrorDetails(data.Item2, response.Error, url));
-            return apiError;
+            error.SetDetails(ErrorUtils.GetOAuthErrorDetails(data.Item2, response.Error, url));
+            return error;
         }
 
         /*
          * Report introspection failures clearly
          */
-        public static ApiError FromIntrospectionError(TokenIntrospectionResponse response, string url)
+        public static ServerError FromIntrospectionError(TokenIntrospectionResponse response, string url)
         {
             var data = ErrorUtils.ReadOAuthErrorResponse(response.Json);
-            var apiError = ErrorUtils.CreateOAuthApiError(
+            var error = ErrorUtils.CreateOAuthServerError(
                 ErrorCodes.IntrospectionFailure,
                 "Token validation failed",
                 data.Item1);
 
-            apiError.SetDetails(ErrorUtils.GetOAuthErrorDetails(data.Item2, response.Error, url));
-            return apiError;
+            error.SetDetails(ErrorUtils.GetOAuthErrorDetails(data.Item2, response.Error, url));
+            return error;
         }
 
         /*
          * Report user info failures clearly
          */
-        public static ApiError FromUserInfoError(UserInfoResponse response, string url)
+        public static ServerError FromUserInfoError(UserInfoResponse response, string url)
         {
             var data = ErrorUtils.ReadOAuthErrorResponse(response.Json);
-            var apiError = ErrorUtils.CreateOAuthApiError(
+            var error = ErrorUtils.CreateOAuthServerError(
                 ErrorCodes.UserInfoFailure,
                 "User info lookup failed",
                 data.Item1);
 
-            apiError.SetDetails(ErrorUtils.GetOAuthErrorDetails(data.Item2, response.Error, url));
-            return apiError;
+            error.SetDetails(ErrorUtils.GetOAuthErrorDetails(data.Item2, response.Error, url));
+            return error;
         }
 
         /*
          * Handle unexpected data errors if an expected claim was not found in an OAuth message
          */
-        public static ApiError FromMissingClaim(string claimName)
+        public static ServerError FromMissingClaim(string claimName)
         {
             var error = ErrorFactory.CreateServerError("claims_failure", "Authorization data not found");
             error.SetDetails($"An empty value was found for the expected claim {claimName}");
@@ -108,23 +107,23 @@
         }
 
         /*
-         * Try to convert an exception to an API error
+         * Try to convert an exception to a server error
          */
-        private static ApiError TryConvertToApiError(Exception exception)
+        private static ServerError TryConvertToServerError(Exception exception)
         {
             // Direct conversions
-            if (exception is ApiError)
+            if (exception is ServerError)
             {
-                return exception as ApiError;
+                return exception as ServerError;
             }
 
             // Check inner exceptions contained in async exceptions
             var inner = exception.InnerException;
             while (inner != null)
             {
-                if (inner is ApiError)
+                if (inner is ServerError)
                 {
-                    return inner as ApiError;
+                    return inner as ServerError;
                 }
 
                 inner = inner.InnerException;
@@ -177,7 +176,7 @@
         /*
          * Create an error object from an error code and include the OAuth error code in the user message
          */
-        private static ApiError CreateOAuthApiError(string errorCode, string userMessage, string oauthErrorCode)
+        private static ServerError CreateOAuthServerError(string errorCode, string userMessage, string oauthErrorCode)
         {
             string message = userMessage;
             if (!string.IsNullOrWhiteSpace(oauthErrorCode))

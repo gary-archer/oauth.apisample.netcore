@@ -134,7 +134,7 @@ namespace SampleApi.Plumbing.Logging
         /*
          * Add error details after they have been processed by the exception handler, including denormalised fields
          */
-        public void SetApiError(ApiError error)
+        public void SetServerError(ServerError error)
         {
             this.Current().ErrorData = error.ToLogFormat(this.data.ApiName);
             this.Current().ErrorCode = error.ErrorCode;

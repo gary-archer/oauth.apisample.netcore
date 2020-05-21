@@ -50,12 +50,12 @@ namespace SampleApi.Plumbing.Logging
             if (this.isInitialized)
             {
                 // Get the error into a loggable format
-                var error = (ApiError)ErrorUtils.FromException(exception);
+                var error = (ServerError)ErrorUtils.FromException(exception);
 
                 // Output via log4net
                 var logEntry = new LogEntry(this.apiName, this.GetProductionLogger());
                 logEntry.SetOperationName("startup");
-                logEntry.SetApiError(error);
+                logEntry.SetServerError(error);
                 logEntry.Write();
             }
             else

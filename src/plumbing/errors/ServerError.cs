@@ -6,19 +6,19 @@
     /*
      * An interface for errors internal to the API
      */
-    public abstract class ApiError : Exception
+    public abstract class ServerError : Exception
     {
-        public ApiError()
+        public ServerError()
             : base()
         {
         }
 
-        public ApiError(string message)
+        public ServerError(string message)
             : base(message)
         {
         }
 
-        public ApiError(string message, Exception inner)
+        public ServerError(string message, Exception inner)
             : base(message, inner)
         {
         }
@@ -35,7 +35,7 @@
         // Return the log format
         public abstract JObject ToLogFormat(string apiName);
 
-        // Return the client error for the API error
+        // Return the client error for the server error
         public abstract ClientError ToClientError(string apiName);
     }
 }

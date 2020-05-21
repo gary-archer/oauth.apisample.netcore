@@ -66,12 +66,12 @@ namespace SampleApi.Plumbing.Middleware
 
             // Get the error into a known object
             var error = ErrorUtils.FromException(exception);
-            if (error is ApiError)
+            if (error is ServerError)
             {
                 // Handle 5xx errors
-                var apiError = (ApiError)error;
-                logEntry.SetApiError(apiError);
-                return apiError.ToClientError(configuration.ApiName);
+                var serverError = (ServerError)error;
+                logEntry.SetServerError(serverError);
+                return serverError.ToClientError(configuration.ApiName);
             }
             else
             {

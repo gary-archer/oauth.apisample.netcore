@@ -12,17 +12,17 @@
         /*
          * Create an error indicating a server error
          */
-        public static ApiError CreateServerError(string errorCode, string userMessage)
+        public static ServerError CreateServerError(string errorCode, string userMessage)
         {
-            return new ApiErrorImpl(errorCode, userMessage);
+            return new ServerErrorImpl(errorCode, userMessage);
         }
 
         /*
          * Create a server error from a caught exception
          */
-        public static ApiError CreateServerError(string errorCode, string userMessage, Exception inner)
+        public static ServerError CreateServerError(string errorCode, string userMessage, Exception inner)
         {
-            return new ApiErrorImpl(errorCode, userMessage, inner);
+            return new ServerErrorImpl(errorCode, userMessage, inner);
         }
 
         /*
@@ -50,7 +50,7 @@
         /*
          * Create a 401 error with the reason
          */
-        public static ClientError Create401Error(string reason)
+        public static ClientError CreateClient401Error(string reason)
         {
             var error = new ClientErrorImpl(
                     HttpStatusCode.Unauthorized,

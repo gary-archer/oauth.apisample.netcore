@@ -35,7 +35,7 @@ namespace SampleApi.Plumbing.OAuth
             var accessToken = this.ReadAccessToken(request);
             if (string.IsNullOrWhiteSpace(accessToken))
             {
-                throw ErrorFactory.Create401Error("No access token was received in the bearer header");
+                throw ErrorFactory.CreateClient401Error("No access token was received in the bearer header");
             }
 
             // Bypass validation and use cached results if they exist
