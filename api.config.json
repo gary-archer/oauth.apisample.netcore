@@ -1,0 +1,53 @@
+﻿{
+    "api": {
+        "sslCertificateFileName": "mycompany.ssl.pfx",
+        "sslCertificatePassword": "SslPassword1",
+        "sslPort": 444,
+        "useProxy": false,
+        "proxyUrl": "http://127.0.0.1:8888",
+        "webTrustedOrigins": [
+            "https://web.mycompany.com"
+        ]
+    },
+    "logging": {
+        "apiName": "SampleApi",
+        "production": {
+            "level": "Info",
+            "appenders": [
+                {
+                    "type": "console"
+                },
+                {
+                    "type": "file",
+                    "filePrefix": "api",
+                    "dirName": "./logs/",
+                    "maxSize": "10MB",
+                    "maxFiles": "100"
+                }
+            ],
+            "performanceThresholdsMilliseconds": {
+                "default": 250,
+                "operationOverrides": {
+                    "Authorizer": 1000
+                }
+            }
+        },
+        "development": {
+            "level": "Info",
+            "overrideLevels": {
+                "Microsoft": "Warning",
+                "Microsoft.AspNetCore.Server.Kestrel": "Error",
+                "SampleApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",
+                "SampleApi.Plumbing.Claims.ClaimsCache": "Info"
+            }
+        }
+    },
+    "oauth": {
+        "authority": "https://dev-843469.oktapreview.com/oauth2/default",
+        "clientId": "0oac5s69rjXE0HcZO0h7",
+        "clientSecret": "VEEe9m9WDneeUSUJUOMKZiso_X6xwKvAqRInT2kg"
+    },
+    "claims": {
+        "maxCacheMinutes": 30
+    }
+}
