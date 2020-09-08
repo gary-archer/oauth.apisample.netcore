@@ -38,7 +38,7 @@ namespace SampleApi.Plumbing.Claims
         /*
          * Set fields after receiving OAuth user info data
          */
-        public void SetCentralUserInfo(string givenName, string familyName, string email)
+        public void SetUserInfo(string givenName, string familyName, string email)
         {
             this.GivenName = givenName;
             this.FamilyName = familyName;

@@ -5,10 +5,12 @@ namespace SampleApi.Plumbing.OAuth
     using System.IdentityModel.Tokens.Jwt;
     using System.Net;
     using System.Net.Http;
+    using System.Security.Claims;
     using System.Threading.Tasks;
     using IdentityModel;
     using IdentityModel.Client;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.IdentityModel.Tokens;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
@@ -56,7 +58,7 @@ namespace SampleApi.Plumbing.OAuth
             }
 
             // It then adds user info claims
-            await this.GetCentralUserInfoClaims(accessToken, claims);
+            await this.GetUserInfoClaims(accessToken, claims);
 
             // Finish logging here, and note that on exception our logging disposes the child
             authorizationLogEntry.Dispose();
@@ -69,36 +71,43 @@ namespace SampleApi.Plumbing.OAuth
         {
             using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
-                using (var client = new HttpClient(this.proxyFactory()))
+                try
                 {
-                    // Send the request
-                    var request = new TokenIntrospectionRequest
+                    using (var client = new HttpClient(this.proxyFactory()))
                     {
-                        Address = this.metadata.IntrospectionEndpoint,
-                        ClientId = this.configuration.ClientId,
-                        ClientSecret = this.configuration.ClientSecret,
-                        Token = accessToken,
-                    };
-                    var response = await client.IntrospectTokenAsync(request);
+                        // Send the request
+                        var request = new TokenIntrospectionRequest
+                        {
+                            Address = this.metadata.IntrospectionEndpoint,
+                            ClientId = this.configuration.ClientId,
+                            ClientSecret = this.configuration.ClientSecret,
+                            Token = accessToken,
+                        };
+                        var response = await client.IntrospectTokenAsync(request);
 
-                    // Handle errors
-                    if (response.IsError)
-                    {
-                        throw ErrorUtils.FromIntrospectionError(response, this.metadata.IntrospectionEndpoint);
+                        // Handle errors
+                        if (response.IsError)
+                        {
+                            throw ErrorUtils.FromIntrospectionError(response, this.metadata.IntrospectionEndpoint);
+                        }
+
+                        // Handle invalid or expired tokens
+                        if (!response.IsActive)
+                        {
+                            throw ErrorFactory.CreateClient401Error("Access token is expired and failed introspection");
+                        }
+
+                        // Get token claims
+                        string subject = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.Subject);
+                        string clientId = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.ClientId);
+                        string scope = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.Scope);
+                        int expiry = this.GetIntegerClaim((name) => response.TryGet(name), JwtClaimTypes.Expiration);
+                        claims.SetTokenInfo(subject, clientId, scope.Split(' '), expiry);
                     }
-
-                    // Handle invalid or expired tokens
-                    if (!response.IsActive)
-                    {
-                        throw ErrorFactory.CreateClient401Error("Access token is expired and failed introspection");
-                    }
-
-                    // Get token claims and use the immutable user id as the subject claim
-                    string subject = this.GetIntrospectionClaim(response, "uid");
-                    string clientId = this.GetIntrospectionClaim(response, JwtClaimTypes.ClientId);
-                    string scope = this.GetIntrospectionClaim(response, JwtClaimTypes.Scope);
-                    int expiry = Convert.ToInt32(this.GetIntrospectionClaim(response, JwtClaimTypes.Expiration), CultureInfo.InvariantCulture);
-                    claims.SetTokenInfo(subject, clientId, scope.Split(' '), expiry);
+                }
+                catch (Exception ex)
+                {
+                    throw ErrorUtils.FromIntrospectionError(ex, this.metadata.IntrospectionEndpoint);
                 }
             }
         }
@@ -110,85 +119,134 @@ namespace SampleApi.Plumbing.OAuth
         {
             using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
-                // First decode the JWT
-                var handler = new JwtSecurityTokenHandler();
-                var jwt = handler.ReadJwtToken(accessToken);
-                
                 // Next get the token signing public key
-                var publicKey = await this.GetTokenSigningPublicKey(jwt.Header.Kid);
+                var keys = await this.GetTokenSigningPublicKeys();
 
                 // Next validate the token
-                await this.ValidateJsonWebToken(jwt, publicKey);
+                var principal = this.ValidateJsonWebToken(accessToken, keys);
 
-                // Next read token claims
+                // Get token claims
+                string subject = this.GetStringClaim((name) => principal.FindFirstValue(name), "username");
+                string clientId = this.GetStringClaim((name) => principal.FindFirstValue(name), JwtClaimTypes.ClientId);
+                string scope = this.GetStringClaim((name) => principal.FindFirstValue(name), JwtClaimTypes.Scope);
+                int expiry = this.GetIntegerClaim((name) => principal.FindFirstValue(name), JwtClaimTypes.Expiration);
+                claims.SetTokenInfo(subject, clientId, scope.Split(' '), expiry);
             }
         }
 
         /*
-         * Get the public key with which our access token is signed
+         * Get the keys from the JWKS endpoint
          */
-        private async Task<string> GetTokenSigningPublicKey(string keyIdentifier)
+        private async Task<string> GetTokenSigningPublicKeys()
         {
-            using (this.logEntry.CreatePerformanceBreakdown("getTokenSigningPublicKeyeToken"))
+            using (this.logEntry.CreatePerformanceBreakdown("getTokenSigningPublicKey"))
             {
+                try
+                {
+                    using (var client = new HttpClient(this.proxyFactory()))
+                    {
+                        // Make the HTTPS request
+                        var response = await client.GetJsonWebKeySetAsync(this.metadata.JwksUri);
+                        if (response.IsError)
+                        {
+                            throw ErrorUtils.FromTokenSigningKeysDownloadError(response, this.metadata.JwksUri);
+                        }
+
+                        // Return the JSON data
+                        return response.Json.ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ErrorUtils.FromTokenSigningKeysDownloadError(ex, this.metadata.JwksUri);
+                }
             }
         }
 
         /*
         * Do the work of verifying the access token
         */
-        private async Task ValidateJsonWebToken(JwtSecurityToken jwt, string publicKey)
+        private ClaimsPrincipal ValidateJsonWebToken(string accessToken, string keys)
         {
             using (this.logEntry.CreatePerformanceBreakdown("validateJsonWebToken"))
             {
-            }
-        }
-
-        /*
-         * User info lookup
-         */
-        private async Task GetCentralUserInfoClaims(string accessToken, CoreApiClaims claims)
-        {
-            using (this.logEntry.CreatePerformanceBreakdown("userInfoLookup"))
-            {
-                using (var client = new HttpClient(this.proxyFactory()))
+                try
                 {
-                    // Send the request
-                    var request = new UserInfoRequest
+                    // Set parameters, and Cognito does not provide an audience claim in access tokens
+                    var tokenValidationParameters = new TokenValidationParameters
                     {
-                        Address = this.metadata.UserInfoEndpoint,
-                        Token = accessToken,
+                        ValidIssuer = this.configuration.Authority,
+                        ValidateIssuer = true,
+                        IssuerSigningKeys = new JsonWebKeySet(keys).Keys,
+                        ValidateAudience = false,
                     };
-                    var response = await client.GetUserInfoAsync(request);
 
-                    // Handle errors
-                    if (response.IsError)
-                    {
-                        // Handle a race condition where the access token expires during user info lookup
-                        if (response.HttpStatusCode == HttpStatusCode.Unauthorized)
-                        {
-                            throw ErrorFactory.CreateClient401Error("Access token is expired and failed user info lookup");
-                        }
-
-                        // Handle technical errors
-                        throw ErrorUtils.FromUserInfoError(response, this.metadata.UserInfoEndpoint);
-                    }
-
-                    // Get token claims and use the immutable user id as the subject claim
-                    string givenName = this.GetUserInfoClaim(response, JwtClaimTypes.GivenName);
-                    string familyName = this.GetUserInfoClaim(response, JwtClaimTypes.FamilyName);
-                    string email = this.GetUserInfoClaim(response, JwtClaimTypes.Email);
-                    claims.SetCentralUserInfo(givenName, familyName, email);
+                    // Do the technical validation, including checking the digital signature via the public key
+                    var handler = new JwtSecurityTokenHandler();
+                    SecurityToken result;
+                    return handler.ValidateToken(accessToken, tokenValidationParameters, out result);
+                }
+                catch (Exception ex)
+                {
+                    // Handle failures and log the error details
+                    var details = $"JWT verification failed: ${ex.Message}";
+                    throw ErrorFactory.CreateClient401Error(details);
                 }
             }
         }
 
         /*
-         * A helper to check the expected introspection claims are present
+         * Perform OAuth user info lookup
          */
-        private string GetIntrospectionClaim(TokenIntrospectionResponse response, string name)
+        private async Task GetUserInfoClaims(string accessToken, CoreApiClaims claims)
         {
-            var value = response.TryGet(name);
+            using (this.logEntry.CreatePerformanceBreakdown("userInfoLookup"))
+            {
+                try
+                {
+                    using (var client = new HttpClient(this.proxyFactory()))
+                    {
+                        // Send the request
+                        var request = new UserInfoRequest
+                        {
+                            Address = this.metadata.UserInfoEndpoint,
+                            Token = accessToken,
+                        };
+                        var response = await client.GetUserInfoAsync(request);
+
+                        // Handle errors
+                        if (response.IsError)
+                        {
+                            // Handle a race condition where the access token expires during user info lookup
+                            if (response.HttpStatusCode == HttpStatusCode.Unauthorized)
+                            {
+                                throw ErrorFactory.CreateClient401Error("Access token is expired and failed user info lookup");
+                            }
+
+                            // Handle technical errors
+                            throw ErrorUtils.FromUserInfoError(response, this.metadata.UserInfoEndpoint);
+                        }
+
+                        // Get token claims and use the immutable user id as the subject claim
+                        string givenName = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.GivenName);
+                        string familyName = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.FamilyName);
+                        string email = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.Email);
+                        claims.SetUserInfo(givenName, familyName, email);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ErrorUtils.FromUserInfoError(ex, this.metadata.UserInfoEndpoint);
+                }
+            }
+        }
+
+        /*
+         * A helper to get a string claim
+         */
+        private string GetStringClaim(Func<string, string> callback, string name)
+        {
+            var value = callback(name);
             if (value == null)
             {
                 throw ErrorUtils.FromMissingClaim(name);
@@ -198,17 +256,17 @@ namespace SampleApi.Plumbing.OAuth
         }
 
         /*
-         * A helper to check the expected user info claims are present
+         * A helper to get an integer claim
          */
-        private string GetUserInfoClaim(UserInfoResponse response, string name)
+        private int GetIntegerClaim(Func<string, string> callback, string name)
         {
-            var value = response.TryGet(name);
+            var value = callback(name);
             if (value == null)
             {
                 throw ErrorUtils.FromMissingClaim(name);
             }
 
-            return value;
+            return Convert.ToInt32(value, CultureInfo.InvariantCulture);
         }
     }
 }

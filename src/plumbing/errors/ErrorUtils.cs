@@ -67,7 +67,15 @@
         }
 
         /*
-         * Report introspection failures clearly
+         * Handle problems connecting to the introspection endpoint
+         */
+        public static ServerError FromIntrospectionError(Exception ex, string url)
+        {
+            return ErrorUtils.CreateServerError(ex, ErrorCodes.IntrospectionFailure, "Token validation failed");
+        }
+
+        /*
+         * Report failures in introspection responses
          */
         public static ServerError FromIntrospectionError(TokenIntrospectionResponse response, string url)
         {
@@ -79,6 +87,37 @@
 
             error.SetDetails(ErrorUtils.GetOAuthErrorDetails(data.Item2, response.Error, url));
             return error;
+        }
+
+        /*
+         * Handle problems connecting to the JWKS keys endpoint
+         */
+        public static ServerError FromTokenSigningKeysDownloadError(Exception ex, string url)
+        {
+            return ErrorUtils.CreateServerError(ex, ErrorCodes.TokenSigningKeysDownloadError,  "Problem downloading JWKS keys");
+        }
+
+        /*
+         * Handle failures in JWKS key responses
+         */
+        public static ServerError FromTokenSigningKeysDownloadError(JsonWebKeySetResponse response, string url)
+        {
+            var data = ErrorUtils.ReadOAuthErrorResponse(response.Json);
+            var error = ErrorUtils.CreateOAuthServerError(
+                ErrorCodes.TokenSigningKeysDownloadError,
+                "Problem downloading JWKS keys",
+                data.Item1);
+
+            error.SetDetails(ErrorUtils.GetOAuthErrorDetails(data.Item2, response.Error, url));
+            return error;
+        }
+
+        /*
+         * Handle problems connecting to the User Info endpoint
+         */
+        public static ServerError FromUserInfoError(Exception ex, string url)
+        {
+            return ErrorUtils.CreateServerError(ex, ErrorCodes.UserInfoFailure,  "User info lookup failed");
         }
 
         /*

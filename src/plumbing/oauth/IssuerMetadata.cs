@@ -38,9 +38,7 @@ namespace SampleApi.Plumbing.OAuth
                     Address = this.configuration.Authority,
                     Policy = new DiscoveryPolicy()
                     {
-                        // In my Okta account the following endpoint does not exist under a /default path segment
-                        // This causes Identity Model endpoint validation to fail, do disable it here
-                        // https://dev-843469.oktapreview.com/oauth2/v1/clients
+                        // Prevent 'Endpoint is on a different host than authority' errors since Cognito uses different values
                         ValidateEndpoints = false,
                     },
                 };

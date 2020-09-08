@@ -15,6 +15,8 @@
 
         public const string IntrospectionFailure = "introspection_failure";
 
+        public const string TokenSigningKeysDownloadError = "jwks_download_failure";
+
         public const string UserInfoFailure = "userinfo_failure";
 
         public const string ExceptionSimulation = "exception_simulation";
