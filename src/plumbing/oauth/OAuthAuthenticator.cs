@@ -2,6 +2,7 @@ namespace SampleApi.Plumbing.OAuth
 {
     using System;
     using System.Globalization;
+    using System.IdentityModel.Tokens.Jwt;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -44,8 +45,15 @@ namespace SampleApi.Plumbing.OAuth
             // This ensures that any errors and performances in this area are reported separately to business logic
             var authorizationLogEntry = this.logEntry.CreateChild("Authorizer");
 
-            // Our implementation introspects the token to get token claims
-            await this.IntrospectTokenAndGetTokenClaims(accessToken, claims);
+            // First validate the token and get token claims, using introspection if supported
+            if (this.metadata.IntrospectionEndpoint != null)
+            {
+                await this.IntrospectTokenAndGetTokenClaims(accessToken, claims);
+            }
+            else
+            {
+                await this.ValidateTokenInMemoryAndGetTokenClaims(accessToken, claims);
+            }
 
             // It then adds user info claims
             await this.GetCentralUserInfoClaims(accessToken, claims);
@@ -55,7 +63,7 @@ namespace SampleApi.Plumbing.OAuth
         }
 
         /*
-         * Introspection processing
+         * Validate the access token via introspection and populate claims
          */
         private async Task IntrospectTokenAndGetTokenClaims(string accessToken, CoreApiClaims claims)
         {
@@ -92,6 +100,47 @@ namespace SampleApi.Plumbing.OAuth
                     int expiry = Convert.ToInt32(this.GetIntrospectionClaim(response, JwtClaimTypes.Expiration), CultureInfo.InvariantCulture);
                     claims.SetTokenInfo(subject, clientId, scope.Split(' '), expiry);
                 }
+            }
+        }
+
+        /*
+         * Validate the access token in memory via the token signing public key
+         */
+        private async Task ValidateTokenInMemoryAndGetTokenClaims(string accessToken, CoreApiClaims claims)
+        {
+            using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
+            {
+                // First decode the JWT
+                var handler = new JwtSecurityTokenHandler();
+                var jwt = handler.ReadJwtToken(accessToken);
+                
+                // Next get the token signing public key
+                var publicKey = await this.GetTokenSigningPublicKey(jwt.Header.Kid);
+
+                // Next validate the token
+                await this.ValidateJsonWebToken(jwt, publicKey);
+
+                // Next read token claims
+            }
+        }
+
+        /*
+         * Get the public key with which our access token is signed
+         */
+        private async Task<string> GetTokenSigningPublicKey(string keyIdentifier)
+        {
+            using (this.logEntry.CreatePerformanceBreakdown("getTokenSigningPublicKeyeToken"))
+            {
+            }
+        }
+
+        /*
+        * Do the work of verifying the access token
+        */
+        private async Task ValidateJsonWebToken(JwtSecurityToken jwt, string publicKey)
+        {
+            using (this.logEntry.CreatePerformanceBreakdown("validateJsonWebToken"))
+            {
             }
         }
 

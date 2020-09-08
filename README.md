@@ -5,7 +5,7 @@
 ### Overview
 
 * The final API code sample using OAuth 2.0 and Open Id Connect, referenced in my blog at https://authguidance.com
-* **The goal of this sample is to implement this blog's** [API Architecture](https://authguidance.com/2019/03/24/api-platform-design/) **in .Net Core**
+* **This sample implements our [API Non Functional Requirements](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior) in Java via .Net Core**
 
 ### Details
 
@@ -18,9 +18,8 @@
 
 ### Middleware Used
 
-* The [IdentityModel](https://github.com/IdentityModel/IdentityModel) library is used for API OAuth operations
+* The Kestrel web server is used to host the API over SSL, using OpenSSL self signed certificates
+* AWS Cognito is used as the Cloud Authorization Server
+* The [IdentityModel Library](https://github.com/IdentityModel/IdentityModel) is used for API OAuth handling
 * The [Microsoft In Memory Cache](https://docs.microsoft.com/en-us/aspnet/core/performance/caching/memory) is used to cache API claims in memory
-* The Kestrel web server is used to host the API
-* Okta is used for the Authorization Server
-* OpenSSL is used for SSL certificate handling
-* API logs can be aggregated to [Elastic Search](https://authguidance.com/2019/07/19/log-aggregation-setup/) to support common [Query Use Cases](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/)
+* API logs can be aggregated to [Elastic Search](https://authguidance.com/2019/07/19/log-aggregation-setup/) to support [Query Use Cases](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/)
