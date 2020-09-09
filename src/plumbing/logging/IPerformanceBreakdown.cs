@@ -11,5 +11,8 @@
     {
         // Set details to associate with the performance breakdown from an object
         void SetDetails(JToken value);
+
+        // Create a child entry
+        IPerformanceBreakdown CreateChild(string name);
     }
 }

@@ -117,13 +117,13 @@ namespace SampleApi.Plumbing.OAuth
          */
         private async Task ValidateTokenInMemoryAndGetTokenClaims(string accessToken, CoreApiClaims claims)
         {
-            using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
+            using (var breakdown = this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
                 // Next get the token signing public key
-                var keys = await this.GetTokenSigningPublicKeys();
+                var keys = await this.GetTokenSigningPublicKeys(breakdown);
 
                 // Next validate the token
-                var principal = this.ValidateJsonWebToken(accessToken, keys);
+                var principal = this.ValidateJsonWebToken(accessToken, keys, breakdown);
 
                 // Get token claims
                 string subject = this.GetStringClaim((name) => principal.FindFirstValue(name), "username");
@@ -137,9 +137,9 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Get the keys from the JWKS endpoint
          */
-        private async Task<string> GetTokenSigningPublicKeys()
+        private async Task<string> GetTokenSigningPublicKeys(IPerformanceBreakdown breakdown)
         {
-            using (this.logEntry.CreatePerformanceBreakdown("getTokenSigningPublicKey"))
+            using (breakdown.CreateChild("getTokenSigningPublicKey"))
             {
                 try
                 {
@@ -166,9 +166,9 @@ namespace SampleApi.Plumbing.OAuth
         /*
         * Do the work of verifying the access token
         */
-        private ClaimsPrincipal ValidateJsonWebToken(string accessToken, string keys)
+        private ClaimsPrincipal ValidateJsonWebToken(string accessToken, string keys, IPerformanceBreakdown breakdown)
         {
-            using (this.logEntry.CreatePerformanceBreakdown("validateJsonWebToken"))
+            using (breakdown.CreateChild("validateJsonWebToken"))
             {
                 try
                 {

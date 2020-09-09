@@ -82,10 +82,11 @@
         /*
         * Add a child to the performance breakdown
         */
-        public PerformanceBreakdown CreateChild(string name)
+        public IPerformanceBreakdown CreateChild(string name)
         {
             var child = new PerformanceBreakdown(name);
             this.children.Add(child);
+            child.Start();
             return child;
         }
     }

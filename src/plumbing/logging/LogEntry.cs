@@ -126,9 +126,7 @@ namespace SampleApi.Plumbing.Logging
          */
         public IPerformanceBreakdown CreatePerformanceBreakdown(string name)
         {
-            var child = this.Current().Performance.CreateChild(name);
-            child.Start();
-            return child;
+            return this.Current().Performance.CreateChild(name);
         }
 
         /*
