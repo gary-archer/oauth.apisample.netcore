@@ -1,0 +1,22 @@
+1. Have a read of this article to understand general port issues:
+   https://www.atlascode.com/blog/running-asp-net-core-in-an-alpine-linux-docker-container/
+
+2. SSL trust issues connecting to metadata address
+   Something I don't understand about SSL trust in .Net Core
+   Fails for Curity also with my self signed cert
+
+3. Understand how my code should use ports when running in a container
+   Configure the API to listen on port 8080 by default and make useSSL optional
+   Get calls from outside the container working over HTTP using IP addresses
+
+4. Verify that logging works for every API request
+
+5. Get DNS working so that the API is called from outside Kubernetes over api.mycompany.com
+
+6. Get SSL working so that the call into Kubernetes from the local PC is over port 444
+   Understand how to make this work in DNS terms
+
+7. Use a redis client to cache tokens across the cluster
+
+8. Get stdout logging pushing to Elastic Search
+   This means pods need to be able to call localhost:9200 on the host

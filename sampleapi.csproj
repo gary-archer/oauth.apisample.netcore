@@ -19,11 +19,11 @@
   <ItemGroup>
     <!-- OAuth security -->
     <PackageReference Include="IdentityModel" Version="4.1.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
 
     <!-- API logging -->
     <PackageReference Include="log4net" Version="2.0.11" />
     <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="3.1.3" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
 
     <!-- Code quality checks -->
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">

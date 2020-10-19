@@ -1,0 +1,46 @@
+﻿{
+    "api": {
+        "sslCertificateFileName": "mycompany.ssl.pfx",
+        "sslCertificatePassword": "SslPassword1",
+        "sslPort": 444,
+        "useProxy": true,
+        "proxyUrl": "http://127.0.0.1:8888",
+        "webTrustedOrigins": [
+            "https://web.mycompany.com"
+        ]
+    },
+    "logging": {
+        "apiName": "SampleApi",
+        "production": {
+            "level": "Info",
+            "appenders": [
+                {
+                    "type": "console"
+                }
+            ],
+            "performanceThresholdsMilliseconds": {
+                "default": 250,
+                "operationOverrides": {
+                    "Authorizer": 1000
+                }
+            }
+        },
+        "development": {
+            "level": "None",
+            "overrideLevels": {
+                "Microsoft": "Warning",
+                "Microsoft.AspNetCore.Server.Kestrel": "Error",
+                "SampleApi.Plumbing.Security.CustomAuthenticationHandler": "Error"
+            }
+        }
+    },
+    "oauth": {
+        "authority":     "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_qqJgVeuTn",
+        "requiredScope": "basicapi",
+        "clientId":      "",
+        "clientSecret":  ""
+    },
+    "claims": {
+        "maxCacheMinutes": 30
+    }
+}

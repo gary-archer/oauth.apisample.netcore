@@ -1,0 +1,33 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: netcoreapi-svc
+spec:
+  selector:
+    app: posts
+  ports:
+  - protocol: "TCP"
+    port: 80
+    targetPort: 8080
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netcoreapi
+  labels:
+    app: netcoreapi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: netcoreapi
+  template:
+    metadata:
+      labels:
+        app: netcoreapi
+    spec:
+      containers:
+      - name: netcoreapi
+        image: netcoreapi
+        imagePullPolicy: Never
