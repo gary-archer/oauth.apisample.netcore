@@ -9,7 +9,7 @@
 ### Details
 
 * See the [Overview Page](http://authguidance.com/2018/01/05/net-core-code-sample-overview/) for what the API does and how to run it
-* See the [OAuth Integration Page](http://authguidance.com/2018/01/06/net-core-api-key-coding-points/) for technical implementation details
+* See the [OAuth Integration Page](http://authguidance.com/2018/01/06/net-core-api-key-coding-points/) for details on OAuth Integration and Custom Claims handling
 
 ### Programming Languages
 
