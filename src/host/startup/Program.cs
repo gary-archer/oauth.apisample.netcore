@@ -58,10 +58,13 @@
                 // Configure the Kestrel web server to listen over SSL
                 .UseKestrel(options =>
                 {
-                    var certFilePath = $"../../../certs/{jsonConfig.Api.SslCertificateFileName}";
-                    options.Listen(IPAddress.Any, jsonConfig.Api.SslPort, listenOptions =>
+                    options.Listen(IPAddress.Any, jsonConfig.Api.Port, listenOptions =>
                     {
-                        listenOptions.UseHttps(certFilePath, jsonConfig.Api.SslCertificatePassword);
+                        if (jsonConfig.Api.UseSsl)
+                        {
+                            var certFilePath = $"../../../certs/{jsonConfig.Api.SslCertificateFileName}";
+                            listenOptions.UseHttps(certFilePath, jsonConfig.Api.SslCertificatePassword);
+                        }
                     });
                 })
 

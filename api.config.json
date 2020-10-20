@@ -1,8 +1,9 @@
 ﻿{
     "api": {
+        "port":  444,
+        "useSsl": true,
         "sslCertificateFileName": "mycompany.ssl.pfx",
         "sslCertificatePassword": "SslPassword1",
-        "sslPort": 444,
         "useProxy": false,
         "proxyUrl": "http://127.0.0.1:8888",
         "webTrustedOrigins": [
