@@ -4,11 +4,10 @@ metadata:
   name: netcoreapi-svc
 spec:
   selector:
-    app: posts
+    app: netcoreapi
   ports:
   - protocol: "TCP"
     port: 80
-    targetPort: 8080
   type: NodePort
 ---
 apiVersion: apps/v1

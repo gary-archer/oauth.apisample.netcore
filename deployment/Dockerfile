@@ -19,5 +19,8 @@ COPY data/*                                                         /usr/samplea
 # When the container is run, this will execute the .Net Core program
 CMD ["dotnet", "sampleapi.dll"]
 
+# Expose the service over port 80 for demo purposes
+EXPOSE 80/tcp
+
 # This can be used to view the image's file structure before deploying it
 # docker run -it netcoreapi sh

@@ -50,23 +50,24 @@ then
 fi
 
 #
-# Output the names of created PODs and indicate success
+# Output POD details then the external address
 #
 echo "Deployment completed successfully"
 kubectl get pod -l app=netcoreapi
+API_URL=$(minikube service --url netcoreapi-svc)/api/companies
+echo $API_URL
 
 #
-# View logs from a POD like this if needed, in order to troubleshoot development errors
+# Troubleshooting commands from outside Kubernetes
 #
+#curl $API_URL
+#kubectl describe service netcoreapi-svc
 #kubectl logs --tail=100 pod/netcoreapi-74f57df659-2tjz5
 
 #
-# Connect to a POD like this if needed, to verify that deployed files are correct
+# Troubleshooting commands from inside the POD
 #
 #kubectl exec --stdin --tty pod/netcoreapi-74f57df659-2tjz5 -- /bin/sh
 #ls -lr /usr/sampleapi
-
-#
-# Get the load balanced Kubernetes URL like this and try to call the service
-#
-# echo $(minikube service --url netcoreapi-svc)/api/companies
+#apk add curl
+#curl http://localhost/api/companies
