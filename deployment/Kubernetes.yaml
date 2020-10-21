@@ -1,3 +1,9 @@
+#
+# The Kubernetes deployment file for our .Net Core API
+# API instances run on dynamically assigned IP addresses and a low privilege port
+# API instances cannot be called directly from outside Kubernetes
+#
+
 kind: Service
 apiVersion: v1
 metadata:
@@ -8,7 +14,6 @@ spec:
   ports:
   - protocol: "TCP"
     port: 80
-  type: NodePort
 ---
 apiVersion: apps/v1
 kind: Deployment
