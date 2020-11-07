@@ -1,0 +1,37 @@
+#
+# The Kubernetes deployment file for our .Net Core API
+# API instances run on dynamically assigned IP addresses and a low privilege port
+# API instances cannot be called directly from outside Kubernetes
+#
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: netcoreapi-svc
+spec:
+  selector:
+    app: netcoreapi
+  ports:
+  - protocol: "TCP"
+    port: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netcoreapi
+  labels:
+    app: netcoreapi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: netcoreapi
+  template:
+    metadata:
+      labels:
+        app: netcoreapi
+    spec:
+      containers:
+      - name: netcoreapi
+        image: netcoreapi:v1
+        imagePullPolicy: Never

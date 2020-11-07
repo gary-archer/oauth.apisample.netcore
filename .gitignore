@@ -1,0 +1,11 @@
+# General files not checked in
+bin
+obj
+logs
+.DS_Store
+
+# Visual Studio files not needed by Visual Studio Code
+.vs
+api.sln
+api.csproj.user
+Properties
