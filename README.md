@@ -1,7 +1,5 @@
 # authguidance.apisample.netcore
 
-[![Known Vulnerabilities](https://snyk.io/test/github/gary-archer/authguidance.apisample.netcore/badge.svg?targetFile=sampleapi.csproj)](https://snyk.io/test/github/gary-archer/authguidance.apisample.netcore?targetFile=sampleapi.csproj)
-
 ### Overview
 
 * The final API code sample using OAuth 2.0 and Open Id Connect, referenced in my blog at https://authguidance.com
