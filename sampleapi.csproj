@@ -24,6 +24,7 @@
     <!-- API logging -->
     <PackageReference Include="log4net" Version="2.0.12" />
     <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="5.0.0" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 
     <!-- Code quality checks -->
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
