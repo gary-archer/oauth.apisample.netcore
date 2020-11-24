@@ -2,7 +2,7 @@
 
 ### Overview
 
-* The final API code sample using OAuth 2.0 and Open Id Connect, referenced in my blog at https://authguidance.com
+* The final API code sample using OAuth 2.x and Open Id Connect, referenced in my blog at https://authguidance.com
 
 ### Details
 
