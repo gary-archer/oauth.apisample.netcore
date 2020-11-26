@@ -12,9 +12,9 @@ RUN apk --no-cache add curl
 WORKDIR /usr/sampleapi
 
 # Copy libraries and other files into our docker image
-COPY bin/Release/netcoreapp3.1/linux-musl-x64/publish/*.dll         /usr/sampleapi/
-COPY bin/Release/netcoreapp3.1/linux-musl-x64/publish/*.so          /usr/sampleapi/
-COPY bin/Release/netcoreapp3.1/linux-musl-x64/publish/*.a           /usr/sampleapi/
+COPY bin/Release/netcoreapp5/linux-musl-x64/publish/*.dll         /usr/sampleapi/
+COPY bin/Release/netcoreapp5/linux-musl-x64/publish/*.so          /usr/sampleapi/
+COPY bin/Release/netcoreapp5/linux-musl-x64/publish/*.a           /usr/sampleapi/
 COPY deployment/api.config.json                                     /usr/sampleapi/
 COPY data/*                                                         /usr/sampleapi/data/
 

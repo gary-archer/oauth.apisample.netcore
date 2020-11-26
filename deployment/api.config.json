@@ -36,8 +36,8 @@
             ],
             "overrideLevels": {
                 "Microsoft": "Warning",
-                "Microsoft.AspNetCore.DataProtection": "Error",
                 "Microsoft.AspNetCore.Server.Kestrel": "Error",
+                "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
                 "SampleApi.Plumbing.Security.CustomAuthenticationHandler": "Error"
             }
         }
