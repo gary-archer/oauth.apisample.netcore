@@ -11,7 +11,7 @@
 
 ### Programming Languages
 
-* C# and .Net Core 3 are used to implement the OAuth Secured REST API
+* C# and .Net 5 are used to implement the OAuth Secured REST API
 
 ### Middleware Used
 
