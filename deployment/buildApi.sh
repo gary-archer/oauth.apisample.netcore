@@ -14,7 +14,7 @@ eval $(minikube docker-env)
 #
 echo "Building C# Code ..."
 dotnet clean ../sampleapi.csproj
-dotnet publish ../sampleapi.csproj -c Release -r linux-musl-x64
+dotnet publish ../sampleapi.csproj -c Release -r linux-x64
 if [ $? -ne 0 ]
 then
   echo "*** C# build error ***"

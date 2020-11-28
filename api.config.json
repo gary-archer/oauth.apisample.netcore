@@ -4,7 +4,7 @@
         "useSsl": true,
         "sslCertificateFileName": "mycompany.ssl.pfx",
         "sslCertificatePassword": "SslPassword1",
-        "useProxy": true,
+        "useProxy": false,
         "proxyUrl": "http://127.0.0.1:8888",
         "webTrustedOrigins": [
             "https://web.mycompany.com"
