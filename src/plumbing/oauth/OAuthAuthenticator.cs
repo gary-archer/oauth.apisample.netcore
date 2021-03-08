@@ -42,7 +42,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * The entry point for validating an access token
          */
-        public async Task ValidateTokenAndGetClaims(string accessToken, HttpRequest httpRequest, CoreApiClaims claims)
+        public async Task ValidateTokenAndGetClaims(string accessToken, HttpRequest httpRequest, ApiClaims claims)
         {
             // Create a child log entry for authentication related work
             // This ensures that any errors and performances in this area are reported separately to business logic
@@ -75,7 +75,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Validate the access token via introspection and populate claims
          */
-        private async Task IntrospectTokenAndGetTokenClaims(string accessToken, CoreApiClaims claims)
+        private async Task IntrospectTokenAndGetTokenClaims(string accessToken, ApiClaims claims)
         {
             using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
@@ -135,7 +135,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Validate the access token in memory via the token signing public key
          */
-        private async Task ValidateTokenInMemoryAndGetTokenClaims(string accessToken, CoreApiClaims claims)
+        private async Task ValidateTokenInMemoryAndGetTokenClaims(string accessToken, ApiClaims claims)
         {
             using (var breakdown = this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
@@ -242,7 +242,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Perform OAuth user info lookup
          */
-        private async Task GetUserInfoClaims(string accessToken, CoreApiClaims claims)
+        private async Task GetUserInfoClaims(string accessToken, ApiClaims claims)
         {
             using (this.logEntry.CreatePerformanceBreakdown("userInfoLookup"))
             {

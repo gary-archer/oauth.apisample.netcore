@@ -1,0 +1,9 @@
+1. Get logic updated
+
+2. Authenticator related code
+
+3. Tidy up startup code
+
+4. DI related code
+
+5. ClaimsCache to be updated to serialize / deserialize text

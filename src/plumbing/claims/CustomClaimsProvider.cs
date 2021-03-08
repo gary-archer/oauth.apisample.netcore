@@ -5,15 +5,15 @@
     /*
      * A base class for enabling custom claims to be included in the cache after OAuth processing
      */
-    public class CustomClaimsProvider<TClaims>
-        where TClaims : CoreApiClaims, new()
+    public class CustomClaimsProvider
     {
         /*
          * This is overridden by base classes
          */
-        public virtual Task AddCustomClaimsAsync(string accessToken, TClaims claims)
+        public virtual Task<CustomClaims> GetCustomClaimsAsync(TokenClaims token, UserInfoClaims userInfo)
         {
-            return Task.FromResult(0);
+            var claims = new CustomClaims();
+            return Task.FromResult(claims);
         }
     }
 }

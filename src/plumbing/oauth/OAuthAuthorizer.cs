@@ -13,17 +13,16 @@ namespace SampleApi.Plumbing.OAuth
     /*
      * The technology neutral algorithm for validating access tokens and returning claims
      */
-    internal sealed class OAuthAuthorizer<TClaims> : IAuthorizer
-        where TClaims : CoreApiClaims, new()
+    internal sealed class OAuthAuthorizer: IAuthorizer
     {
-        private readonly ClaimsCache<TClaims> cache;
+        private readonly ClaimsCache cache;
         private readonly OAuthAuthenticator authenticator;
-        private readonly CustomClaimsProvider<TClaims> customClaimsProvider;
+        private readonly CustomClaimsProvider customClaimsProvider;
 
         public OAuthAuthorizer(
-            ClaimsCache<TClaims> cache,
+            ClaimsCache cache,
             OAuthAuthenticator authenticator,
-            CustomClaimsProvider<TClaims> customClaimsProvider)
+            CustomClaimsProvider customClaimsProvider)
         {
             this.cache = cache;
             this.authenticator = authenticator;
@@ -33,7 +32,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * The entry point to populate claims from an access token
          */
-        public async Task<CoreApiClaims> Execute(HttpRequest request)
+        public async Task<ApiClaims> Execute(HttpRequest request)
         {
             // First handle missing tokens
             var accessToken = this.ReadAccessToken(request);
@@ -51,7 +50,7 @@ namespace SampleApi.Plumbing.OAuth
             }
 
             // Otherwise create new claims which we will populate
-            var claims = new TClaims();
+            var claims = new ApiClaims();
 
             // Validate the token, read token claims, and do a user info lookup
             await this.authenticator.ValidateTokenAndGetClaims(accessToken, request, claims);
