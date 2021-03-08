@@ -7,7 +7,7 @@ namespace SampleApi.Host.Claims
     /*
      * A custom claims provider to include extra domain specific claims in the claims cache
      */
-    public class SampleCustomClaimsProvider: CustomClaimsProvider
+    public class SampleCustomClaimsProvider : CustomClaimsProvider
     {
         /*
          * An example of how custom claims can be included
@@ -22,7 +22,7 @@ namespace SampleApi.Host.Claims
             // - guestadmin@mycompany.com is an admin and sees all data
             // - guestuser@mycompany.com is not an admin and only sees data for the USA region
             var isAdmin = userInfo.Email.ToLower().Contains("admin");
-            var regionsCovered = isAdmin ? new string[] {} : new[] { "USA" };;
+            var regionsCovered = isAdmin ? new string[] { } : new[] { "USA" };
 
             CustomClaims claims = new SampleCustomClaims(userDatabaseId, isAdmin, regionsCovered);
             return Task.FromResult(claims);

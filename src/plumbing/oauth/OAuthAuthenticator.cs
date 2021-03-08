@@ -1,7 +1,6 @@
 namespace SampleApi.Plumbing.OAuth
 {
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
     using System.IdentityModel.Tokens.Jwt;
     using System.Linq;
@@ -10,7 +9,6 @@ namespace SampleApi.Plumbing.OAuth
     using System.Threading.Tasks;
     using IdentityModel;
     using IdentityModel.Client;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.IdentityModel.Tokens;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
@@ -42,40 +40,74 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * The entry point for validating an access token
          */
-        public async Task ValidateTokenAndGetClaims(string accessToken, HttpRequest httpRequest, ApiClaims claims)
+        public async Task<TokenClaims> ValidateToken(string accessToken)
         {
-            // Create a child log entry for authentication related work
-            // This ensures that any errors and performances in this area are reported separately to business logic
-            var authorizationLogEntry = this.logEntry.CreateChild("Authorizer");
-
             // Validate the token and read token claims
             if (!string.IsNullOrWhiteSpace(this.metadata.IntrospectionEndpoint) &&
                 !string.IsNullOrWhiteSpace(this.configuration.ClientId) &&
                 !string.IsNullOrWhiteSpace(this.configuration.ClientId))
             {
                 // Use introspection if we can
-                await this.IntrospectTokenAndGetTokenClaims(accessToken, claims).ConfigureAwait(false);
+                return await this.IntrospectTokenAndGetTokenClaims(accessToken).ConfigureAwait(false);
             }
             else
             {
                 // Use in memory validation otherwise
-                await this.ValidateTokenInMemoryAndGetTokenClaims(accessToken, claims).ConfigureAwait(false);
+                return await this.ValidateTokenInMemoryAndGetTokenClaims(accessToken).ConfigureAwait(false);
             }
+        }
 
-            // Add user info claims if the access token supports Open Id Connect operations
-            if (claims.Scopes.AsEnumerable().Any(s => s == "openid"))
+        /*
+         * Perform OAuth user info lookup
+         */
+        public async Task<UserInfoClaims> GetUserInfo(string accessToken)
+        {
+            using (this.logEntry.CreatePerformanceBreakdown("userInfoLookup"))
             {
-                await this.GetUserInfoClaims(accessToken, claims).ConfigureAwait(false);
-            }
+                try
+                {
+                    using (var client = new HttpClient(this.proxyFactory()))
+                    {
+                        // Send the request
+                        var request = new UserInfoRequest
+                        {
+                            Address = this.metadata.UserInfoEndpoint,
+                            Token = accessToken,
+                        };
+                        var response = await client.GetUserInfoAsync(request).ConfigureAwait(false);
 
-            // Finish logging here, and note that on exception our logging disposes the child
-            authorizationLogEntry.Dispose();
+                        // Handle errors
+                        if (response.IsError)
+                        {
+                            // Handle technical errors
+                            if (response.Exception != null)
+                            {
+                                throw ErrorUtils.FromUserInfoError(response.Exception, this.metadata.UserInfoEndpoint);
+                            }
+                            else
+                            {
+                                throw ErrorUtils.FromUserInfoError(response, this.metadata.UserInfoEndpoint);
+                            }
+                        }
+
+                        // Get token claims and use the immutable user id as the subject claim
+                        string givenName = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.GivenName);
+                        string familyName = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.FamilyName);
+                        string email = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.Email);
+                        return new UserInfoClaims(givenName, familyName, email);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ErrorUtils.FromUserInfoError(ex, this.metadata.UserInfoEndpoint);
+                }
+            }
         }
 
         /*
          * Validate the access token via introspection and populate claims
          */
-        private async Task IntrospectTokenAndGetTokenClaims(string accessToken, ApiClaims claims)
+        private async Task<TokenClaims> IntrospectTokenAndGetTokenClaims(string accessToken)
         {
             using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
@@ -122,7 +154,7 @@ namespace SampleApi.Plumbing.OAuth
                         this.VerifyScopes(scopes);
 
                         // Update token claims
-                        claims.SetTokenInfo(subject, clientId, scopes, expiry);
+                        return new TokenClaims(subject, clientId, scopes, expiry);
                     }
                 }
                 catch (Exception ex)
@@ -135,7 +167,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Validate the access token in memory via the token signing public key
          */
-        private async Task ValidateTokenInMemoryAndGetTokenClaims(string accessToken, ApiClaims claims)
+        private async Task<TokenClaims> ValidateTokenInMemoryAndGetTokenClaims(string accessToken)
         {
             using (var breakdown = this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
@@ -155,7 +187,7 @@ namespace SampleApi.Plumbing.OAuth
                 this.VerifyScopes(scopes);
 
                 // Update token claims
-                claims.SetTokenInfo(subject, clientId, scopes, expiry);
+                return new TokenClaims(subject, clientId, scopes, expiry);
             }
         }
 
@@ -236,53 +268,6 @@ namespace SampleApi.Plumbing.OAuth
             if (!scopes.ToList().Exists((s) => s == this.configuration.RequiredScope))
             {
                 throw ErrorFactory.CreateClient401Error("Access token does not have a valid scope for this API");
-            }
-        }
-
-        /*
-         * Perform OAuth user info lookup
-         */
-        private async Task GetUserInfoClaims(string accessToken, ApiClaims claims)
-        {
-            using (this.logEntry.CreatePerformanceBreakdown("userInfoLookup"))
-            {
-                try
-                {
-                    using (var client = new HttpClient(this.proxyFactory()))
-                    {
-                        // Send the request
-                        var request = new UserInfoRequest
-                        {
-                            Address = this.metadata.UserInfoEndpoint,
-                            Token = accessToken,
-                        };
-                        var response = await client.GetUserInfoAsync(request).ConfigureAwait(false);
-
-                        // Handle errors
-                        if (response.IsError)
-                        {
-                            // Handle technical errors
-                            if (response.Exception != null)
-                            {
-                                throw ErrorUtils.FromUserInfoError(response.Exception, this.metadata.UserInfoEndpoint);
-                            }
-                            else
-                            {
-                                throw ErrorUtils.FromUserInfoError(response, this.metadata.UserInfoEndpoint);
-                            }
-                        }
-
-                        // Get token claims and use the immutable user id as the subject claim
-                        string givenName = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.GivenName);
-                        string familyName = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.FamilyName);
-                        string email = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.Email);
-                        claims.SetUserInfo(givenName, familyName, email);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ErrorUtils.FromUserInfoError(ex, this.metadata.UserInfoEndpoint);
-                }
             }
         }
 

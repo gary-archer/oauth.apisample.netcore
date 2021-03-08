@@ -5,7 +5,6 @@
     using System.Net;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
-    using SampleApi.Host.Claims;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Errors;
     using SampleApi.Logic.Repositories;
@@ -18,12 +17,10 @@
     public class CompanyController : Controller
     {
         private readonly CompanyService service;
-        private readonly SampleApiClaims claims;
 
-        public CompanyController(CompanyService service, SampleApiClaims claims)
+        public CompanyController(CompanyService service)
         {
             this.service = service;
-            this.claims = claims;
         }
 
         /*
@@ -32,7 +29,7 @@
         [HttpGet("")]
         public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
-            return await this.service.GetCompanyListAsync(this.claims.IsAdmin, this.claims.RegionsCovered);
+            return await this.service.GetCompanyListAsync();
         }
 
         /*
@@ -52,7 +49,7 @@
             }
 
             // Forward the numeric id to the service
-            return await this.service.GetCompanyTransactionsAsync(idValue, this.claims.IsAdmin, this.claims.RegionsCovered);
+            return await this.service.GetCompanyTransactionsAsync(idValue);
         }
     }
 }

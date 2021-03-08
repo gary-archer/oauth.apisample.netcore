@@ -1,9 +1,8 @@
-1. Get logic updated
+1. ClaimsCache to be updated to serialize / deserialize text
+   ImportData and ExportData methods using JObject
 
-2. Authenticator related code
+2. Review use of ConfigureAwait, which seems inconsistent
 
-3. Tidy up startup code
+3. Testing
 
-4. DI related code
-
-5. ClaimsCache to be updated to serialize / deserialize text
+4. Do I still need to write CORS error responses manually?

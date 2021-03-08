@@ -20,8 +20,8 @@
         private LoggingConfiguration loggingConfiguration;
         private LoggerFactory loggerFactory;
         private OAuthConfiguration oauthConfiguration;
+        private CustomClaimsProvider customClaimsProvider;
         private ClaimsConfiguration claimsConfiguration;
-        private Type customClaimsProviderType;
         private Func<HttpClientHandler> httpProxyFactory;
         private IServiceCollection services;
 
@@ -56,9 +56,9 @@
         /*
          * Provide the type of custom claims provider
          */
-        public BaseCompositionRoot WithCustomClaimsProvider()
+        public BaseCompositionRoot WithCustomClaimsProvider(CustomClaimsProvider provider)
         {
-            this.customClaimsProviderType = typeof(TProvider);
+            this.customClaimsProvider = provider;
             return this;
         }
 
@@ -153,26 +153,17 @@
             var cache = container.GetService<IDistributedCache>();
             var claimsCache = new ClaimsCache(cache, this.claimsConfiguration, container);
 
-            // Create a default injecteable custom claims provider if needed
-            if (this.customClaimsProviderType == null)
-            {
-                this.customClaimsProviderType = typeof(CustomClaimsProvider);
-            }
-
             // Register singletons
             this.services.AddSingleton(claimsCache);
-
-            // Register OAuth per request dependencies
-            this.services.AddScoped(typeof(CustomClaimsProvider), this.customClaimsProviderType);
+            this.services.AddSingleton(this.customClaimsProvider);
 
             // Claims are injected into this holder at runtime
             this.services.AddScoped<ClaimsHolder>();
 
-            // The underlying claims object can then be retrieved via this factory method
-            this.services.AddScoped<ApiClaims>(ctx =>
-            {
-                return ctx.GetService<ClaimsHolder>().Value;
-            });
+            // The underlying claims objects can then be retrieved via these factory methods
+            this.services.AddScoped<TokenClaims>(ctx => ctx.GetService<ClaimsHolder>().Value.Token);
+            this.services.AddScoped<UserInfoClaims>(ctx => ctx.GetService<ClaimsHolder>().Value.UserInfo);
+            this.services.AddScoped<CustomClaims>(ctx => ctx.GetService<ClaimsHolder>().Value.Custom);
         }
     }
 }
