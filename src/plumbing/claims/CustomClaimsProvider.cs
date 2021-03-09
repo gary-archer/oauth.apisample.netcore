@@ -26,7 +26,7 @@
             data.token = claims.Token.ExportData();
             data.userInfo = claims.UserInfo.ExportData();
             data.custom = claims.Custom.ExportData();
-            return data;
+            return data.ToString();
         }
 
         /*

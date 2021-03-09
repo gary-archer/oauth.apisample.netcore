@@ -1,8 +1,0 @@
-1. ClaimsCache to be updated to serialize / deserialize text
-   ImportData and ExportData methods using JObject
-
-2. Google when to call ConfigureAwait???
-
-3. Testing
-
-4. Do I still need to write CORS error responses manually?

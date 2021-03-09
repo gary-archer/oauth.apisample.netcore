@@ -124,8 +124,8 @@
             new BaseCompositionRoot()
                 .UseDiagnostics(this.configuration.Logging, this.loggerFactory)
                 .UseOAuth(this.configuration.OAuth)
-                .UseClaimsCaching(this.configuration.Claims)
                 .WithCustomClaimsProvider(new SampleCustomClaimsProvider())
+                .UseClaimsCaching(this.configuration.Claims)
                 .WithHttpDebugging(this.configuration.Api.UseProxy, this.configuration.Api.ProxyUrl)
                 .WithServices(services)
                 .Register();
