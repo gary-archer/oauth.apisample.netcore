@@ -132,7 +132,7 @@
         {
             // Load issuer metadata into an object
             var issuerMetadata = new IssuerMetadata(this.oauthConfiguration, this.httpProxyFactory);
-            issuerMetadata.Load().Wait();
+            issuerMetadata.LoadAsync().Wait();
 
             // Register singletons
             this.services.AddSingleton(this.oauthConfiguration);

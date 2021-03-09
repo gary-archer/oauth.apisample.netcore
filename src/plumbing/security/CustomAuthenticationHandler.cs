@@ -47,7 +47,7 @@ namespace SampleApi.Plumbing.Security
 
                 // Do the authorization work
                 IAuthorizer authorizer = (IAuthorizer)this.Context.RequestServices.GetService(typeof(IAuthorizer));
-                var claims = await authorizer.Execute(this.Request);
+                var claims = await authorizer.ExecuteAsync(this.Request);
 
                 // Update the claims holder so that other classes can resolve the claims directly
                 var holder = (ClaimsHolder)this.Context.RequestServices.GetService(typeof(ClaimsHolder));

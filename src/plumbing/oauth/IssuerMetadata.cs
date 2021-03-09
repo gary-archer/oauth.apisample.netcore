@@ -28,7 +28,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Load metadata from our configuration URL
          */
-        public async Task Load()
+        public async Task LoadAsync()
         {
             using (var client = new HttpClient(this.proxyFactory()))
             {

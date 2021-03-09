@@ -40,7 +40,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * The entry point for validating an access token
          */
-        public async Task<TokenClaims> ValidateToken(string accessToken)
+        public async Task<TokenClaims> ValidateTokenAsync(string accessToken)
         {
             // Validate the token and read token claims
             if (!string.IsNullOrWhiteSpace(this.metadata.IntrospectionEndpoint) &&
@@ -48,19 +48,19 @@ namespace SampleApi.Plumbing.OAuth
                 !string.IsNullOrWhiteSpace(this.configuration.ClientId))
             {
                 // Use introspection if we can
-                return await this.IntrospectTokenAndGetTokenClaims(accessToken);
+                return await this.IntrospectTokenAndGetTokenClaimsAsync(accessToken);
             }
             else
             {
                 // Use in memory validation otherwise
-                return await this.ValidateTokenInMemoryAndGetTokenClaims(accessToken);
+                return await this.ValidateTokenInMemoryAndGetTokenClaimsAsync(accessToken);
             }
         }
 
         /*
          * Perform OAuth user info lookup
          */
-        public async Task<UserInfoClaims> GetUserInfo(string accessToken)
+        public async Task<UserInfoClaims> GetUserInfoAsync(string accessToken)
         {
             using (this.logEntry.CreatePerformanceBreakdown("userInfoLookup"))
             {
@@ -107,7 +107,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Validate the access token via introspection and populate claims
          */
-        private async Task<TokenClaims> IntrospectTokenAndGetTokenClaims(string accessToken)
+        private async Task<TokenClaims> IntrospectTokenAndGetTokenClaimsAsync(string accessToken)
         {
             using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
@@ -167,12 +167,12 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Validate the access token in memory via the token signing public key
          */
-        private async Task<TokenClaims> ValidateTokenInMemoryAndGetTokenClaims(string accessToken)
+        private async Task<TokenClaims> ValidateTokenInMemoryAndGetTokenClaimsAsync(string accessToken)
         {
             using (var breakdown = this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
                 // Next get the token signing public key
-                var keys = await this.GetTokenSigningPublicKeys(breakdown);
+                var keys = await this.GetTokenSigningPublicKeysAsync(breakdown);
 
                 // Next validate the token
                 var principal = this.ValidateJsonWebToken(accessToken, keys, breakdown);
@@ -194,7 +194,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Get the keys from the JWKS endpoint
          */
-        private async Task<string> GetTokenSigningPublicKeys(IPerformanceBreakdown breakdown)
+        private async Task<string> GetTokenSigningPublicKeysAsync(IPerformanceBreakdown breakdown)
         {
             using (breakdown.CreateChild("getTokenSigningPublicKey"))
             {

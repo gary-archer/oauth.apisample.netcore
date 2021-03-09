@@ -36,7 +36,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * The entry point to populate claims from an access token
          */
-        public async Task<ApiClaims> Execute(HttpRequest request)
+        public async Task<ApiClaims> ExecuteAsync(HttpRequest request)
         {
             // First handle missing tokens
             var accessToken = this.ReadAccessToken(request);
@@ -58,10 +58,10 @@ namespace SampleApi.Plumbing.OAuth
             var authorizationLogEntry = this.logEntry.CreateChild("Authorizer");
 
             // Validate the token, read token claims, and do a user info lookup
-            var token = await this.authenticator.ValidateToken(accessToken);
+            var token = await this.authenticator.ValidateTokenAsync(accessToken);
 
             // Get OAuth user info
-            var userInfo = await this.authenticator.GetUserInfo(accessToken);
+            var userInfo = await this.authenticator.GetUserInfoAsync(accessToken);
 
             // Add custom claims from the API's own data if needed
             var custom = await this.customClaimsProvider.GetCustomClaimsAsync(token, userInfo);
