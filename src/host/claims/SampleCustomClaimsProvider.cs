@@ -1,6 +1,7 @@
 namespace SampleApi.Host.Claims
 {
     using System.Threading.Tasks;
+    using Newtonsoft.Json.Linq;
     using SampleApi.Logic.Entities;
     using SampleApi.Plumbing.Claims;
 
@@ -26,6 +27,14 @@ namespace SampleApi.Host.Claims
 
             CustomClaims claims = new SampleCustomClaims(userDatabaseId, isAdmin, regionsCovered);
             return Task.FromResult(claims);
+        }
+
+        /*
+         * Override to call the correct concrete class for this API
+         */
+        protected override CustomClaims DeserializeCustomClaims(JObject claimsNode)
+        {
+            return SampleCustomClaims.ImportData(claimsNode);
         }
     }
 }

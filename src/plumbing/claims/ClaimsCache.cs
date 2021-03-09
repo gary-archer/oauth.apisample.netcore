@@ -6,7 +6,6 @@ namespace SampleApi.Plumbing.Claims
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json;
     using SampleApi.Plumbing.Configuration;
 
     /*
@@ -16,15 +15,18 @@ namespace SampleApi.Plumbing.Claims
     {
         private readonly IDistributedCache cache;
         private readonly ClaimsConfiguration configuration;
+        private readonly CustomClaimsProvider customClaimsProvider;
         private readonly ILogger traceLogger;
 
         public ClaimsCache(
             IDistributedCache cache,
             ClaimsConfiguration configuration,
+            CustomClaimsProvider customClaimsProvider,
             ServiceProvider container)
         {
             this.cache = cache;
             this.configuration = configuration;
+            this.customClaimsProvider = customClaimsProvider;
 
             // Get a development trace logger for this class
             this.traceLogger = container.GetService<ILoggerFactory>().CreateLogger<ClaimsCache>();
@@ -36,7 +38,7 @@ namespace SampleApi.Plumbing.Claims
         public async Task<ApiClaims> GetClaimsForTokenAsync(string accessTokenHash)
         {
             // Get the hash as a cache key and see if it exists in the cache
-            var bytes = await this.cache.GetAsync(accessTokenHash).ConfigureAwait(false);
+            var bytes = await this.cache.GetAsync(accessTokenHash);
             if (bytes == null)
             {
                 this.traceLogger.LogDebug($"New token will be added to claims cache (hash: {accessTokenHash})");
@@ -46,7 +48,10 @@ namespace SampleApi.Plumbing.Claims
             // Deserialization requires the claims class to have public setter properties
             this.traceLogger.LogDebug($"Found existing token in claims cache (hash: {accessTokenHash})");
             var json = Encoding.UTF8.GetString(bytes);
-            return JsonConvert.DeserializeObject<ApiClaims>(json);
+            System.Console.WriteLine($"*** GET CLAIMS TEXT");
+            System.Console.WriteLine(json);
+            System.Console.WriteLine($"*** GET CLAIMS TEXT");
+            return this.customClaimsProvider.Deserialize(json);
         }
 
         /*
@@ -70,7 +75,10 @@ namespace SampleApi.Plumbing.Claims
                 }
 
                 // Serialize claims to bytes
-                var json = JsonConvert.SerializeObject(claims);
+                var json = this.customClaimsProvider.Serialize(claims);
+                System.Console.WriteLine($"*** PUT CLAIMS TEXT");
+                System.Console.WriteLine(json);
+                System.Console.WriteLine($"*** PUT CLAIMS TEXT");
                 var bytes = Encoding.UTF8.GetBytes(json);
 
                 // Cache the token until the above time
@@ -80,7 +88,7 @@ namespace SampleApi.Plumbing.Claims
                 };
 
                 this.traceLogger.LogDebug($"Adding token to claims cache for {secondsToCache} seconds (hash: {accessTokenHash})");
-                await this.cache.SetAsync(accessTokenHash, bytes, options).ConfigureAwait(false);
+                await this.cache.SetAsync(accessTokenHash, bytes, options);
             }
         }
     }

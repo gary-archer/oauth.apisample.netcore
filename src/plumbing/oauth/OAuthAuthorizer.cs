@@ -25,12 +25,12 @@ namespace SampleApi.Plumbing.OAuth
             ClaimsCache cache,
             OAuthAuthenticator authenticator,
             CustomClaimsProvider customClaimsProvider,
-            LogEntry logEntry)
+            ILogEntry logEntry)
         {
             this.cache = cache;
             this.authenticator = authenticator;
             this.customClaimsProvider = customClaimsProvider;
-            this.logEntry = logEntry;
+            this.logEntry = (LogEntry)logEntry;
         }
 
         /*

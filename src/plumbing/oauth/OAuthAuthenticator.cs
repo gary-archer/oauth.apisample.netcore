@@ -48,12 +48,12 @@ namespace SampleApi.Plumbing.OAuth
                 !string.IsNullOrWhiteSpace(this.configuration.ClientId))
             {
                 // Use introspection if we can
-                return await this.IntrospectTokenAndGetTokenClaims(accessToken).ConfigureAwait(false);
+                return await this.IntrospectTokenAndGetTokenClaims(accessToken);
             }
             else
             {
                 // Use in memory validation otherwise
-                return await this.ValidateTokenInMemoryAndGetTokenClaims(accessToken).ConfigureAwait(false);
+                return await this.ValidateTokenInMemoryAndGetTokenClaims(accessToken);
             }
         }
 
@@ -74,7 +74,7 @@ namespace SampleApi.Plumbing.OAuth
                             Address = this.metadata.UserInfoEndpoint,
                             Token = accessToken,
                         };
-                        var response = await client.GetUserInfoAsync(request).ConfigureAwait(false);
+                        var response = await client.GetUserInfoAsync(request);
 
                         // Handle errors
                         if (response.IsError)
@@ -125,7 +125,7 @@ namespace SampleApi.Plumbing.OAuth
                         };
 
                         // Handle errors
-                        var response = await client.IntrospectTokenAsync(request).ConfigureAwait(false);
+                        var response = await client.IntrospectTokenAsync(request);
                         if (response.IsError)
                         {
                             if (response.Exception != null)
@@ -172,7 +172,7 @@ namespace SampleApi.Plumbing.OAuth
             using (var breakdown = this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
                 // Next get the token signing public key
-                var keys = await this.GetTokenSigningPublicKeys(breakdown).ConfigureAwait(false);
+                var keys = await this.GetTokenSigningPublicKeys(breakdown);
 
                 // Next validate the token
                 var principal = this.ValidateJsonWebToken(accessToken, keys, breakdown);
@@ -203,7 +203,7 @@ namespace SampleApi.Plumbing.OAuth
                     using (var client = new HttpClient(this.proxyFactory()))
                     {
                         // Make the HTTPS request
-                        var response = await client.GetJsonWebKeySetAsync(this.metadata.JwksUri).ConfigureAwait(false);
+                        var response = await client.GetJsonWebKeySetAsync(this.metadata.JwksUri);
                         if (response.IsError)
                         {
                             if (response.Exception != null)

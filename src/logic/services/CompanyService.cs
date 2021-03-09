@@ -6,6 +6,7 @@ namespace SampleApi.Logic.Repositories
     using System.Threading.Tasks;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Errors;
+    using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
 
     /*
@@ -16,10 +17,10 @@ namespace SampleApi.Logic.Repositories
         private readonly CompanyRepository repository;
         private readonly SampleCustomClaims claims;
 
-        public CompanyService(CompanyRepository repository, SampleCustomClaims claims)
+        public CompanyService(CompanyRepository repository, CustomClaims claims)
         {
             this.repository = repository;
-            this.claims = claims;
+            this.claims = (SampleCustomClaims)claims;
         }
 
         /*

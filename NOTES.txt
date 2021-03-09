@@ -1,7 +1,7 @@
 1. ClaimsCache to be updated to serialize / deserialize text
    ImportData and ExportData methods using JObject
 
-2. Review use of ConfigureAwait, which seems inconsistent
+2. Google when to call ConfigureAwait???
 
 3. Testing
 

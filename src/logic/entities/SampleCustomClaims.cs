@@ -1,5 +1,6 @@
 namespace SampleApi.Logic.Entities
 {
+    using Newtonsoft.Json.Linq;
     using SampleApi.Plumbing.Claims;
 
     /*
@@ -19,5 +20,22 @@ namespace SampleApi.Logic.Entities
         public bool IsAdmin { get; set; }
 
         public string[] RegionsCovered { get; set; }
+
+        public static new SampleCustomClaims ImportData(JObject data)
+        {
+            var userDatabaseId = data.GetValue("userDatabaseId").Value<string>();
+            var isAdmin = data.GetValue("isAdmin").Value<bool>();
+            var regionsCovered = data.GetValue("regionsCovered").Value<string>();
+            return new SampleCustomClaims(userDatabaseId, isAdmin, regionsCovered.Split(" "));
+        }
+
+        public override JObject ExportData()
+        {
+            dynamic data = new JObject();
+            data.userDatabaseId = this.UserDatabaseId;
+            data.isAdmin = this.IsAdmin;
+            data.regionsCovered = string.Join(" ", this.RegionsCovered);
+            return data;
+        }
     }
 }
