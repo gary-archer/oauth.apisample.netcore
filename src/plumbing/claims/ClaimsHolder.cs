@@ -5,6 +5,6 @@ namespace SampleApi.Plumbing.Claims
      */
     public class ClaimsHolder
     {
-        public CoreApiClaims Value { get; set; }
+        public ApiClaims Value { get; set; }
     }
 }

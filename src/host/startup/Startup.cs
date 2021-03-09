@@ -7,7 +7,6 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc.Authorization;
     using Microsoft.Extensions.DependencyInjection;
-    using SampleApi.Host.Authorization;
     using SampleApi.Host.Claims;
     using SampleApi.Host.Configuration;
     using SampleApi.Logic.Repositories;
@@ -122,11 +121,11 @@
             });
 
             // Register depedencies used to implement cross cutting concerns
-            new BaseCompositionRoot<SampleApiClaims>()
+            new BaseCompositionRoot()
                 .UseDiagnostics(this.configuration.Logging, this.loggerFactory)
                 .UseOAuth(this.configuration.OAuth)
+                .WithCustomClaimsProvider(new SampleCustomClaimsProvider())
                 .UseClaimsCaching(this.configuration.Claims)
-                .WithCustomClaimsProvider<SampleApiClaimsProvider>()
                 .WithHttpDebugging(this.configuration.Api.UseProxy, this.configuration.Api.ProxyUrl)
                 .WithServices(services)
                 .Register();

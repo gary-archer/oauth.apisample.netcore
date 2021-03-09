@@ -1,7 +1,8 @@
 namespace SampleApi.Host.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using SampleApi.Host.Claims;
+    using SampleApi.Logic.Entities;
+    using SampleApi.Plumbing.Claims;
 
     /*
      * A simple API controller to return user info
@@ -9,9 +10,9 @@ namespace SampleApi.Host.Controllers
     [Route("api/userclaims")]
     public class UserInfoController : Controller
     {
-        private readonly SampleApiClaims claims;
+        private readonly UserInfoClaims claims;
 
-        public UserInfoController(SampleApiClaims claims)
+        public UserInfoController(UserInfoClaims claims)
         {
             this.claims = claims;
         }
@@ -20,9 +21,9 @@ namespace SampleApi.Host.Controllers
          * Return user info to the UI
          */
         [HttpGet("current")]
-        public UserInfoClaims GetUserClaims()
+        public ClientUserInfo GetUserClaims()
         {
-            return new UserInfoClaims(this.claims.GivenName, this.claims.FamilyName, this.claims.Email);
+            return new ClientUserInfo(this.claims.GivenName, this.claims.FamilyName);
         }
     }
 }

@@ -54,7 +54,7 @@ namespace SampleApi.Plumbing.Security
                 holder.Value = claims;
 
                 // Add identity details to logs
-                logEntry.SetIdentity(claims);
+                logEntry.SetIdentity(claims.Token);
 
                 // Also set up the .Net security context
                 var principal = this.CreateClaimsPrincipal(claims);
@@ -115,10 +115,10 @@ namespace SampleApi.Plumbing.Security
         /*
          * We will set up the .Net claims principal here, and we could add all of our claims to it if needed
          */
-        private ClaimsPrincipal CreateClaimsPrincipal(CoreApiClaims claims)
+        private ClaimsPrincipal CreateClaimsPrincipal(ApiClaims claims)
         {
             var claimsList = new List<Claim>();
-            claimsList.Add(new Claim(JwtClaimTypes.Subject, claims.Subject));
+            claimsList.Add(new Claim(JwtClaimTypes.Subject, claims.Token.Subject));
             var identity = new ClaimsIdentity(claimsList, this.Scheme.Name, JwtClaimTypes.Subject, string.Empty);
             return new ClaimsPrincipal(identity);
         }

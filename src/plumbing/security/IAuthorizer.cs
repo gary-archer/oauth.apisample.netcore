@@ -9,6 +9,6 @@
      */
     public interface IAuthorizer
     {
-        Task<CoreApiClaims> Execute(HttpRequest request);
+        Task<ApiClaims> Execute(HttpRequest request);
     }
 }

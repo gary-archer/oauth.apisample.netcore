@@ -15,21 +15,20 @@
     /*
      * A class to manage composing core API behaviour
      */
-    public sealed class BaseCompositionRoot<TClaims>
-        where TClaims : CoreApiClaims, new()
+    public sealed class BaseCompositionRoot
     {
         private LoggingConfiguration loggingConfiguration;
         private LoggerFactory loggerFactory;
         private OAuthConfiguration oauthConfiguration;
+        private CustomClaimsProvider customClaimsProvider;
         private ClaimsConfiguration claimsConfiguration;
-        private Type customClaimsProviderType;
         private Func<HttpClientHandler> httpProxyFactory;
         private IServiceCollection services;
 
         /*
          * Receive the logging configuration so that we can create objects related to logging and error handling
          */
-        public BaseCompositionRoot<TClaims> UseDiagnostics(LoggingConfiguration loggingConfiguration, ILoggerFactory loggerFactory)
+        public BaseCompositionRoot UseDiagnostics(LoggingConfiguration loggingConfiguration, ILoggerFactory loggerFactory)
         {
             this.loggingConfiguration = loggingConfiguration;
             this.loggerFactory = (LoggerFactory)loggerFactory;
@@ -39,7 +38,7 @@
         /*
          * Indicate that we're using OAuth and receive the configuration
          */
-        public BaseCompositionRoot<TClaims> UseOAuth(OAuthConfiguration oauthConfiguration)
+        public BaseCompositionRoot UseOAuth(OAuthConfiguration oauthConfiguration)
         {
             this.oauthConfiguration = oauthConfiguration;
             return this;
@@ -48,7 +47,7 @@
         /*
          * Receive information used for claims caching
          */
-        public BaseCompositionRoot<TClaims> UseClaimsCaching(ClaimsConfiguration claimsConfiguration)
+        public BaseCompositionRoot UseClaimsCaching(ClaimsConfiguration claimsConfiguration)
         {
             this.claimsConfiguration = claimsConfiguration;
             return this;
@@ -57,17 +56,16 @@
         /*
          * Provide the type of custom claims provider
          */
-        public BaseCompositionRoot<TClaims> WithCustomClaimsProvider<TProvider>()
-            where TProvider : CustomClaimsProvider<TClaims>
+        public BaseCompositionRoot WithCustomClaimsProvider(CustomClaimsProvider provider)
         {
-            this.customClaimsProviderType = typeof(TProvider);
+            this.customClaimsProvider = provider;
             return this;
         }
 
         /*
          * Store an object to manage HTTP debugging
          */
-        public BaseCompositionRoot<TClaims> WithHttpDebugging(bool enabled, string url)
+        public BaseCompositionRoot WithHttpDebugging(bool enabled, string url)
         {
             this.httpProxyFactory = () => new ProxyHttpHandler(enabled, url);
             return this;
@@ -76,7 +74,7 @@
         /*
          * Store an ASP.Net core services reference which we will update later
          */
-        public BaseCompositionRoot<TClaims> WithServices(IServiceCollection services)
+        public BaseCompositionRoot WithServices(IServiceCollection services)
         {
             this.services = services;
             return this;
@@ -141,7 +139,7 @@
             this.services.AddSingleton(issuerMetadata);
 
             // Register OAuth per request dependencies
-            this.services.AddScoped<IAuthorizer, OAuthAuthorizer<TClaims>>();
+            this.services.AddScoped<IAuthorizer, OAuthAuthorizer>();
             this.services.AddScoped<OAuthAuthenticator>();
         }
 
@@ -153,28 +151,19 @@
             // Create the thread safe claims cache and pass it a container reference
             this.services.AddDistributedMemoryCache();
             var cache = container.GetService<IDistributedCache>();
-            var claimsCache = new ClaimsCache<TClaims>(cache, this.claimsConfiguration, container);
-
-            // Create a default injecteable custom claims provider if needed
-            if (this.customClaimsProviderType == null)
-            {
-                this.customClaimsProviderType = typeof(CustomClaimsProvider<TClaims>);
-            }
+            var claimsCache = new ClaimsCache(cache, this.claimsConfiguration, this.customClaimsProvider, container);
 
             // Register singletons
             this.services.AddSingleton(claimsCache);
-
-            // Register OAuth per request dependencies
-            this.services.AddScoped(typeof(CustomClaimsProvider<TClaims>), this.customClaimsProviderType);
+            this.services.AddSingleton(this.customClaimsProvider);
 
             // Claims are injected into this holder at runtime
             this.services.AddScoped<ClaimsHolder>();
 
-            // The underlying claims object can then be retrieved via this factory method
-            this.services.AddScoped<TClaims>(ctx =>
-            {
-                return (TClaims)ctx.GetService<ClaimsHolder>().Value;
-            });
+            // The underlying claims objects can then be retrieved via these factory methods
+            this.services.AddScoped<TokenClaims>(ctx => ctx.GetService<ClaimsHolder>().Value.Token);
+            this.services.AddScoped<UserInfoClaims>(ctx => ctx.GetService<ClaimsHolder>().Value.UserInfo);
+            this.services.AddScoped<CustomClaims>(ctx => ctx.GetService<ClaimsHolder>().Value.Custom);
         }
     }
 }

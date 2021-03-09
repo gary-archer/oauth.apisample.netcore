@@ -6,6 +6,7 @@ namespace SampleApi.Logic.Repositories
     using System.Threading.Tasks;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Errors;
+    using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
 
     /*
@@ -14,31 +15,33 @@ namespace SampleApi.Logic.Repositories
     public class CompanyService
     {
         private readonly CompanyRepository repository;
+        private readonly SampleCustomClaims claims;
 
-        public CompanyService(CompanyRepository repository)
+        public CompanyService(CompanyRepository repository, CustomClaims claims)
         {
             this.repository = repository;
+            this.claims = (SampleCustomClaims)claims;
         }
 
         /*
          * Return the list of companies from a hard coded data file
          */
-        public async Task<IEnumerable<Company>> GetCompanyListAsync(bool isAdmin, string[] regionsCovered)
+        public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
             // Use a micro services approach of getting all data
             var data = await this.repository.GetCompanyListAsync();
 
             // Filter on what the user is allowed to access
-            return data.Where(c => this.IsUserAuthorizedForCompany(c, isAdmin, regionsCovered));
+            return data.Where(c => this.IsUserAuthorizedForCompany(c));
         }
 
         /*
          * Get transaction details for a company
          */
-        public async Task<CompanyTransactions> GetCompanyTransactionsAsync(int id, bool isAdmin, string[] regionsCovered)
+        public async Task<CompanyTransactions> GetCompanyTransactionsAsync(int id)
         {
             var data = await this.repository.GetCompanyTransactionsAsync(id);
-            if (data == null || !this.IsUserAuthorizedForCompany(data.Company, isAdmin, regionsCovered))
+            if (data == null || !this.IsUserAuthorizedForCompany(data.Company))
             {
                 throw this.UnauthorizedError(id);
             }
@@ -49,14 +52,14 @@ namespace SampleApi.Logic.Repositories
         /*
          * A simple example of applying domain specific claims
          */
-        private bool IsUserAuthorizedForCompany(Company company, bool isAdmin, string[] regionsCovered)
+        private bool IsUserAuthorizedForCompany(Company company)
         {
-            if (isAdmin)
+            if (this.claims.IsAdmin)
             {
                 return true;
             }
 
-            return regionsCovered.AsEnumerable().Any(ur => ur == company.Region);
+            return this.claims.RegionsCovered.AsEnumerable().Any(ur => ur == company.Region);
         }
 
         /*

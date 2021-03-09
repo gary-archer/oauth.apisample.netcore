@@ -8,32 +8,35 @@ namespace SampleApi.Plumbing.OAuth
     using Microsoft.AspNetCore.Http;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
+    using SampleApi.Plumbing.Logging;
     using SampleApi.Plumbing.Security;
 
     /*
      * The technology neutral algorithm for validating access tokens and returning claims
      */
-    internal sealed class OAuthAuthorizer<TClaims> : IAuthorizer
-        where TClaims : CoreApiClaims, new()
+    internal sealed class OAuthAuthorizer : IAuthorizer
     {
-        private readonly ClaimsCache<TClaims> cache;
+        private readonly ClaimsCache cache;
         private readonly OAuthAuthenticator authenticator;
-        private readonly CustomClaimsProvider<TClaims> customClaimsProvider;
+        private readonly CustomClaimsProvider customClaimsProvider;
+        private readonly LogEntry logEntry;
 
         public OAuthAuthorizer(
-            ClaimsCache<TClaims> cache,
+            ClaimsCache cache,
             OAuthAuthenticator authenticator,
-            CustomClaimsProvider<TClaims> customClaimsProvider)
+            CustomClaimsProvider customClaimsProvider,
+            ILogEntry logEntry)
         {
             this.cache = cache;
             this.authenticator = authenticator;
             this.customClaimsProvider = customClaimsProvider;
+            this.logEntry = (LogEntry)logEntry;
         }
 
         /*
          * The entry point to populate claims from an access token
          */
-        public async Task<CoreApiClaims> Execute(HttpRequest request)
+        public async Task<ApiClaims> Execute(HttpRequest request)
         {
             // First handle missing tokens
             var accessToken = this.ReadAccessToken(request);
@@ -50,19 +53,25 @@ namespace SampleApi.Plumbing.OAuth
                 return cachedClaims;
             }
 
-            // Otherwise create new claims which we will populate
-            var claims = new TClaims();
+            // Create a child log entry for authentication related work
+            // This ensures that any errors and performances in this area are reported separately to business logic
+            var authorizationLogEntry = this.logEntry.CreateChild("Authorizer");
 
             // Validate the token, read token claims, and do a user info lookup
-            await this.authenticator.ValidateTokenAndGetClaims(accessToken, request, claims);
+            var token = await this.authenticator.ValidateToken(accessToken);
+
+            // Get OAuth user info
+            var userInfo = await this.authenticator.GetUserInfo(accessToken);
 
             // Add custom claims from the API's own data if needed
-            await this.customClaimsProvider.AddCustomClaimsAsync(accessToken, claims);
+            var custom = await this.customClaimsProvider.GetCustomClaimsAsync(token, userInfo);
 
             // Cache the claims against the token hash until the token's expiry time
+            var claims = new ApiClaims(token, userInfo, custom);
             await this.cache.AddClaimsForTokenAsync(accessTokenHash, claims);
 
-            // Return the final claims
+            // Finish logging here, and note that on exception our logging disposes the child
+            authorizationLogEntry.Dispose();
             return claims;
         }
 
