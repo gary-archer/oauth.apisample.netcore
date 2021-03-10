@@ -48,7 +48,6 @@ namespace SampleApi.Plumbing.Middleware
 
                 // Write the error response to the client
                 await ResponseErrorWriter.WriteErrorResponse(
-                    context.Request,
                     context.Response,
                     clientError.StatusCode,
                     clientError.ToResponseFormat());

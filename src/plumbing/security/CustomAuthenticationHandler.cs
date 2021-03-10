@@ -98,16 +98,15 @@ namespace SampleApi.Plumbing.Security
                 if (statusCode == HttpStatusCode.Unauthorized)
                 {
                     // Write 401 responses due to invalid tokens
-                    await ResponseErrorWriter.WriteInvalidTokenResponse(this.Request, this.Response, clientError);
+                    await ResponseErrorWriter.WriteInvalidTokenResponse(this.Response, clientError);
                 }
                 else if (statusCode == HttpStatusCode.InternalServerError)
                 {
                     // Write 500 responses due to technical problems during authentication
                     await ResponseErrorWriter.WriteErrorResponse(
-                            this.Request,
-                            this.Response,
-                            statusCode,
-                            clientError.ToResponseFormat());
+                        this.Response,
+                        statusCode,
+                        clientError.ToResponseFormat());
                 }
             }
         }
