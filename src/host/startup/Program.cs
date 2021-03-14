@@ -37,7 +37,7 @@
         private static IWebHost BuildWebHost(ILoggerFactory loggerFactory)
         {
             // Load the configuration file
-            var jsonConfig = Configuration.Load("./api.config.json");
+            var configuration = Configuration.Load("./api.config.json");
 
             // Build the web host
             return new WebHostBuilder()
@@ -46,24 +46,27 @@
                 .ConfigureServices(services =>
                 {
                     services.AddSingleton<ILoggerFactory>(loggerFactory);
-                    services.AddSingleton(jsonConfig);
+                    services.AddSingleton(configuration);
                 })
 
                 // Configure logging behaviour for both production and developer trace logging
                 .ConfigureLogging(loggingBuilder =>
                 {
-                    loggerFactory.Configure(loggingBuilder, jsonConfig.Logging);
+                    loggerFactory.Configure(loggingBuilder, configuration.Logging);
                 })
 
                 // Configure the Kestrel web server to listen over SSL
                 .UseKestrel(options =>
                 {
-                    options.Listen(IPAddress.Any, jsonConfig.Api.Port, listenOptions =>
+                    options.Listen(IPAddress.Any, configuration.Api.Port, listenOptions =>
                     {
-                        if (jsonConfig.Api.UseSsl)
+                        if (!String.IsNullOrWhiteSpace(configuration.Api.SslCertificateFileName) &&
+                            !String.IsNullOrWhiteSpace(configuration.Api.SslCertificatePassword))
                         {
-                            var certFilePath = $"../../../certs/{jsonConfig.Api.SslCertificateFileName}";
-                            listenOptions.UseHttps(certFilePath, jsonConfig.Api.SslCertificatePassword);
+                            // Listen over HTTPS
+                            listenOptions.UseHttps(
+                                configuration.Api.SslCertificateFileName,
+                                configuration.Api.SslCertificatePassword);
                         }
                     });
                 })
