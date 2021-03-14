@@ -16,8 +16,9 @@ eval $(minikube docker-env)
 # Build the API's code
 #
 cd ..
-dotnet clean ../sampleapi.csproj
-dotnet publish ../sampleapi.csproj -c Release -r linux-x64
+rm -rf bin
+dotnet clean sampleapi.csproj
+dotnet publish sampleapi.csproj -c Release -r linux-x64
 if [ $? -ne 0 ]
 then
   exit 1

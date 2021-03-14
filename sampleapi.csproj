@@ -25,5 +25,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+
+    <!-- Prevent these items from being copied to the publish folder -->
+    <Content Remove="api.config.json" />
+    <Content Remove="data\**\*" />
+    <Content Remove="kubernetes\**\*" />
   </ItemGroup>
 </Project>

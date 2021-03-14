@@ -55,15 +55,15 @@
                     loggerFactory.Configure(loggingBuilder, configuration.Logging);
                 })
 
-                // Configure the Kestrel web server to listen over SSL
+                // Configure the Kestrel web server
                 .UseKestrel(options =>
                 {
                     options.Listen(IPAddress.Any, configuration.Api.Port, listenOptions =>
                     {
-                        if (!String.IsNullOrWhiteSpace(configuration.Api.SslCertificateFileName) &&
-                            !String.IsNullOrWhiteSpace(configuration.Api.SslCertificatePassword))
+                        if (!string.IsNullOrWhiteSpace(configuration.Api.SslCertificateFileName) &&
+                            !string.IsNullOrWhiteSpace(configuration.Api.SslCertificatePassword))
                         {
-                            // Listen over HTTPS
+                            // Listen over HTTPS if we configure certificate details, or HTTP otherwise
                             listenOptions.UseHttps(
                                 configuration.Api.SslCertificateFileName,
                                 configuration.Api.SslCertificatePassword);

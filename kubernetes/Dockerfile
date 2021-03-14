@@ -19,7 +19,7 @@ WORKDIR /usr/api
 
 # Copy libraries and other files into our docker image
 COPY bin/Release/netcoreapp5/linux-x64/publish/*  /usr/api/
-COPY deployment/api.config.json                   /usr/api/
+COPY kubernetes/api.config.json                   /usr/api/
 COPY data/*                                       /usr/api/data/
 
 # Create a low privilege user, which will by default have read access to our files under /usr
