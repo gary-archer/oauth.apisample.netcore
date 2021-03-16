@@ -7,7 +7,7 @@ namespace SampleApi.Host.Controllers
     /*
      * A simple API controller to return user info
      */
-    [Route("api/userclaims")]
+    [Route("api/userinfo")]
     public class UserInfoController : Controller
     {
         private readonly UserInfoClaims claims;
@@ -20,7 +20,7 @@ namespace SampleApi.Host.Controllers
         /*
          * Return user info to the UI
          */
-        [HttpGet("current")]
+        [HttpGet("")]
         public ClientUserInfo GetUserClaims()
         {
             return new ClientUserInfo(this.claims.GivenName, this.claims.FamilyName);
