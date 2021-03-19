@@ -21,7 +21,6 @@
             this.ResourceId = string.Empty;
             this.RequestPath = string.Empty;
             this.ClientApplicationName = string.Empty;
-            this.ClientOAuthId = string.Empty;
             this.UserOAuthId = string.Empty;
             this.StatusCode = 0;
             this.MillisecondsTaken = 0;
@@ -63,9 +62,6 @@
 
         // The calling application name
         public string ClientApplicationName { get; set; }
-
-        // The client id from the OAuth 2.0 access token
-        public string ClientOAuthId { get; set; }
 
         // The subject claim from the OAuth 2.0 access token
         public string UserOAuthId { get; set; }
@@ -120,7 +116,6 @@
             this.ResourceId = parent.ResourceId;
             this.RequestPath = parent.RequestPath;
             this.ClientApplicationName = parent.ClientApplicationName;
-            this.ClientOAuthId = parent.ClientOAuthId;
             this.UserOAuthId = parent.UserOAuthId;
             this.CorrelationId = parent.CorrelationId;
             this.SessionId = parent.SessionId;
@@ -158,7 +153,6 @@
             this.OutputString((x) => output.resourceId = x, this.ResourceId);
             this.OutputString((x) => output.requestPath = x, this.RequestPath);
             this.OutputString((x) => output.clientApplicationName = x, this.ClientApplicationName);
-            this.OutputString((x) => output.clientOAuthId = x, this.ClientOAuthId);
             this.OutputString((x) => output.userOAuthId = x, this.UserOAuthId);
             this.OutputNumber((x) => output.statusCode = x, this.StatusCode);
             this.OutputString((x) => output.errorCode = x, this.ErrorCode);

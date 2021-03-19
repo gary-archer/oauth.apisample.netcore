@@ -146,7 +146,6 @@ namespace SampleApi.Plumbing.OAuth
 
                         // Get token claims
                         string subject = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.Subject);
-                        string clientId = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.ClientId);
                         string[] scopes = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.Scope).Split(' ');
                         int expiry = this.GetIntegerClaim((name) => response.TryGet(name), JwtClaimTypes.Expiration);
 
@@ -154,7 +153,7 @@ namespace SampleApi.Plumbing.OAuth
                         this.VerifyScopes(scopes);
 
                         // Update token claims
-                        return new TokenClaims(subject, clientId, scopes, expiry);
+                        return new TokenClaims(subject, scopes, expiry);
                     }
                 }
                 catch (Exception ex)
@@ -179,7 +178,6 @@ namespace SampleApi.Plumbing.OAuth
 
                 // Get token claims, and note that Microsoft move the subject claim to a username field
                 string subject = this.GetStringClaim((name) => principal.FindFirstValue(name), "username");
-                string clientId = this.GetStringClaim((name) => principal.FindFirstValue(name), JwtClaimTypes.ClientId);
                 string[] scopes = this.GetStringClaim((name) => principal.FindFirstValue(name), JwtClaimTypes.Scope).Split(' ');
                 int expiry = this.GetIntegerClaim((name) => principal.FindFirstValue(name), JwtClaimTypes.Expiration);
 
@@ -187,7 +185,7 @@ namespace SampleApi.Plumbing.OAuth
                 this.VerifyScopes(scopes);
 
                 // Update token claims
-                return new TokenClaims(subject, clientId, scopes, expiry);
+                return new TokenClaims(subject, scopes, expiry);
             }
         }
 

@@ -108,7 +108,6 @@ namespace SampleApi.Plumbing.Logging
          */
         public void SetIdentity(TokenClaims claims)
         {
-            this.data.ClientOAuthId = claims.ClientId;
             this.data.UserOAuthId = claims.Subject;
         }
 
