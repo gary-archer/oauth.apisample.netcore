@@ -13,7 +13,7 @@ namespace SampleApi.Host.Claims
         /*
          * An example of how custom claims can be included
          */
-        public override Task<CustomClaims> GetCustomClaimsAsync(TokenClaims token, UserInfoClaims userInfo)
+        public override Task<CustomClaims> GetCustomClaimsAsync(BaseClaims token, UserInfoClaims userInfo)
         {
             // A real implementation would look up the database user id from the subject and / or email claim
             var email = userInfo.Email;

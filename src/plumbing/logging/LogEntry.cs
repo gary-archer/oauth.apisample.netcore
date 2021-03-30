@@ -106,7 +106,7 @@ namespace SampleApi.Plumbing.Logging
         /*
          * Add identity details for secured requests
          */
-        public void SetIdentity(TokenClaims claims)
+        public void SetIdentity(BaseClaims claims)
         {
             this.data.UserOAuthId = claims.Subject;
         }

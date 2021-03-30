@@ -10,11 +10,13 @@ namespace SampleApi.Host.Controllers
     [Route("api/userinfo")]
     public class UserInfoController : Controller
     {
-        private readonly UserInfoClaims claims;
+        private readonly BaseClaims baseClaims;
+        private readonly UserInfoClaims userInfoClaims;
 
-        public UserInfoController(UserInfoClaims claims)
+        public UserInfoController(BaseClaims baseClaims, UserInfoClaims userInfoClaims)
         {
-            this.claims = claims;
+            this.baseClaims = baseClaims;
+            this.userInfoClaims = userInfoClaims;
         }
 
         /*
@@ -23,7 +25,11 @@ namespace SampleApi.Host.Controllers
         [HttpGet("")]
         public ClientUserInfo GetUserClaims()
         {
-            return new ClientUserInfo(this.claims.GivenName, this.claims.FamilyName);
+            // First check we have access to this level of data
+            this.baseClaims.VerifyScope("profile");
+
+            // Next return the user info
+            return new ClientUserInfo(this.userInfoClaims.GivenName, this.userInfoClaims.FamilyName);
         }
     }
 }

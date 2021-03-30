@@ -59,7 +59,7 @@ namespace SampleApi.Plumbing.Claims
             // Check for a race condition where the token passes validation but it expired when it gets here
             var now = DateTimeOffset.UtcNow;
             var epochSeconds = now.ToUnixTimeSeconds();
-            var secondsToCache = claims.Token.Expiry - epochSeconds;
+            var secondsToCache = claims.Base.Expiry - epochSeconds;
             if (secondsToCache > 0)
             {
                 // Get the hash and output debug info

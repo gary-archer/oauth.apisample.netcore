@@ -7,8 +7,6 @@ namespace SampleApi.Plumbing.Configuration
     {
         public string Authority { get; set; }
 
-        public string RequiredScope { get; set; }
-
         public string ClientId { get; set; }
 
         public string ClientSecret { get; set; }

@@ -1,13 +1,16 @@
 namespace SampleApi.Plumbing.Claims
 {
+    using System.Linq;
+    using System.Net;
     using Newtonsoft.Json.Linq;
+    using SampleApi.Plumbing.Errors;
 
     /*
      * Claims received in the access token
      */
-    public class TokenClaims
+    public class BaseClaims
     {
-        public TokenClaims(string subject, string[] scopes, int expiry)
+        public BaseClaims(string subject, string[] scopes, int expiry)
         {
             this.Subject = subject;
             this.Scopes = scopes;
@@ -20,12 +23,12 @@ namespace SampleApi.Plumbing.Claims
 
         public int Expiry { get; set; }
 
-        public static TokenClaims ImportData(JObject data)
+        public static BaseClaims ImportData(JObject data)
         {
             var subject = data.GetValue("subject").Value<string>();
             var scope = data.GetValue("scopes").Value<string>();
             var expiry = data.GetValue("expiry").Value<int>();
-            return new TokenClaims(subject, scope.Split(" "), expiry);
+            return new BaseClaims(subject, scope.Split(" "), expiry);
         }
 
         public JObject ExportData()
@@ -35,6 +38,20 @@ namespace SampleApi.Plumbing.Claims
             data.scopes = string.Join(" ", this.Scopes);
             data.expiry = this.Expiry;
             return data;
+        }
+
+        /*
+        * Make sure the token has the correct scope for an area of data
+        */
+        public void VerifyScope(string scope)
+        {
+            if (!this.Scopes.ToList().Exists((s) => s.Contains(scope)))
+            {
+                throw ErrorFactory.CreateClientError(
+                    HttpStatusCode.Forbidden,
+                    ErrorCodes.InsufficientScope,
+                    "Access token does not have a valid scope for this API");
+            }
         }
     }
 }

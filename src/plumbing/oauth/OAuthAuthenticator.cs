@@ -40,7 +40,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * The entry point for validating an access token
          */
-        public async Task<TokenClaims> ValidateTokenAsync(string accessToken)
+        public async Task<BaseClaims> ValidateTokenAsync(string accessToken)
         {
             // Validate the token and read token claims
             if (!string.IsNullOrWhiteSpace(this.metadata.IntrospectionEndpoint) &&
@@ -107,7 +107,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Validate the access token via introspection and populate claims
          */
-        private async Task<TokenClaims> IntrospectTokenAndGetTokenClaimsAsync(string accessToken)
+        private async Task<BaseClaims> IntrospectTokenAndGetTokenClaimsAsync(string accessToken)
         {
             using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
@@ -149,11 +149,8 @@ namespace SampleApi.Plumbing.OAuth
                         string[] scopes = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.Scope).Split(' ');
                         int expiry = this.GetIntegerClaim((name) => response.TryGet(name), JwtClaimTypes.Expiration);
 
-                        // Make sure the token is for this API
-                        this.VerifyScopes(scopes);
-
                         // Update token claims
-                        return new TokenClaims(subject, scopes, expiry);
+                        return new BaseClaims(subject, scopes, expiry);
                     }
                 }
                 catch (Exception ex)
@@ -166,7 +163,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Validate the access token in memory via the token signing public key
          */
-        private async Task<TokenClaims> ValidateTokenInMemoryAndGetTokenClaimsAsync(string accessToken)
+        private async Task<BaseClaims> ValidateTokenInMemoryAndGetTokenClaimsAsync(string accessToken)
         {
             using (var breakdown = this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
@@ -181,11 +178,8 @@ namespace SampleApi.Plumbing.OAuth
                 string[] scopes = this.GetStringClaim((name) => principal.FindFirstValue(name), JwtClaimTypes.Scope).Split(' ');
                 int expiry = this.GetIntegerClaim((name) => principal.FindFirstValue(name), JwtClaimTypes.Expiration);
 
-                // Make sure the token is for this API
-                this.VerifyScopes(scopes);
-
                 // Update token claims
-                return new TokenClaims(subject, scopes, expiry);
+                return new BaseClaims(subject, scopes, expiry);
             }
         }
 
@@ -255,17 +249,6 @@ namespace SampleApi.Plumbing.OAuth
                     var details = $"JWT verification failed: ${ex.Message}";
                     throw ErrorFactory.CreateClient401Error(details);
                 }
-            }
-        }
-
-        /*
-        * Make sure the token is for this API
-        */
-        private void VerifyScopes(string[] scopes)
-        {
-            if (!scopes.ToList().Exists((s) => s == this.configuration.RequiredScope))
-            {
-                throw ErrorFactory.CreateClient401Error("Access token does not have a valid scope for this API");
             }
         }
 
