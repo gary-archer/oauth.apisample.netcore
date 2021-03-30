@@ -19,18 +19,15 @@ namespace SampleApi.Plumbing.OAuth
         private readonly ClaimsCache cache;
         private readonly OAuthAuthenticator authenticator;
         private readonly CustomClaimsProvider customClaimsProvider;
-        private readonly LogEntry logEntry;
 
         public OAuthAuthorizer(
             ClaimsCache cache,
             OAuthAuthenticator authenticator,
-            CustomClaimsProvider customClaimsProvider,
-            ILogEntry logEntry)
+            CustomClaimsProvider customClaimsProvider)
         {
             this.cache = cache;
             this.authenticator = authenticator;
             this.customClaimsProvider = customClaimsProvider;
-            this.logEntry = (LogEntry)logEntry;
         }
 
         /*
@@ -53,10 +50,6 @@ namespace SampleApi.Plumbing.OAuth
                 return cachedClaims;
             }
 
-            // Create a child log entry for authentication related work
-            // This ensures that any errors and performances in this area are reported separately to business logic
-            var authorizationLogEntry = this.logEntry.CreateChild("Authorizer");
-
             // Validate the token, read token claims, and do a user info lookup
             var token = await this.authenticator.ValidateTokenAsync(accessToken);
 
@@ -69,9 +62,6 @@ namespace SampleApi.Plumbing.OAuth
             // Cache the claims against the token hash until the token's expiry time
             var claims = new ApiClaims(token, userInfo, custom);
             await this.cache.AddClaimsForTokenAsync(accessTokenHash, claims);
-
-            // Finish logging here, and note that on exception our logging disposes the child
-            authorizationLogEntry.Dispose();
             return claims;
         }
 

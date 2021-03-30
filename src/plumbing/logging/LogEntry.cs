@@ -18,8 +18,6 @@ namespace SampleApi.Plumbing.Logging
         private readonly ILog productionLogger;
         private readonly Func<string, int> performanceThresholdCallback;
         private readonly LogEntryData data;
-        private readonly IList<LogEntryData> children;
-        private LogEntryData activeChild;
         private bool started;
 
         /*
@@ -48,8 +46,6 @@ namespace SampleApi.Plumbing.Logging
             this.data = new LogEntryData();
             this.data.ApiName = apiName;
             this.data.HostName = Environment.MachineName;
-            this.children = new List<LogEntryData>();
-            this.activeChild = null;
 
             // Set a flag to prevent re-entrancy
             this.started = false;
@@ -124,7 +120,7 @@ namespace SampleApi.Plumbing.Logging
          */
         public IPerformanceBreakdown CreatePerformanceBreakdown(string name)
         {
-            return this.Current().Performance.CreateChild(name);
+            return this.data.Performance.CreateChild(name);
         }
 
         /*
@@ -132,9 +128,9 @@ namespace SampleApi.Plumbing.Logging
          */
         public void SetServerError(ServerError error)
         {
-            this.Current().ErrorData = error.ToLogFormat(this.data.ApiName);
-            this.Current().ErrorCode = error.ErrorCode;
-            this.Current().ErrorId = error.InstanceId;
+            this.data.ErrorData = error.ToLogFormat(this.data.ApiName);
+            this.data.ErrorCode = error.ErrorCode;
+            this.data.ErrorId = error.InstanceId;
         }
 
         /*
@@ -142,8 +138,8 @@ namespace SampleApi.Plumbing.Logging
          */
         public void SetClientError(ClientError error)
         {
-            this.Current().ErrorData = error.ToLogFormat();
-            this.Current().ErrorCode = error.ErrorCode;
+            this.data.ErrorData = error.ToLogFormat();
+            this.data.ErrorCode = error.ErrorCode;
         }
 
         /*
@@ -151,42 +147,7 @@ namespace SampleApi.Plumbing.Logging
          */
         public void AddInfo(JToken info)
         {
-            this.Current().InfoData.Add(info);
-        }
-
-        /*
-         * Start a child operation, which gets its own JSON log output
-         */
-        public IDisposable CreateChild(string name)
-        {
-            // Fail if used incorrectly
-            if (this.activeChild != null)
-            {
-                throw new InvalidOperationException("The previous child operation must be completed before a new child can be started");
-            }
-
-            this.activeChild = new LogEntryData();
-            this.activeChild.OperationName = name;
-            if (this.performanceThresholdCallback != null)
-            {
-                this.activeChild.PerformanceThresholdMilliseconds = this.performanceThresholdCallback(name);
-            }
-
-            this.activeChild.Performance.Start();
-            this.children.Add(this.activeChild);
-            return new ChildLogEntry(this);
-        }
-
-        /*
-        * Complete a child operation
-        */
-        public void EndChildOperation()
-        {
-            if (this.activeChild != null)
-            {
-                this.activeChild.Performance.Dispose();
-                this.activeChild = null;
-            }
+            this.data.InfoData.Add(info);
         }
 
         /*
@@ -197,9 +158,6 @@ namespace SampleApi.Plumbing.Logging
             // Fill in route details that are not available until now
             this.ProcessRoutes(request.RouteValues);
 
-            // If an active child operation needs ending (due to exceptions) then we do it here
-            this.EndChildOperation();
-
             // Finish performance measurements
             this.data.Performance.Dispose();
 
@@ -208,26 +166,13 @@ namespace SampleApi.Plumbing.Logging
 
             // Finalise this log entry
             this.data.Finalise();
-
-            // Finalise data related to child log entries, to copy data points between parent and children
-            foreach (var child in this.children)
-            {
-                child.Finalise();
-                child.UpdateFromParent(this.data);
-                this.data.UpdateFromChild(child);
-            }
         }
 
         /*
-         * Output any child data and then the parent data
+         * Output this log entry
          */
         public void Write()
         {
-            foreach (var child in this.children)
-            {
-                this.WriteDataItem(child);
-            }
-
             this.WriteDataItem(this.data);
         }
 
@@ -267,21 +212,6 @@ namespace SampleApi.Plumbing.Logging
             if (ids.Count > 0)
             {
                 this.data.ResourceId = string.Join('/', ids);
-            }
-        }
-
-        /*
-        * Get the data to use when a child operation needs to be managed
-        */
-        private LogEntryData Current()
-        {
-            if (this.activeChild != null)
-            {
-                return this.activeChild;
-            }
-            else
-            {
-                return this.data;
             }
         }
 
