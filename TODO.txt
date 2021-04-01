@@ -1,0 +1,7 @@
+1. Kubernetes deploy script update
+
+2. Start with config objects update
+
+3. Rework claims handling and claims objects
+
+4. DI composition updates
