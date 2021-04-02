@@ -130,16 +130,11 @@
          */
         private void RegisterOAuthDependencies()
         {
-            // Load issuer metadata into an object
-            var issuerMetadata = new IssuerMetadata(this.oauthConfiguration, this.httpProxyFactory);
-            issuerMetadata.LoadAsync().Wait();
-
             // Register singletons
             this.services.AddSingleton(this.oauthConfiguration);
-            this.services.AddSingleton(issuerMetadata);
 
             // Register OAuth per request dependencies
-            this.services.AddScoped<IAuthorizer, OAuthAuthorizer>();
+            this.services.AddScoped<IAuthorizer, ClaimsCachingAuthorizer>();
             this.services.AddScoped<OAuthAuthenticator>();
         }
 

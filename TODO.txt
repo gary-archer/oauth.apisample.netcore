@@ -11,3 +11,5 @@
    Update to 5.1.0 of IdentityModel library
 
 5. Load testing of all 3 final APIs using Curity Identity Server
+
+6. Check codacy warnings

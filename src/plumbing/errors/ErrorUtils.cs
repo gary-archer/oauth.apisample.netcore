@@ -49,34 +49,6 @@
         }
 
         /*
-         * Report metadata failures clearly
-         */
-        public static ServerError FromMetadataError(DiscoveryDocumentResponse response, string url)
-        {
-            var data = ReadOAuthErrorResponse(response.Json);
-            var oauthError = CreateOAuthServerError(
-                ErrorCodes.MetadataLookupFailure,
-                "Metadata lookup failed",
-                data.Item1);
-
-            oauthError.SetDetails(GetOAuthErrorDetails(data.Item2, response.Error, url));
-            return oauthError;
-        }
-
-        /*
-         * Report metadata lookup exceptions clearly
-         */
-        public static ServerError FromMetadataError(Exception ex, string url)
-        {
-            var error = CreateServerError(
-                ex,
-                ErrorCodes.MetadataLookupFailure,
-                "Metadata lookup failed");
-            error.SetDetails($"URL: {url}");
-            return error;
-        }
-
-        /*
          * Report failures in introspection responses
          */
         public static ServerError FromIntrospectionError(TokenIntrospectionResponse response, string url)

@@ -43,7 +43,7 @@ namespace SampleApi.Plumbing.Logging
         }
 
         /*
-         * Handle errors that prevent startup, such as those downloading metadata or setting up logging
+         * Handle errors that prevent startup
          */
         public void LogStartupError(Exception exception)
         {
