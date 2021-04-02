@@ -1,6 +1,5 @@
 ﻿namespace SampleApi.Plumbing.Logging
 {
-    using System;
     using Newtonsoft.Json.Linq;
 
     /*

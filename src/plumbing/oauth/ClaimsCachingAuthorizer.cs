@@ -8,19 +8,18 @@ namespace SampleApi.Plumbing.OAuth
     using Microsoft.AspNetCore.Http;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
-    using SampleApi.Plumbing.Logging;
     using SampleApi.Plumbing.Security;
 
     /*
-     * The technology neutral algorithm for validating access tokens and returning claims
+     * An authorizer that manages claims in an extensible manner, with the ability to use claims from the API's own data
      */
-    internal sealed class OAuthAuthorizer : IAuthorizer
+    internal sealed class ClaimsCachingAuthorizer : IAuthorizer
     {
         private readonly ClaimsCache cache;
         private readonly OAuthAuthenticator authenticator;
         private readonly CustomClaimsProvider customClaimsProvider;
 
-        public OAuthAuthorizer(
+        public ClaimsCachingAuthorizer(
             ClaimsCache cache,
             OAuthAuthenticator authenticator,
             CustomClaimsProvider customClaimsProvider)

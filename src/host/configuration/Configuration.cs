@@ -18,9 +18,6 @@ namespace SampleApi.Host.Configuration
         // Common OAuth processing
         public OAuthConfiguration OAuth { get; private set; }
 
-        // Common claims processing
-        public ClaimsConfiguration Claims { get; private set; }
-
         /*
          * A utility method to load the file and deal with casing
          */
@@ -33,8 +30,7 @@ namespace SampleApi.Host.Configuration
             {
                 Api = data.api.ToObject<ApiConfiguration>(),
                 Logging = data.logging.ToObject<LoggingConfiguration>(),
-                OAuth = data.oauth.ToObject<OAuthConfiguration>(),
-                Claims = data.claims.ToObject<ClaimsConfiguration>(),
+                OAuth = data.oauth.ToObject<OAuthConfiguration>()
             };
         }
     }

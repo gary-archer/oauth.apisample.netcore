@@ -6,7 +6,6 @@ namespace SampleApi.Plumbing.Claims
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using SampleApi.Plumbing.Configuration;
 
     /*
      * Encapsulate getting and setting claims from the cache
@@ -14,18 +13,18 @@ namespace SampleApi.Plumbing.Claims
     internal sealed class ClaimsCache
     {
         private readonly IDistributedCache cache;
-        private readonly ClaimsConfiguration configuration;
+        private readonly int timeToLiveMinutes;
         private readonly CustomClaimsProvider customClaimsProvider;
         private readonly ILogger traceLogger;
 
         public ClaimsCache(
             IDistributedCache cache,
-            ClaimsConfiguration configuration,
+            int timeToLiveMinutes,
             CustomClaimsProvider customClaimsProvider,
             ServiceProvider container)
         {
             this.cache = cache;
-            this.configuration = configuration;
+            this.timeToLiveMinutes =timeToLiveMinutes;
             this.customClaimsProvider = customClaimsProvider;
 
             // Get a development trace logger for this class
@@ -66,9 +65,9 @@ namespace SampleApi.Plumbing.Claims
                 this.traceLogger.LogDebug($"Token to be cached will expire in {secondsToCache} seconds (hash: {accessTokenHash})");
 
                 // Do not exceed the maximum time we configured
-                if (secondsToCache > this.configuration.MaxCacheMinutes * 60)
+                if (secondsToCache > this.timeToLiveMinutes * 60)
                 {
-                    secondsToCache = this.configuration.MaxCacheMinutes * 60;
+                    secondsToCache = this.timeToLiveMinutes * 60;
                 }
 
                 // Serialize claims to bytes

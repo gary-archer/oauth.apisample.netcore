@@ -151,7 +151,11 @@
             // Create the thread safe claims cache and pass it a container reference
             this.services.AddDistributedMemoryCache();
             var cache = container.GetService<IDistributedCache>();
-            var claimsCache = new ClaimsCache(cache, this.claimsConfiguration, this.customClaimsProvider, container);
+            var claimsCache = new ClaimsCache(
+                cache,
+                this.oauthConfiguration.ClaimsCacheTimeToLiveMinutes,
+                this.customClaimsProvider,
+                container);
 
             // Register singletons
             this.services.AddSingleton(claimsCache);

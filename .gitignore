@@ -6,6 +6,6 @@ logs
 
 # Visual Studio files not needed by Visual Studio Code
 .vs
-api.sln
-api.csproj.user
+# sampleapi.sln
+sampleapi.csproj.user
 Properties

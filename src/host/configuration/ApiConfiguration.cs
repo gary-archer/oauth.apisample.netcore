@@ -9,8 +9,6 @@ namespace SampleApi.Host.Configuration
     {
         public int Port { get; set; }
 
-        public bool UseSsl { get; set; }
-
         public string SslCertificateFileName { get; set; }
 
         public string SslCertificatePassword { get; set; }

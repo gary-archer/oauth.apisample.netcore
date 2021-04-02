@@ -1,14 +1,38 @@
 namespace SampleApi.Plumbing.Configuration
 {
     /*
-     * OAuth configuration settings
+     * Configuration settings to enable standard security and extensible use of claims
      */
     public sealed class OAuthConfiguration
     {
-        public string Authority { get; set; }
+        // The OAuth strategy to use, either 'standard' or 'claims-caching'
+    public string Strategy;
 
-        public string ClientId { get; set; }
+    // The expected issuer of access tokens
+    public string Issuer;
 
-        public string ClientSecret { get; set; }
-    }
+    // The expected audience of access tokens
+    public string Audience;
+
+    // The strategy for validating access tokens, either 'jwt' or 'introspection'
+    public string TokenValidationStrategy;
+
+    // The endpoint from which to download the token signing public key, when validating JWTs
+    public string JwksEndpoint;
+
+    // The endpoint for token introspection
+    public string IntrospectEndpoint;
+
+    // The client id with which to call the introspection endpoint
+    public string IntrospectClientId;
+
+    // The client secret with which to call the introspection endpoint
+    public string IntrospectClientSecre;
+
+    // The URL to the Authorization Server's user info endpoint, which could be an internal URL
+    // This is used with the claims caching strategy, when we need to look up user info claims
+    public string UserInfoEndpoint;
+
+    // The maximum number of minutes for which to cache claims, when using the claims caching strategy
+    public int ClaimsCacheTimeToLiveMinutes;
 }
