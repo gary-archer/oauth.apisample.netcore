@@ -1,17 +1,12 @@
-INITIAL UPDATES
----------------
-1. Kubernetes deploy script update
-
-2. Update README files for final APIs
-
-CODE REVAMP
------------
+CODE REVAMP (TODAY)
+-------------------
 1. Start revamp with config objects update
 
 2. Rework claims handling and claims objects
 
 3. DI composition updates
 
-JSON
-----
+JSON (SUNDAY OR MONDAY)
+-----------------------
 1. Update to System.Text.Json
+2. Update to 5.1.0 of IdentityModel library
