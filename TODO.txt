@@ -1,5 +1,3 @@
-CODE REVAMP (TODAY)
--------------------
 1. DI composition updates for OAuth strategy objects
    Inject proxy into authenticator and token validator classes to fix compile errors
    Func<HttpClientHandler> to be a method on an injectable class
@@ -7,7 +5,7 @@ CODE REVAMP (TODAY)
 2. Complete claims provider classes and read claims values
    User Regions to be serialized to cache as a proper array
 
-3. Java and underscores to revert
+3. Caching of JWKS keys
 
 4. Update to System.Text.Json
    Update to 5.1.0 of IdentityModel library
