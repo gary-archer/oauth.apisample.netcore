@@ -11,5 +11,10 @@ namespace SampleApi.Plumbing.Claims
         {
             this.claims = claims;
         }
+
+        public string GetClaim(string name)
+        {
+            return string.Empty;
+        }
     }
 }

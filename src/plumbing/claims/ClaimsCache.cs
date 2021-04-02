@@ -47,7 +47,7 @@ namespace SampleApi.Plumbing.Claims
             // Deserialization requires the claims class to have public setter properties
             this.traceLogger.LogDebug($"Found existing token in claims cache (hash: {accessTokenHash})");
             var json = Encoding.UTF8.GetString(bytes);
-            return this.customClaimsProvider.Deserialize(json);
+            return this.customClaimsProvider.DeserializeFromCache(json);
         }
 
         /*
@@ -71,7 +71,7 @@ namespace SampleApi.Plumbing.Claims
                 }
 
                 // Serialize claims to bytes
-                var json = this.customClaimsProvider.Serialize(claims);
+                var json = this.customClaimsProvider.SerializeToCache(claims);
                 var bytes = Encoding.UTF8.GetBytes(json);
 
                 // Cache the token until the above time

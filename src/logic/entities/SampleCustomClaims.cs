@@ -8,33 +8,33 @@ namespace SampleApi.Logic.Entities
      */
     public class SampleCustomClaims : CustomClaims
     {
-        public SampleCustomClaims(string userDatabaseId, bool isAdmin, string[] regionsCovered)
+        public SampleCustomClaims(string userId, string userRole, string[] userRegions)
         {
-            this.UserDatabaseId = userDatabaseId;
-            this.IsAdmin = isAdmin;
-            this.RegionsCovered = regionsCovered;
+            this.UserId = userId;
+            this.UserRole = userRole;
+            this.UserRegions = userRegions;
         }
 
-        public string UserDatabaseId { get; set; }
+        public string UserId { get; set; }
 
-        public bool IsAdmin { get; set; }
+        public string UserRole { get; set; }
 
-        public string[] RegionsCovered { get; set; }
+        public string[] UserRegions { get; set; }
 
         public static new SampleCustomClaims ImportData(JObject data)
         {
-            var userDatabaseId = data.GetValue("userDatabaseId").Value<string>();
-            var isAdmin = data.GetValue("isAdmin").Value<bool>();
-            var regionsCovered = data.GetValue("regionsCovered").Value<string>();
-            return new SampleCustomClaims(userDatabaseId, isAdmin, regionsCovered.Split(" "));
+            var userId = data.GetValue("userId").Value<string>();
+            var userRole = data.GetValue("userRole").Value<string>();
+            var userRegions = data.GetValue("regionsCovered").Value<string>();
+            return new SampleCustomClaims(userId, userRole, userRegions.Split(" "));
         }
 
         public override JObject ExportData()
         {
             dynamic data = new JObject();
-            data.userDatabaseId = this.UserDatabaseId;
-            data.isAdmin = this.IsAdmin;
-            data.regionsCovered = string.Join(" ", this.RegionsCovered);
+            data.userId = this.UserId;
+            data.userRole = this.UserRole;
+            data.userRegions = string.Join(" ", this.UserRegions);
             return data;
         }
     }

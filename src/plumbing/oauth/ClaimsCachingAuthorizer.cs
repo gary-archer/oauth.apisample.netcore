@@ -1,7 +1,6 @@
 namespace SampleApi.Plumbing.OAuth
 {
     using System;
-    using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
@@ -35,7 +34,7 @@ namespace SampleApi.Plumbing.OAuth
         public async Task<ApiClaims> ExecuteAsync(HttpRequest request)
         {
             // First handle missing tokens
-            var accessToken = this.ReadAccessToken(request);
+            var accessToken = BearerToken.Read(request);
             if (string.IsNullOrWhiteSpace(accessToken))
             {
                 throw ErrorFactory.CreateClient401Error("No access token was received in the bearer header");
@@ -49,37 +48,18 @@ namespace SampleApi.Plumbing.OAuth
                 return cachedClaims;
             }
 
-            // Validate the token, read token claims, and do a user info lookup
+            // Validate the token and read token claims
             var token = await this.authenticator.ValidateTokenAsync(accessToken);
 
-            // Get OAuth user info
+            // Do the work for user info lookup
             var userInfo = await this.authenticator.GetUserInfoAsync(accessToken);
 
-            // Add custom claims from the API's own data if needed
-            var custom = await this.customClaimsProvider.GetCustomClaimsAsync(token, userInfo);
+            // Ask the provider to supply claims not in the token and then create the final claims object
+            var claims = await this.customClaimsProvider.SupplyClaimsAsync(token, userInfo);
 
             // Cache the claims against the token hash until the token's expiry time
-            var claims = new ApiClaims(token, userInfo, custom);
             await this.cache.AddClaimsForTokenAsync(accessTokenHash, claims);
             return claims;
-        }
-
-        /*
-         * Try to read the bearer token from the authorization header
-         */
-        private string ReadAccessToken(HttpRequest request)
-        {
-            string authorization = request.Headers["Authorization"].FirstOrDefault();
-            if (!string.IsNullOrWhiteSpace(authorization))
-            {
-                var parts = authorization.Split(' ');
-                if (parts.Length == 2 && parts[0] == "Bearer")
-                {
-                    return parts[1];
-                }
-            }
-
-            return null;
         }
 
         /*

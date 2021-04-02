@@ -6,8 +6,8 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
     /*
      * An interface for validating tokens, which can have multiple implementations
      */
-    public interface ITokenValidator
+    internal interface ITokenValidator
     {
-        Task<ClaimsPayload> ValidateToken(string accessToken);
+        Task<ClaimsPayload> ValidateTokenAsync(string accessToken);
     }
 }

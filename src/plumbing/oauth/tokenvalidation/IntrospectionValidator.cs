@@ -1,15 +1,29 @@
 namespace SampleApi.Plumbing.OAuth.TokenValidation
 {
     using System;
+    using System.Net.Http;
     using System.Threading.Tasks;
+    using IdentityModel.Client;
     using SampleApi.Plumbing.Claims;
+    using SampleApi.Plumbing.Configuration;
+    using SampleApi.Plumbing.Errors;
 
     /*
      * An interface for validating tokens, which can have multiple implementations
      */
-    public class IntrospectionValidator : ITokenValidator 
+    internal class IntrospectionValidator : ITokenValidator 
     {
-        public async Task<ClaimsPayload> ValidateToken(string accessToken)
+        private readonly OAuthConfiguration configuration;
+
+        public IntrospectionValidator(OAuthConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
+
+        /*
+         * The entry point for validating a token via introspection and returning its claims
+         */
+        public async Task<ClaimsPayload> ValidateTokenAsync(string accessToken)
         {
             try
             {
@@ -18,9 +32,9 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
                     // Send the request
                     var request = new TokenIntrospectionRequest
                     {
-                        Address = this.metadata.IntrospectionEndpoint,
-                        ClientId = this.configuration.ClientId,
-                        ClientSecret = this.configuration.ClientSecret,
+                        Address = this.configuration.IntrospectEndpoint,
+                        ClientId = this.configuration.IntrospectClientId,
+                        ClientSecret = this.configuration.IntrospectClientSecret,
                         Token = accessToken,
                     };
 
@@ -30,11 +44,11 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
                     {
                         if (response.Exception != null)
                         {
-                            throw ErrorUtils.FromIntrospectionError(response.Exception, this.metadata.IntrospectionEndpoint);
+                            throw ErrorUtils.FromIntrospectionError(response.Exception, this.configuration.IntrospectEndpoint);
                         }
                         else
                         {
-                            throw ErrorUtils.FromIntrospectionError(response, this.metadata.IntrospectionEndpoint);
+                            throw ErrorUtils.FromIntrospectionError(response, this.configuration.IntrospectEndpoint);
                         }
                     }
 
@@ -43,6 +57,8 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
                     {
                         throw ErrorFactory.CreateClient401Error("Access token is expired and failed introspection");
                     }
+
+                    return new ClaimsPayload(response);
 
                     /*
                     // Get token claims
@@ -56,7 +72,7 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
             }
             catch (Exception ex)
             {
-                throw ErrorUtils.FromIntrospectionError(ex, this.metadata.IntrospectionEndpoint);
+                throw ErrorUtils.FromIntrospectionError(ex, this.configuration.IntrospectEndpoint);
             }
         }
     }

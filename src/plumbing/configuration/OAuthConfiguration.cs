@@ -27,7 +27,7 @@ namespace SampleApi.Plumbing.Configuration
     public string IntrospectClientId;
 
     // The client secret with which to call the introspection endpoint
-    public string IntrospectClientSecre;
+    public string IntrospectClientSecret;
 
     // The URL to the Authorization Server's user info endpoint, which could be an internal URL
     // This is used with the claims caching strategy, when we need to look up user info claims
