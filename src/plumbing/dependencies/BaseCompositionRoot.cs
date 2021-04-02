@@ -161,9 +161,9 @@
             this.services.AddScoped<ClaimsHolder>();
 
             // The underlying claims objects can then be retrieved via these factory methods
-            this.services.AddScoped<BaseClaims>(ctx => ctx.GetService<ClaimsHolder>().Value.Base);
-            this.services.AddScoped<UserInfoClaims>(ctx => ctx.GetService<ClaimsHolder>().Value.UserInfo);
-            this.services.AddScoped<CustomClaims>(ctx => ctx.GetService<ClaimsHolder>().Value.Custom);
+            this.services.AddScoped(ctx => ctx.GetService<ClaimsHolder>().Value.Base);
+            this.services.AddScoped(ctx => ctx.GetService<ClaimsHolder>().Value.UserInfo);
+            this.services.AddScoped(ctx => ctx.GetService<ClaimsHolder>().Value.Custom);
         }
     }
 }

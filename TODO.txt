@@ -1,7 +1,17 @@
+INITIAL UPDATES
+---------------
 1. Kubernetes deploy script update
 
-2. Start with config objects update
+2. Update README files for final APIs
 
-3. Rework claims handling and claims objects
+CODE REVAMP
+-----------
+1. Start revamp with config objects update
 
-4. DI composition updates
+2. Rework claims handling and claims objects
+
+3. DI composition updates
+
+JSON
+----
+1. Update to System.Text.Json
