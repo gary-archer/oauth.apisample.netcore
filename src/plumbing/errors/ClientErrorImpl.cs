@@ -1,7 +1,6 @@
 namespace SampleApi.Plumbing.Errors
 {
     using System.Net;
-    using System.Text.Json;
     using Newtonsoft.Json.Linq;
 
     /*
