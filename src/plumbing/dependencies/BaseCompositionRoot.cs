@@ -1,5 +1,6 @@
 ﻿namespace SampleApi.Host.Startup
 {
+    using System.IdentityModel.Tokens.Jwt;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
@@ -136,6 +137,9 @@
             {
                 this.services.AddScoped<ITokenValidator, JwtValidator>();
             }
+
+            // Tell Microsoft claims handling to use OAuth claim names and not those from WS-Federation
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
         }
 
         /*

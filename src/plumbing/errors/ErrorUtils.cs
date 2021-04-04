@@ -160,7 +160,7 @@
         public static ServerError FromMissingClaim(string claimName)
         {
             var error = ErrorFactory.CreateServerError("claims_failure", "Authorization data not found");
-            error.SetDetails($"An empty value was found for the expected claim {claimName}");
+            error.SetDetails($"An empty value was found for the expected claim '{claimName}'");
             return error;
         }
 

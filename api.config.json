@@ -1,12 +1,12 @@
 {
     "api": {
-        "port": 444,
-        "sslCertificateFileName": "../../../certs/local/mycompany.com.ssl.p12",
-        "sslCertificatePassword": "Password1",
+        "port": 8101,
+        "sslCertificateFileName": "",
+        "sslCertificatePassword": "",
         "useProxy": false,
         "proxyUrl": "http://127.0.0.1:8888",
         "webTrustedOrigins": [
-            "https://web.mycompany.com"
+            "https://web-garcher.eu.ngrok.io"
         ]
     },
     "logging": {
@@ -32,25 +32,29 @@
         },
         "development": {
             "level": "Info",
+            "appenders": [
+                {
+                    "type": "console"
+                }
+            ],
             "overrideLevels": {
                 "Microsoft": "Warning",
                 "Microsoft.AspNetCore.Server.Kestrel": "Error",
                 "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
-                "SampleApi.Plumbing.Security.CustomAuthenticationHandler": "Error",
-                "SampleApi.Plumbing.Claims.ClaimsCache": "Info"
+                "SampleApi.Plumbing.Security.CustomAuthenticationHandler": "Error"
             }
         }
     },
     "oauth": {
-        "strategy":                      "claims-caching",
-        "issuer":                        "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_qqJgVeuTn",
-        "audience":                      "",
+        "strategy":                      "standard",
+        "issuer":                        "https://login-garcher.eu.ngrok.io/oauth/v2/oauth-anonymous",
+        "audience":                      "api-garcher.eu.ngrok.io",
         "tokenValidationStrategy":       "jwt",
-        "jwksEndpoint":                  "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_qqJgVeuTn/.well-known/jwks.json",
+        "jwksEndpoint":                  "https://login-garcher.eu.ngrok.io/oauth/v2/oauth-anonymous/jwks",
         "introspectEndpoint":            "",
         "introspectClientId":            "",
         "introspectClientSecret":        "",
-        "userInfoEndpoint":              "https://login.authsamples.com/oauth2/userInfo",
-        "claimsCacheTimeToLiveMinutes":  30
+        "userInfoEndpoint":              "",
+        "claimsCacheTimeToLiveMinutes":  0
     }
 }

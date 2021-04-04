@@ -2,10 +2,10 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
 {
     using System;
     using System.IdentityModel.Tokens.Jwt;
+    using System.Linq;
     using System.Net.Http;
     using System.Security.Claims;
     using System.Threading.Tasks;
-    using IdentityModel;
     using IdentityModel.Client;
     using Microsoft.IdentityModel.Tokens;
     using SampleApi.Plumbing.Claims;
@@ -29,19 +29,22 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
 
         public async Task<ClaimsPayload> ValidateTokenAsync(string accessToken)
         {
-            // Next get the token signing public key
+            // Get the token signing public key
             var keys = await this.GetTokenSigningPublicKeysAsync();
 
-            // Next validate the token
+            // Use it to validate the token and read a claims principal
             var principal = this.ValidateJsonWebToken(accessToken, keys);
 
-            // Return the payload for processing later
+            // Create the payload for processing later
             var payload = new ClaimsPayload(principal);
 
-            // The sub claim is translated to a username claim when the Claims Principal is built
-            payload.StringClaimCallback = (name) =>
+            // Indicate how to get a string claim by name
+            payload.StringClaimCallback = principal.FindFirstValue;
+
+            // Indicate how to get a string array claim by name
+            payload.StringArrayClaimCallback = (name) =>
             {
-                return principal.FindFirstValue(name == JwtClaimTypes.Subject ? "username" : name);
+                return principal.FindAll((c) => c.Type == name).Select((c) => c.Value).ToArray();
             };
 
             return payload;
