@@ -122,11 +122,10 @@
 
             // Register depedencies used to implement cross cutting concerns
             new BaseCompositionRoot()
-                .UseDiagnostics(this.configuration.Logging, this.loggerFactory)
                 .UseOAuth(this.configuration.OAuth)
                 .WithCustomClaimsProvider(new SampleCustomClaimsProvider())
-                .UseClaimsCaching(this.configuration.Claims)
-                .WithHttpDebugging(this.configuration.Api.UseProxy, this.configuration.Api.ProxyUrl)
+                .WithLogging(this.configuration.Logging, this.loggerFactory)
+                .WithProxyConfiguration(this.configuration.Api.UseProxy, this.configuration.Api.ProxyUrl)
                 .WithServices(services)
                 .Register();
         }

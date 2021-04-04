@@ -11,15 +11,16 @@ namespace SampleApi.Host.Claims
      */
     public class SampleCustomClaimsProvider : CustomClaimsProvider
     {
-
         /*
         * When using the StandardAuthorizer this is called at the time of token issuance by the ClaimsController
         * My Authorization Server setup currently sends the user's email as the subject claim
         */
-        public async Task<SampleCustomClaims> SupplyCustomClaimsFromSubjectAsync(string subject) 
+        #pragma warning disable 1998
+        public async Task<SampleCustomClaims> SupplyCustomClaimsFromSubjectAsync(string subject)
         {
             return this.SupplyCustomClaims(subject) as SampleCustomClaims;
         }
+        #pragma warning restore 1998
 
         /*
          * An example of how custom claims can be included
@@ -61,12 +62,11 @@ namespace SampleApi.Host.Claims
         private CustomClaims SupplyCustomClaims(string email)
         {
             var isAdmin = email.ToLowerInvariant().Contains("admin");
-            if (isAdmin) 
+            if (isAdmin)
             {
                 // For admin users we hard code this user id, assign a role of 'admin' and grant access to all regions
                 // The CompanyService class will use these claims to return all transaction data
-                return new SampleCustomClaims("20116", "admin", new string[] {});
-
+                return new SampleCustomClaims("20116", "admin", new string[] { });
             }
             else
             {
@@ -75,4 +75,5 @@ namespace SampleApi.Host.Claims
                 return new SampleCustomClaims("10345", "user", new string[] { "USA" });
             }
         }
+    }
 }

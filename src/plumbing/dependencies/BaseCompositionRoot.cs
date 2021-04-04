@@ -1,7 +1,5 @@
 ﻿namespace SampleApi.Host.Startup
 {
-    using System;
-    using System.Net.Http;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +7,7 @@
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Logging;
     using SampleApi.Plumbing.OAuth;
+    using SampleApi.Plumbing.OAuth.TokenValidation;
     using SampleApi.Plumbing.Security;
     using SampleApi.Plumbing.Utilities;
 
@@ -17,23 +16,12 @@
      */
     public sealed class BaseCompositionRoot
     {
-        private LoggingConfiguration loggingConfiguration;
-        private LoggerFactory loggerFactory;
         private OAuthConfiguration oauthConfiguration;
         private CustomClaimsProvider customClaimsProvider;
-        private ClaimsConfiguration claimsConfiguration;
-        private Func<HttpClientHandler> httpProxyFactory;
+        private LoggingConfiguration loggingConfiguration;
+        private LoggerFactory loggerFactory;
+        private HttpProxy httpProxy;
         private IServiceCollection services;
-
-        /*
-         * Receive the logging configuration so that we can create objects related to logging and error handling
-         */
-        public BaseCompositionRoot UseDiagnostics(LoggingConfiguration loggingConfiguration, ILoggerFactory loggerFactory)
-        {
-            this.loggingConfiguration = loggingConfiguration;
-            this.loggerFactory = (LoggerFactory)loggerFactory;
-            return this;
-        }
 
         /*
          * Indicate that we're using OAuth and receive the configuration
@@ -41,15 +29,6 @@
         public BaseCompositionRoot UseOAuth(OAuthConfiguration oauthConfiguration)
         {
             this.oauthConfiguration = oauthConfiguration;
-            return this;
-        }
-
-        /*
-         * Receive information used for claims caching
-         */
-        public BaseCompositionRoot UseClaimsCaching(ClaimsConfiguration claimsConfiguration)
-        {
-            this.claimsConfiguration = claimsConfiguration;
             return this;
         }
 
@@ -63,11 +42,21 @@
         }
 
         /*
+         * Receive the logging configuration so that we can create objects related to logging and error handling
+         */
+        public BaseCompositionRoot WithLogging(LoggingConfiguration loggingConfiguration, ILoggerFactory loggerFactory)
+        {
+            this.loggingConfiguration = loggingConfiguration;
+            this.loggerFactory = (LoggerFactory)loggerFactory;
+            return this;
+        }
+
+        /*
          * Store an object to manage HTTP debugging
          */
-        public BaseCompositionRoot WithHttpDebugging(bool enabled, string url)
+        public BaseCompositionRoot WithProxyConfiguration(bool enabled, string url)
         {
-            this.httpProxyFactory = () => new ProxyHttpHandler(enabled, url);
+            this.httpProxy = new HttpProxy(enabled, url);
             return this;
         }
 
@@ -98,12 +87,6 @@
 
                 // Register claims related dependencies
                 this.RegisterClaimsDependencies(container);
-
-                // Create an injectable object for managing proxy connections
-                if (this.httpProxyFactory == null)
-                {
-                    this.httpProxyFactory = () => new ProxyHttpHandler(false, null);
-                }
             }
         }
 
@@ -120,8 +103,8 @@
                     return this.loggerFactory.CreateLogEntry();
                 });
 
-            // Register other objects
-            this.services.AddSingleton(this.httpProxyFactory);
+            // Register HTTP related objects
+            this.services.AddSingleton(this.httpProxy);
             this.services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
@@ -133,9 +116,26 @@
             // Register singletons
             this.services.AddSingleton(this.oauthConfiguration);
 
-            // Register OAuth per request dependencies
-            this.services.AddScoped<IAuthorizer, ClaimsCachingAuthorizer>();
+            // Register the authorizer, depending on the configured strategy
+            if (this.oauthConfiguration.Strategy == "claims-caching")
+            {
+                this.services.AddScoped<IAuthorizer, ClaimsCachingAuthorizer>();
+            }
+            else
+            {
+                this.services.AddScoped<IAuthorizer, StandardAuthorizer>();
+            }
+
+            // Register the authenticator and the token validator, which depends on the configured strategy
             this.services.AddScoped<OAuthAuthenticator>();
+            if (this.oauthConfiguration.TokenValidationStrategy == "introspection")
+            {
+                this.services.AddScoped<ITokenValidator, IntrospectionValidator>();
+            }
+            else
+            {
+                this.services.AddScoped<ITokenValidator, JwtValidator>();
+            }
         }
 
         /*
@@ -143,17 +143,21 @@
          */
         private void RegisterClaimsDependencies(ServiceProvider container)
         {
-            // Create the thread safe claims cache and pass it a container reference
-            this.services.AddDistributedMemoryCache();
-            var cache = container.GetService<IDistributedCache>();
-            var claimsCache = new ClaimsCache(
-                cache,
-                this.oauthConfiguration.ClaimsCacheTimeToLiveMinutes,
-                this.customClaimsProvider,
-                container);
+            // Register the singleton cache if using claims caching
+            if (this.oauthConfiguration.Strategy == "claims-caching")
+            {
+                this.services.AddDistributedMemoryCache();
+                var cache = container.GetService<IDistributedCache>();
 
-            // Register singletons
-            this.services.AddSingleton(claimsCache);
+                var claimsCache = new ClaimsCache(
+                    cache,
+                    this.oauthConfiguration.ClaimsCacheTimeToLiveMinutes,
+                    this.customClaimsProvider,
+                    container);
+                this.services.AddSingleton(claimsCache);
+            }
+
+            // Register an object to issue custom claims from the API's own data
             this.services.AddSingleton(this.customClaimsProvider);
 
             // Claims are injected into this holder at runtime

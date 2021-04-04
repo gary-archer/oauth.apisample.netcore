@@ -7,17 +7,20 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
+    using SampleApi.Plumbing.Utilities;
 
     /*
      * An interface for validating tokens, which can have multiple implementations
      */
-    internal class IntrospectionValidator : ITokenValidator 
+    internal sealed class IntrospectionValidator : ITokenValidator
     {
         private readonly OAuthConfiguration configuration;
+        private readonly HttpProxy httpProxy;
 
-        public IntrospectionValidator(OAuthConfiguration configuration)
+        public IntrospectionValidator(OAuthConfiguration configuration, HttpProxy httpProxy)
         {
             this.configuration = configuration;
+            this.httpProxy = httpProxy;
         }
 
         /*
@@ -27,7 +30,7 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
         {
             try
             {
-                using (var client = new HttpClient(this.proxyFactory()))
+                using (var client = new HttpClient(this.httpProxy.GetHandler()))
                 {
                     // Send the request
                     var request = new TokenIntrospectionRequest

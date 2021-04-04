@@ -10,17 +10,20 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
-    
+    using SampleApi.Plumbing.Utilities;
+
     /*
      * An implementation that validates access tokens as JWTs
      */
-    internal class JwtValidator : ITokenValidator 
+    internal sealed class JwtValidator : ITokenValidator
     {
         private readonly OAuthConfiguration configuration;
+        private readonly HttpProxy httpProxy;
 
-        public JwtValidator(OAuthConfiguration configuration)
+        public JwtValidator(OAuthConfiguration configuration, HttpProxy httpProxy)
         {
             this.configuration = configuration;
+            this.httpProxy = httpProxy;
         }
 
         public async Task<ClaimsPayload> ValidateTokenAsync(string accessToken)
@@ -50,7 +53,7 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
         {
             try
             {
-                using (var client = new HttpClient(this.proxyFactory()))
+                using (var client = new HttpClient(this.httpProxy.GetHandler()))
                 {
                     // Make the HTTPS request
                     var response = await client.GetJsonWebKeySetAsync(this.configuration.JwksEndpoint);

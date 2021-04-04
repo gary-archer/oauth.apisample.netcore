@@ -15,7 +15,6 @@
                 this.ReadBaseClaims(tokenData),
                 this.ReadUserInfoClaims(tokenData),
                 this.ReadCustomClaims(tokenData));
-
         }
 
         /*
@@ -57,7 +56,7 @@
 
         /*
          * This default implementation can be overridden by derived classes
-         */ 
+         */
         protected virtual CustomClaims ReadCustomClaims(ClaimsPayload payload)
         {
             return new CustomClaims();
@@ -66,12 +65,14 @@
         /*
          * This default implementation can be overridden by derived classes
          */
+        #pragma warning disable 1998
         protected virtual async Task<CustomClaims> SupplyCustomClaimsAsync(
             ClaimsPayload tokenData,
             ClaimsPayload userInfoData)
         {
             return new CustomClaims();
         }
+        #pragma warning restore 1998
 
         /*
          * This default implementation can be overridden to manage deserialization

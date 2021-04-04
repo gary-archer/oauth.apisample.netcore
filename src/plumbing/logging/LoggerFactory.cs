@@ -61,9 +61,9 @@ namespace SampleApi.Plumbing.Logging
             else
             {
                 // If logging is not set up yet use a plain exception dump
-#pragma warning disable S2228
+                #pragma warning disable S2228
                 Console.WriteLine($"STARTUP ERROR : {exception}");
-#pragma warning restore S2228
+                #pragma warning restore S2228
             }
         }
 
@@ -94,11 +94,11 @@ namespace SampleApi.Plumbing.Logging
             var repository = (Hierarchy)LogManager.CreateRepository($"{InstanceName}Repository", typeof(Hierarchy));
             repository.Root.Level = repository.LevelMap[loggingConfiguration["level"].ToString()];
 
-#pragma warning disable S125
+            #pragma warning disable S125
             /* Uncomment to view internal messages such as problems creating log files
             log4net.Util.LogLog.InternalDebugging = true;
             */
-#pragma warning restore S125
+            #pragma warning restore S125
 
             // Create appenders from configuration
             var appenders = this.CreateProductionAppenders((JArray)loggingConfiguration["appenders"]);

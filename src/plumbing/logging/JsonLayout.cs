@@ -22,11 +22,11 @@ namespace SampleApi.Plumbing.Logging
         /*
          * An empty implementation of the required overload
          */
-#pragma warning disable S1186
+        #pragma warning disable S1186
         public override void ActivateOptions()
         {
         }
-#pragma warning restore S1186
+        #pragma warning restore S1186
 
         /*
          * Format the output as JSON

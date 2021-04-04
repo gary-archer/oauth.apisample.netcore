@@ -24,7 +24,7 @@ namespace SampleApi.Plumbing.Claims
             ServiceProvider container)
         {
             this.cache = cache;
-            this.timeToLiveMinutes =timeToLiveMinutes;
+            this.timeToLiveMinutes = timeToLiveMinutes;
             this.customClaimsProvider = customClaimsProvider;
 
             // Get a development trace logger for this class

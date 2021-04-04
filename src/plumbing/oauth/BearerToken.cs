@@ -9,7 +9,7 @@ namespace SampleApi.Plumbing.OAuth
     internal static class BearerToken
     {
         /*
-         * OAuth authorization involves token validation and claims lookup
+         * Read the access token from the Authorization header
          */
         public static string Read(HttpRequest request)
         {
@@ -17,7 +17,7 @@ namespace SampleApi.Plumbing.OAuth
             if (!string.IsNullOrWhiteSpace(authorization))
             {
                 var parts = authorization.Split(' ');
-                if (parts.Length == 2 && parts[0] == "Bearer")
+                if (parts.Length == 2 && parts[0].ToLowerInvariant() == "bearer")
                 {
                     return parts[1];
                 }

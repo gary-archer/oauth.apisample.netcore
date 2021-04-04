@@ -30,7 +30,7 @@ namespace SampleApi.Host.Configuration
             {
                 Api = data.api.ToObject<ApiConfiguration>(),
                 Logging = data.logging.ToObject<LoggingConfiguration>(),
-                OAuth = data.oauth.ToObject<OAuthConfiguration>()
+                OAuth = data.oauth.ToObject<OAuthConfiguration>(),
             };
         }
     }

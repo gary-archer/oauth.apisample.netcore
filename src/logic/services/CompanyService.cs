@@ -54,12 +54,12 @@ namespace SampleApi.Logic.Repositories
          */
         private bool IsUserAuthorizedForCompany(Company company)
         {
-            if (this.claims.IsAdmin)
+            if (this.claims.UserRole.Contains("admin"))
             {
                 return true;
             }
 
-            return this.claims.RegionsCovered.AsEnumerable().Any(ur => ur == company.Region);
+            return this.claims.UserRegions.AsEnumerable().Any(ur => ur == company.Region);
         }
 
         /*

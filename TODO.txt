@@ -1,15 +1,11 @@
-1. DI composition updates for OAuth strategy objects
-   Inject proxy into authenticator and token validator classes to fix compile errors
-   Func<HttpClientHandler> to be a method on an injectable class
-
-2. Complete claims provider classes and read claims values
+1. Complete claims provider classes and read claims values
    User Regions to be serialized to cache as a proper array
 
-3. Caching of JWKS keys
+2. Caching of JWKS keys
 
-4. Update to System.Text.Json
+3. Update to System.Text.Json
    Update to 5.1.0 of IdentityModel library
 
-5. Load testing of all 3 final APIs using Curity Identity Server
+4. Load testing of all 3 final APIs using Curity Identity Server
 
-6. Check codacy warnings
+5. Codacy warnings to review
