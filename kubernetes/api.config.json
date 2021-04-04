@@ -1,5 +1,4 @@
-﻿
-{
+﻿{
     "api": {
         "port": 8101,
         "sslCertificateFileName": "./certs/keystore.p12",

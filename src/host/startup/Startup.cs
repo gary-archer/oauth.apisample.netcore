@@ -37,14 +37,22 @@
          */
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Configure API pre flight requests
+            // Configure CORS for API pre flight requests
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method == "OPTIONS",
                 api => app.UseCors("api"));
 
-            // Configure .Net Core middleware for the API
+            // Configure .Net Core authentication to handle all paths except the anonymous path for custom claims
             app.UseWhen(
-                ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method != "OPTIONS",
+                ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) &&
+                       !ctx.Request.Path.StartsWithSegments(new PathString("/api/customclaims")) &&
+                       ctx.Request.Method != "OPTIONS",
+                api => api.UseAuthentication());
+
+            // Configure .Net Core middleware
+            app.UseWhen(
+                ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) &&
+                       ctx.Request.Method != "OPTIONS",
                 api => this.ConfigureApiMiddleware(api));
 
             // Use controller attributes for API request routing
@@ -80,10 +88,6 @@
          */
         private void ConfigureApiMiddleware(IApplicationBuilder api)
         {
-            // Ensure that authentication middleware is called for API requests
-            api.UseAuthentication();
-
-            // Add our own middleware classes
             api.UseMiddleware<LoggerMiddleware>();
             api.UseMiddleware<UnhandledExceptionMiddleware>();
             api.UseMiddleware<CustomHeaderMiddleware>();

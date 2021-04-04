@@ -8,6 +8,8 @@ namespace SampleApi.Plumbing.Security
     using System.Threading.Tasks;
     using IdentityModel;
     using Microsoft.AspNetCore.Authentication;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
@@ -41,7 +43,23 @@ namespace SampleApi.Plumbing.Security
         {
             try
             {
-                // For secured requests we hit this class before the logger middleware so start logging here
+                // Avoid running the OAuth logic for endpoints marked with the AllowAnonymous attribute
+                var endpoint = this.Context.GetEndpoint();
+                if (endpoint != null)
+                {
+                    System.Console.WriteLine("*** HAS ENDPOINT");
+                    if (endpoint.Metadata != null)
+                    {
+                        System.Console.WriteLine("*** HAS METADATA");
+                        if (endpoint.Metadata.GetMetadata<IAllowAnonymous>() != null)
+                        {
+                            System.Console.WriteLine("*** YAY RETURNING");
+                            return AuthenticateResult.NoResult();
+                        }
+                    }
+                }
+
+                System.Console.WriteLine("*** APPLYING AUTH");
                 var logEntry = (LogEntry)this.Context.RequestServices.GetService(typeof(ILogEntry));
                 logEntry.Start(this.Request);
 

@@ -2,6 +2,7 @@ namespace SampleApi.Plumbing.OAuth
 {
     using System.Linq;
     using Microsoft.AspNetCore.Http;
+    using SampleApi.Plumbing.Utilities;
 
     /*
      * A simple utility class to read the access token
@@ -13,7 +14,7 @@ namespace SampleApi.Plumbing.OAuth
          */
         public static string Read(HttpRequest request)
         {
-            string authorization = request.Headers["Authorization"].FirstOrDefault();
+            string authorization = request.GetHeader("Authorization");
             if (!string.IsNullOrWhiteSpace(authorization))
             {
                 var parts = authorization.Split(' ');
