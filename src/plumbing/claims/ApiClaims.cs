@@ -5,14 +5,14 @@ namespace SampleApi.Plumbing.Claims
      */
     public class ApiClaims
     {
-        public ApiClaims(TokenClaims token, UserInfoClaims userInfo, CustomClaims custom)
+        public ApiClaims(BaseClaims baseClaims, UserInfoClaims userInfo, CustomClaims custom)
         {
-            this.Token = token;
+            this.Base = baseClaims;
             this.UserInfo = userInfo;
             this.Custom = custom;
         }
 
-        public TokenClaims Token { get; set; }
+        public BaseClaims Base { get; set; }
 
         public UserInfoClaims UserInfo { get; set; }
 

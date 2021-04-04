@@ -16,20 +16,20 @@
         public static Exception FromException(Exception exception)
         {
             // Avoid reprocessing
-            var serverError = ErrorUtils.TryConvertToServerError(exception);
+            var serverError = TryConvertToServerError(exception);
             if (serverError != null)
             {
                 return serverError;
             }
 
-            var clientError = ErrorUtils.TryConvertToClientError(exception);
+            var clientError = TryConvertToClientError(exception);
             if (clientError != null)
             {
                 return clientError;
             }
 
             // Otherwise create a generic server error
-            return ErrorUtils.CreateServerError(exception, null, null);
+            return CreateServerError(exception, null, null);
         }
 
         /*
@@ -49,45 +49,17 @@
         }
 
         /*
-         * Report metadata failures clearly
-         */
-        public static ServerError FromMetadataError(DiscoveryDocumentResponse response, string url)
-        {
-            var data = ErrorUtils.ReadOAuthErrorResponse(response.Json);
-            var oauthError = ErrorUtils.CreateOAuthServerError(
-                ErrorCodes.MetadataLookupFailure,
-                "Metadata lookup failed",
-                data.Item1);
-
-            oauthError.SetDetails(ErrorUtils.GetOAuthErrorDetails(data.Item2, response.Error, url));
-            return oauthError;
-        }
-
-        /*
-         * Report metadata lookup exceptions clearly
-         */
-        public static ServerError FromMetadataError(Exception ex, string url)
-        {
-            var error = ErrorUtils.CreateServerError(
-                ex,
-                ErrorCodes.MetadataLookupFailure,
-                "Metadata lookup failed");
-            error.SetDetails($"URL: {url}");
-            return error;
-        }
-
-        /*
          * Report failures in introspection responses
          */
         public static ServerError FromIntrospectionError(TokenIntrospectionResponse response, string url)
         {
-            var data = ErrorUtils.ReadOAuthErrorResponse(response.Json);
-            var error = ErrorUtils.CreateOAuthServerError(
+            var data = ReadOAuthErrorResponse(response.Json);
+            var error = CreateOAuthServerError(
                 ErrorCodes.IntrospectionFailure,
                 "Token validation failed",
                 data.Item1);
 
-            error.SetDetails(ErrorUtils.GetOAuthErrorDetails(data.Item2, response.Error, url));
+            error.SetDetails(GetOAuthErrorDetails(data.Item2, response.Error, url));
             return error;
         }
 
@@ -97,19 +69,19 @@
         public static Exception FromIntrospectionError(Exception ex, string url)
         {
             // Avoid reprocessing
-            var serverError = ErrorUtils.TryConvertToServerError(ex);
+            var serverError = TryConvertToServerError(ex);
             if (serverError != null)
             {
                 return serverError;
             }
 
-            var clientError = ErrorUtils.TryConvertToClientError(ex);
+            var clientError = TryConvertToClientError(ex);
             if (clientError != null)
             {
                 return clientError;
             }
 
-            var error = ErrorUtils.CreateServerError(ex, ErrorCodes.IntrospectionFailure, "Token validation failed");
+            var error = CreateServerError(ex, ErrorCodes.IntrospectionFailure, "Token validation failed");
             error.SetDetails($"URL: {url}");
             return error;
         }
@@ -119,13 +91,13 @@
          */
         public static ServerError FromTokenSigningKeysDownloadError(JsonWebKeySetResponse response, string url)
         {
-            var data = ErrorUtils.ReadOAuthErrorResponse(response.Json);
-            var error = ErrorUtils.CreateOAuthServerError(
+            var data = ReadOAuthErrorResponse(response.Json);
+            var error = CreateOAuthServerError(
                 ErrorCodes.TokenSigningKeysDownloadError,
                 "Problem downloading JWKS keys",
                 data.Item1);
 
-            error.SetDetails(ErrorUtils.GetOAuthErrorDetails(data.Item2, response.Error, url));
+            error.SetDetails(GetOAuthErrorDetails(data.Item2, response.Error, url));
             return error;
         }
 
@@ -134,7 +106,7 @@
          */
         public static ServerError FromTokenSigningKeysDownloadError(Exception ex, string url)
         {
-            return ErrorUtils.CreateServerError(ex, ErrorCodes.TokenSigningKeysDownloadError,  "Problem downloading JWKS keys");
+            return CreateServerError(ex, ErrorCodes.TokenSigningKeysDownloadError,  "Problem downloading JWKS keys");
         }
 
         /*
@@ -143,7 +115,7 @@
         public static Exception FromUserInfoError(UserInfoResponse response, string url)
         {
             // Read the OAuth error code
-            var data = ErrorUtils.ReadOAuthErrorResponse(response.Json);
+            var data = ReadOAuthErrorResponse(response.Json);
 
             // Handle a race condition where the access token expires during user info lookup
             if (data.Item1 == ErrorCodes.UserInfoTokenExpired)
@@ -152,11 +124,11 @@
             }
 
             // Report other errors
-            var error = ErrorUtils.CreateOAuthServerError(
+            var error = CreateOAuthServerError(
                 ErrorCodes.UserInfoFailure,
                 "User info lookup failed",
                 data.Item1);
-            error.SetDetails(ErrorUtils.GetOAuthErrorDetails(data.Item2, response.Error, url));
+            error.SetDetails(GetOAuthErrorDetails(data.Item2, response.Error, url));
             return error;
         }
 
@@ -166,20 +138,20 @@
         public static Exception FromUserInfoError(Exception ex, string url)
         {
             // Avoid reprocessing
-            var serverError = ErrorUtils.TryConvertToServerError(ex);
+            var serverError = TryConvertToServerError(ex);
             if (serverError != null)
             {
                 return serverError;
             }
 
-            var clientError = ErrorUtils.TryConvertToClientError(ex);
+            var clientError = TryConvertToClientError(ex);
             if (clientError != null)
             {
                 return clientError;
             }
 
             // Create the error
-            return ErrorUtils.CreateServerError(ex, ErrorCodes.UserInfoFailure,  "User info lookup failed");
+            return CreateServerError(ex, ErrorCodes.UserInfoFailure,  "User info lookup failed");
         }
 
         /*

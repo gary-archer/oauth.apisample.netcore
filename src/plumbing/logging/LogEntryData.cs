@@ -105,39 +105,6 @@
         }
 
         /*
-        * For child items, this receives common properties from the parent
-        */
-        public void UpdateFromParent(LogEntryData parent)
-        {
-            this.StatusCode = parent.StatusCode;
-            this.ApiName = parent.ApiName;
-            this.HostName = parent.HostName;
-            this.RequestVerb = parent.RequestVerb;
-            this.ResourceId = parent.ResourceId;
-            this.RequestPath = parent.RequestPath;
-            this.ClientApplicationName = parent.ClientApplicationName;
-            this.UserOAuthId = parent.UserOAuthId;
-            this.CorrelationId = parent.CorrelationId;
-            this.SessionId = parent.SessionId;
-        }
-
-        /*
-        * This updates the parent log entry when the child log entry completes
-        */
-        public void UpdateFromChild(LogEntryData child)
-        {
-            // If the child fails, also indicate a parent failure
-            if (string.IsNullOrWhiteSpace(this.ErrorCode) && !string.IsNullOrWhiteSpace(child.ErrorCode))
-            {
-                this.ErrorCode = child.ErrorCode;
-            }
-
-            // Exclude child execution time from the parent time
-            this.Performance.MillisecondsTaken -= child.MillisecondsTaken;
-            this.MillisecondsTaken -= child.MillisecondsTaken;
-        }
-
-        /*
         * Produce the output format
         */
         public JObject ToLogFormat()

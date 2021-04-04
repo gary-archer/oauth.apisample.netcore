@@ -21,10 +21,7 @@
                 }
             ],
             "performanceThresholdsMilliseconds": {
-                "default": 250,
-                "operationOverrides": {
-                    "Authorizer": 1000
-                }
+                "default": 250
             }
         },
         "development": {
@@ -43,12 +40,15 @@
         }
     },
     "oauth": {
-        "authority":     "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_qqJgVeuTn",
-        "requiredScope": "https://api.authsamples.com/api/default",
-        "clientId":      "",
-        "clientSecret":  ""
-    },
-    "claims": {
-        "maxCacheMinutes": 30
+        "strategy":                      "claims-caching",
+        "issuer":                        "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_qqJgVeuTn",
+        "audience":                      "",
+        "tokenValidationStrategy":       "jwt",
+        "jwksEndpoint":                  "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_qqJgVeuTn/.well-known/jwks.json",
+        "introspectEndpoint":            "",
+        "introspectClientId":            "",
+        "introspectClientSecret":        "",
+        "userInfoEndpoint":              "https://login.authsamples.com/oauth2/userInfo",
+        "claimsCacheTimeToLiveMinutes":  30
     }
 }

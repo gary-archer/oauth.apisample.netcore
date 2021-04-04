@@ -1,6 +1,5 @@
 ﻿namespace SampleApi.Plumbing.Logging
 {
-    using System;
     using Newtonsoft.Json.Linq;
 
     /*
@@ -14,8 +13,5 @@
 
         // Add arbitrary data
         void AddInfo(JToken info);
-
-        // Our sample logs OAuth authorization as a child log entry
-        IDisposable CreateChild(string name);
     }
 }

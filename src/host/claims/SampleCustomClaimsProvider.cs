@@ -1,6 +1,7 @@
 namespace SampleApi.Host.Claims
 {
     using System.Threading.Tasks;
+    using IdentityModel;
     using Newtonsoft.Json.Linq;
     using SampleApi.Logic.Entities;
     using SampleApi.Plumbing.Claims;
@@ -11,22 +12,38 @@ namespace SampleApi.Host.Claims
     public class SampleCustomClaimsProvider : CustomClaimsProvider
     {
         /*
+        * When using the StandardAuthorizer this is called at the time of token issuance by the ClaimsController
+        * My Authorization Server setup currently sends the user's email as the subject claim
+        */
+        #pragma warning disable 1998
+        public async Task<SampleCustomClaims> SupplyCustomClaimsFromSubjectAsync(string subject)
+        {
+            return this.SupplyCustomClaims(subject) as SampleCustomClaims;
+        }
+        #pragma warning restore 1998
+
+        /*
          * An example of how custom claims can be included
          */
-        public override Task<CustomClaims> GetCustomClaimsAsync(TokenClaims token, UserInfoClaims userInfo)
+        #pragma warning disable 1998
+        protected override async Task<CustomClaims> SupplyCustomClaimsAsync(
+            ClaimsPayload tokenData,
+            ClaimsPayload userInfoData)
         {
-            // A real implementation would look up the database user id from the subject and / or email claim
-            var email = userInfo.Email;
-            var userDatabaseId = "10345";
+            var email = userInfoData.GetStringClaim(JwtClaimTypes.Email);
+            return this.SupplyCustomClaims(email);
+        }
+        #pragma warning restore 1998
 
-            // Our blog's code samples have two fixed users and we use the below mock implementation:
-            // - guestadmin@mycompany.com is an admin and sees all data
-            // - guestuser@mycompany.com is not an admin and only sees data for the USA region
-            var isAdmin = userInfo.Email.ToLower().Contains("admin");
-            var regionsCovered = isAdmin ? new string[] { } : new[] { "USA" };
-
-            CustomClaims claims = new SampleCustomClaims(userDatabaseId, isAdmin, regionsCovered);
-            return Task.FromResult(claims);
+        /*
+         * When using the StandardAuthorizer we read all custom claims directly from the token
+         */
+        protected override CustomClaims ReadCustomClaims(ClaimsPayload payload)
+        {
+            var userId = payload.GetStringClaim("user_id");
+            var role = payload.GetStringClaim("user_role");
+            var userRegions = payload.GetStringArrayClaim("user_regions");
+            return new SampleCustomClaims(userId, role, userRegions);
         }
 
         /*
@@ -35,6 +52,27 @@ namespace SampleApi.Host.Claims
         protected override CustomClaims DeserializeCustomClaims(JObject claimsNode)
         {
             return SampleCustomClaims.ImportData(claimsNode);
+        }
+
+        /*
+         * Simulate some API logic for identifying the user from OAuth data, via either the subject or email claims
+         * A real API would then do a database lookup to find the user's custom claims
+         */
+        private CustomClaims SupplyCustomClaims(string email)
+        {
+            var isAdmin = email.ToLowerInvariant().Contains("admin");
+            if (isAdmin)
+            {
+                // For admin users we hard code this user id, assign a role of 'admin' and grant access to all regions
+                // The CompanyService class will use these claims to return all transaction data
+                return new SampleCustomClaims("20116", "admin", new string[] { });
+            }
+            else
+            {
+                // For other users we hard code this user id, assign a role of 'user' and grant access to only one region
+                // The CompanyService class will use these claims to return only transactions for the US region
+                return new SampleCustomClaims("10345", "user", new string[] { "USA" });
+            }
         }
     }
 }

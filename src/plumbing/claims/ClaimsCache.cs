@@ -6,7 +6,6 @@ namespace SampleApi.Plumbing.Claims
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using SampleApi.Plumbing.Configuration;
 
     /*
      * Encapsulate getting and setting claims from the cache
@@ -14,18 +13,18 @@ namespace SampleApi.Plumbing.Claims
     internal sealed class ClaimsCache
     {
         private readonly IDistributedCache cache;
-        private readonly ClaimsConfiguration configuration;
+        private readonly int timeToLiveMinutes;
         private readonly CustomClaimsProvider customClaimsProvider;
         private readonly ILogger traceLogger;
 
         public ClaimsCache(
             IDistributedCache cache,
-            ClaimsConfiguration configuration,
+            int timeToLiveMinutes,
             CustomClaimsProvider customClaimsProvider,
             ServiceProvider container)
         {
             this.cache = cache;
-            this.configuration = configuration;
+            this.timeToLiveMinutes = timeToLiveMinutes;
             this.customClaimsProvider = customClaimsProvider;
 
             // Get a development trace logger for this class
@@ -48,7 +47,7 @@ namespace SampleApi.Plumbing.Claims
             // Deserialization requires the claims class to have public setter properties
             this.traceLogger.LogDebug($"Found existing token in claims cache (hash: {accessTokenHash})");
             var json = Encoding.UTF8.GetString(bytes);
-            return this.customClaimsProvider.Deserialize(json);
+            return this.customClaimsProvider.DeserializeFromCache(json);
         }
 
         /*
@@ -59,20 +58,20 @@ namespace SampleApi.Plumbing.Claims
             // Check for a race condition where the token passes validation but it expired when it gets here
             var now = DateTimeOffset.UtcNow;
             var epochSeconds = now.ToUnixTimeSeconds();
-            var secondsToCache = claims.Token.Expiry - epochSeconds;
+            var secondsToCache = claims.Base.Expiry - epochSeconds;
             if (secondsToCache > 0)
             {
                 // Get the hash and output debug info
                 this.traceLogger.LogDebug($"Token to be cached will expire in {secondsToCache} seconds (hash: {accessTokenHash})");
 
                 // Do not exceed the maximum time we configured
-                if (secondsToCache > this.configuration.MaxCacheMinutes * 60)
+                if (secondsToCache > this.timeToLiveMinutes * 60)
                 {
-                    secondsToCache = this.configuration.MaxCacheMinutes * 60;
+                    secondsToCache = this.timeToLiveMinutes * 60;
                 }
 
                 // Serialize claims to bytes
-                var json = this.customClaimsProvider.Serialize(claims);
+                var json = this.customClaimsProvider.SerializeToCache(claims);
                 var bytes = Encoding.UTF8.GetBytes(json);
 
                 // Cache the token until the above time
