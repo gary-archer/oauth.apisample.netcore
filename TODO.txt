@@ -1,0 +1,9 @@
+1. Do client error to response format next
+
+2. Then update LogEntry output
+
+3. Then update IdentityModel to v5.1 and fix up
+
+4. Then search for occurrences
+
+5. Leave config to last, due to its untyped sections for logging

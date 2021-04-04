@@ -2,8 +2,8 @@ namespace SampleApi.Logic.Utilities
 {
     using System;
     using System.IO;
-    using System.Text.Json;
     using System.Threading.Tasks;
+    using Newtonsoft.Json;
     using SampleApi.Logic.Errors;
     using SampleApi.Plumbing.Errors;
 
@@ -20,13 +20,7 @@ namespace SampleApi.Logic.Utilities
             try
             {
                 string jsonText = await File.ReadAllTextAsync(filePath);
-                
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                };
-
-                return JsonSerializer.Deserialize<T>(jsonText, options);
+                return JsonConvert.DeserializeObject<T>(jsonText);
             }
             catch (Exception ex)
             {

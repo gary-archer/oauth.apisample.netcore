@@ -1,9 +1,9 @@
 ﻿namespace SampleApi.Host.Controllers
 {
-    using System.Text.Json;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Newtonsoft.Json;
     using SampleApi.Host.Claims;
     using SampleApi.Plumbing.Claims;
 
@@ -38,7 +38,7 @@
                 user_regions = customClaims.UserRegions,
             };
 
-            return this.Content(JsonSerializer.Serialize(data), "application/json");
+            return this.Content(JsonConvert.SerializeObject(data), "application/json");
         }
     }
 }

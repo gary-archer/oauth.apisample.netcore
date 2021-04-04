@@ -22,7 +22,6 @@
             try
             {
                 // Build and run the web host
-                JsonUtility.Run();
                 BuildWebHost(loggerFactory).Run();
             }
             catch (Exception ex)
