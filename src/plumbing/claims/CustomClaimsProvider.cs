@@ -1,7 +1,9 @@
 ﻿namespace SampleApi.Plumbing.Claims
 {
     using System;
+    using System.Globalization;
     using System.Threading.Tasks;
+    using IdentityModel;
     using Newtonsoft.Json.Linq;
 
     /*
@@ -87,12 +89,10 @@
          */
         private BaseClaims ReadBaseClaims(ClaimsPayload data)
         {
-            /*const subject = data.getClaim('sub');
-            const scopes = data.getClaim('scope').split(' ');
-            const expiry = parseInt(data.getClaim('exp'), 10);
-            return new BaseClaims(subject, scopes, expiry);*/
-
-            throw new NotImplementedException("not implemented");
+            var subject = data.GetStringClaim(JwtClaimTypes.Subject);
+            var scopes = data.GetStringClaim(JwtClaimTypes.Scope).Split(' ');
+            var expiry = Convert.ToInt32(data.GetStringClaim(JwtClaimTypes.Expiration), CultureInfo.InvariantCulture);
+            return new BaseClaims(subject, scopes, expiry);
         }
 
         /*
@@ -100,13 +100,10 @@
          */
         private UserInfoClaims ReadUserInfoClaims(ClaimsPayload data)
         {
-            /*
-            const givenName = data.getClaim('given_name');
-            const familyName = data.getClaim('family_name');
-            const email = data.getClaim('email');
-            return new UserInfoClaims(givenName, familyName, email);*/
-
-            throw new NotImplementedException("not implemented");
+            var givenName = data.GetStringClaim(JwtClaimTypes.GivenName);
+            var familyName = data.GetStringClaim(JwtClaimTypes.FamilyName);
+            var email = data.GetStringClaim(JwtClaimTypes.Email);
+            return new UserInfoClaims(givenName, familyName, email);
         }
     }
 }

@@ -1,5 +1,6 @@
 namespace SampleApi.Logic.Entities
 {
+    using System.Linq;
     using Newtonsoft.Json.Linq;
     using SampleApi.Plumbing.Claims;
 
@@ -25,8 +26,11 @@ namespace SampleApi.Logic.Entities
         {
             var userId = data.GetValue("userId").Value<string>();
             var userRole = data.GetValue("userRole").Value<string>();
-            var userRegions = data.GetValue("regionsCovered").Value<string>();
-            return new SampleCustomClaims(userId, userRole, userRegions.Split(" "));
+
+            var userRegionsNode = data.GetValue("regionsCovered").ToArray();
+            var userRegions = userRegionsNode.Select(node => node.Value<string>());
+
+            return new SampleCustomClaims(userId, userRole, userRegions.ToArray());
         }
 
         public override JObject ExportData()
@@ -34,7 +38,13 @@ namespace SampleApi.Logic.Entities
             dynamic data = new JObject();
             data.userId = this.UserId;
             data.userRole = this.UserRole;
-            data.userRegions = string.Join(" ", this.UserRegions);
+
+            data.userRegions = new JArray();
+            foreach (var region in this.UserRegions)
+            {
+                data.userRegions.Add(region);
+            }
+
             return data;
         }
     }

@@ -1,7 +1,6 @@
 namespace SampleApi.Plumbing.OAuth
 {
     using System;
-    using System.Globalization;
     using System.Net.Http;
     using System.Threading.Tasks;
     using IdentityModel.Client;
@@ -10,6 +9,7 @@ namespace SampleApi.Plumbing.OAuth
     using SampleApi.Plumbing.Errors;
     using SampleApi.Plumbing.Logging;
     using SampleApi.Plumbing.OAuth.TokenValidation;
+    using SampleApi.Plumbing.Utilities;
 
     /*
      * The class from which OAuth calls are initiated
@@ -18,18 +18,18 @@ namespace SampleApi.Plumbing.OAuth
     {
         private readonly OAuthConfiguration configuration;
         private readonly ITokenValidator tokenValidator;
-        private readonly Func<HttpClientHandler> proxyFactory;
+        private readonly HttpProxy httpProxy;
         private readonly LogEntry logEntry;
 
         public OAuthAuthenticator(
             OAuthConfiguration configuration,
             ITokenValidator tokenValidator,
-            Func<HttpClientHandler> proxyFactory,
+            HttpProxy httpProxy,
             ILogEntry logEntry)
         {
             this.configuration = configuration;
             this.tokenValidator = tokenValidator;
-            this.proxyFactory = proxyFactory;
+            this.httpProxy = httpProxy;
             this.logEntry = (LogEntry)logEntry;
         }
 
@@ -38,7 +38,7 @@ namespace SampleApi.Plumbing.OAuth
          */
         public async Task<ClaimsPayload> ValidateTokenAsync(string accessToken)
         {
-            using (this.logEntry.CreatePerformanceBreakdown("userInfoLookup"))
+            using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
                 return await this.tokenValidator.ValidateTokenAsync(accessToken);
             }
@@ -53,7 +53,7 @@ namespace SampleApi.Plumbing.OAuth
             {
                 try
                 {
-                    using (var client = new HttpClient(this.proxyFactory()))
+                    using (var client = new HttpClient(this.httpProxy.GetHandler()))
                     {
                         // Send the request
                         var request = new UserInfoRequest
@@ -77,13 +77,9 @@ namespace SampleApi.Plumbing.OAuth
                             }
                         }
 
-                        return new ClaimsPayload(response);
-
-                        /*// Get token claims and use the immutable user id as the subject claim
-                        string givenName = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.GivenName);
-                        string familyName = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.FamilyName);
-                        string email = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.Email);
-                        return new UserInfoClaims(givenName, familyName, email);*/
+                        var payload = new ClaimsPayload(response);
+                        payload.StringClaimCallback = response.TryGet;
+                        return payload;
                     }
                 }
                 catch (Exception ex)
@@ -91,34 +87,6 @@ namespace SampleApi.Plumbing.OAuth
                     throw ErrorUtils.FromUserInfoError(ex, this.configuration.UserInfoEndpoint);
                 }
             }
-        }
-
-        /*
-         * A helper to get a string claim
-         */
-        private string GetStringClaim(Func<string, string> callback, string name)
-        {
-            var value = callback(name);
-            if (value == null)
-            {
-                throw ErrorUtils.FromMissingClaim(name);
-            }
-
-            return value;
-        }
-
-        /*
-         * A helper to get an integer claim
-         */
-        private int GetIntegerClaim(Func<string, string> callback, string name)
-        {
-            var value = callback(name);
-            if (value == null)
-            {
-                throw ErrorUtils.FromMissingClaim(name);
-            }
-
-            return Convert.ToInt32(value, CultureInfo.InvariantCulture);
         }
     }
 }

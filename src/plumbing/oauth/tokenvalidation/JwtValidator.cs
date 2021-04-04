@@ -5,6 +5,7 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
     using System.Net.Http;
     using System.Security.Claims;
     using System.Threading.Tasks;
+    using IdentityModel;
     using IdentityModel.Client;
     using Microsoft.IdentityModel.Tokens;
     using SampleApi.Plumbing.Claims;
@@ -34,16 +35,16 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
             // Next validate the token
             var principal = this.ValidateJsonWebToken(accessToken, keys);
 
-            // Return the claims for processing later
-            return new ClaimsPayload(principal);
+            // Return the payload for processing later
+            var payload = new ClaimsPayload(principal);
 
-            /*// Get token claims, and note that Microsoft move the subject claim to a username field
-            string subject = this.GetStringClaim((name) => principal.FindFirstValue(name), "username");
-            string[] scopes = this.GetStringClaim((name) => principal.FindFirstValue(name), JwtClaimTypes.Scope).Split(' ');
-            int expiry = this.GetIntegerClaim((name) => principal.FindFirstValue(name), JwtClaimTypes.Expiration);
+            // The sub claim is translated to a username claim when the Claims Principal is built
+            payload.StringClaimCallback = (name) =>
+            {
+                return principal.FindFirstValue(name == JwtClaimTypes.Subject ? "username" : name);
+            };
 
-            // Update token claims
-            return new BaseClaims(subject, scopes, expiry);*/
+            return payload;
         }
 
         /*
@@ -92,7 +93,7 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
                     ValidateIssuer = true,
                     ValidIssuer = this.configuration.Issuer,
                     IssuerSigningKeys = new JsonWebKeySet(keys).Keys,
-                    ValidateAudience = true,
+                    ValidateAudience = string.IsNullOrWhiteSpace(this.configuration.Audience) ? false : true,
                     ValidAudience = this.configuration.Audience,
                     ValidAlgorithms = new[] { "RS256" },
                 };

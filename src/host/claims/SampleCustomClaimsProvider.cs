@@ -1,7 +1,7 @@
 namespace SampleApi.Host.Claims
 {
-    using System;
     using System.Threading.Tasks;
+    using IdentityModel;
     using Newtonsoft.Json.Linq;
     using SampleApi.Logic.Entities;
     using SampleApi.Plumbing.Claims;
@@ -25,26 +25,25 @@ namespace SampleApi.Host.Claims
         /*
          * An example of how custom claims can be included
          */
-        protected override Task<CustomClaims> SupplyCustomClaimsAsync(
+        #pragma warning disable 1998
+        protected override async Task<CustomClaims> SupplyCustomClaimsAsync(
             ClaimsPayload tokenData,
             ClaimsPayload userInfoData)
         {
-            var email = userInfoData.GetClaim("email");
-            var claims = this.SupplyCustomClaims(email);
-            return Task.FromResult(claims);
+            var email = userInfoData.GetStringClaim(JwtClaimTypes.Email);
+            return this.SupplyCustomClaims(email);
         }
+        #pragma warning restore 1998
 
         /*
          * When using the StandardAuthorizer we read all custom claims directly from the token
          */
         protected override CustomClaims ReadCustomClaims(ClaimsPayload payload)
         {
-            /*const userId = token.getClaim('user_id');
-            const role = token.getClaim('user_role');
-            const userRegions = token.getClaim('user_regions');
-            return new SampleCustomClaims(userId, role, userRegions);*/
-
-            throw new NotImplementedException("Not implemented");
+            var userId = payload.GetStringClaim("user_id");
+            var role = payload.GetStringClaim("user_role");
+            var userRegions = payload.GetStringArrayClaim("user_regions");
+            return new SampleCustomClaims(userId, role, userRegions);
         }
 
         /*

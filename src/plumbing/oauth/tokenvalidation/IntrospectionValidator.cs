@@ -61,16 +61,9 @@ namespace SampleApi.Plumbing.OAuth.TokenValidation
                         throw ErrorFactory.CreateClient401Error("Access token is expired and failed introspection");
                     }
 
-                    return new ClaimsPayload(response);
-
-                    /*
-                    // Get token claims
-                    string subject = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.Subject);
-                    string[] scopes = this.GetStringClaim((name) => response.TryGet(name), JwtClaimTypes.Scope).Split(' ');
-                    int expiry = this.GetIntegerClaim((name) => response.TryGet(name), JwtClaimTypes.Expiration);
-
-                    // Update token claims
-                    return new BaseClaims(subject, scopes, expiry);*/
+                    var payload = new ClaimsPayload(response);
+                    payload.StringClaimCallback = response.TryGet;
+                    return payload;
                 }
             }
             catch (Exception ex)
