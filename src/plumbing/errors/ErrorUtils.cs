@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Text.Json;
     using IdentityModel.Client;
-    using Newtonsoft.Json.Linq;
 
     /*
      * A class to manage error translation
@@ -218,16 +218,10 @@
         /*
          * Return any OAuth protocol error details
          */
-        private static Tuple<string, string> ReadOAuthErrorResponse(JObject jsonBody)
+        private static Tuple<string, string> ReadOAuthErrorResponse(JsonElement jsonBody)
         {
-            string code = null;
-            string description = null;
-            if (jsonBody != null)
-            {
-                code = jsonBody.TryGetString("error");
-                description = jsonBody.TryGetString("error_description");
-            }
-
+            string code = jsonBody.TryGetString("error");
+            string description = jsonBody.TryGetString("error_description");
             return Tuple.Create(code, description);
         }
 
