@@ -1,10 +1,9 @@
 ﻿namespace SampleApi.Host.Controllers
 {
+    using System.Text.Json;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
     using SampleApi.Host.Claims;
     using SampleApi.Plumbing.Claims;
 
@@ -32,18 +31,14 @@
         {
             var customClaims = await this.claimsProvider.SupplyCustomClaimsFromSubjectAsync(subject);
 
-            dynamic data = new JObject();
-            data.user_id = customClaims.UserId;
-            data.user_role = customClaims.UserRole;
-
-            var userRegionsNode = new JArray();
-            foreach (var region in customClaims.UserRegions)
+            var data = new
             {
-                userRegionsNode.Add(region);
-            }
+                user_id = customClaims.UserId,
+                user_role = customClaims.UserRole,
+                user_regions = customClaims.UserRegions,
+            };
 
-            data.user_regions = userRegionsNode;
-            return this.Content(JsonConvert.SerializeObject(data), "application/json");
+            return this.Content(JsonSerializer.Serialize(data), "application/json");
         }
     }
 }

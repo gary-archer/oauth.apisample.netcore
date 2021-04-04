@@ -42,7 +42,7 @@
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method == "OPTIONS",
                 api => app.UseCors("api"));
 
-            // Configure .Net Core authentication to handle all paths except the anonymous path for custom claims
+            // Configure .Net Core authentication to run on all paths except those marked with [AllowAnonymous]
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) &&
                        !ctx.Request.Path.StartsWithSegments(new PathString("/api/customclaims")) &&
@@ -99,7 +99,7 @@
         private void ConfigureApiDependencies(IServiceCollection services)
         {
             // Configure common code
-            this.ConfigureCoreDependencies(services);
+            this.ConfigureBaseDependencies(services);
 
             // Register dependencies specific to this service
             services.AddScoped<JsonReader>();
@@ -108,23 +108,23 @@
         }
 
         /*
-         * Configure dependencies needed to manage cross cutting concerns
+         * Configure dependencies used for cross cutting concerns
          */
-        private void ConfigureCoreDependencies(IServiceCollection services)
+        private void ConfigureBaseDependencies(IServiceCollection services)
         {
-            // Indicate the type of our .Net Core custom authentication handler
+            // Customise the whole of the OAuth processing
             string scheme = "Bearer";
             services.AddAuthentication(scheme)
                     .AddScheme<AuthenticationSchemeOptions, CustomAuthenticationHandler>(scheme, null);
 
-            // Indicate that all API requests are authorized, by applying the standard .Net Core Authorize Filter
+            // Add a global filter to ensure that all API requests are authorized
             services.AddMvc(options =>
             {
                 options.Filters.Add(new AuthorizeFilter(
                     new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
             });
 
-            // Register depedencies used to implement cross cutting concerns
+            // Register dependencies used to implement cross cutting concerns
             new BaseCompositionRoot()
                 .UseOAuth(this.configuration.OAuth)
                 .WithCustomClaimsProvider(new SampleCustomClaimsProvider())
