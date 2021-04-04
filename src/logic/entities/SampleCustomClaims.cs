@@ -27,7 +27,7 @@ namespace SampleApi.Logic.Entities
             var userId = data.GetValue("userId").Value<string>();
             var userRole = data.GetValue("userRole").Value<string>();
 
-            var userRegionsNode = data.GetValue("regionsCovered").ToArray();
+            var userRegionsNode = data.GetValue("userRegions").ToArray();
             var userRegions = userRegionsNode.Select(node => node.Value<string>());
 
             return new SampleCustomClaims(userId, userRole, userRegions.ToArray());
