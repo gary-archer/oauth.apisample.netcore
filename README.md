@@ -11,11 +11,9 @@ The final API code sample using OAuth and Open Id Connect, referenced in my blog
 
 ### Quick Start
 
-The setup script downloads SSL certificates, after which run the standard .Net commands:
+Run the start script to begin listening over SSL:
 
-- ./setup.sh
-- dotnet build
-- dotnet run
+- ./start.sh
 
 ### Details
 
