@@ -79,7 +79,11 @@
                                     .AllowCredentials());
             });
 
-            // Register our API's dependencies
+            // Configure the API's OAuth behaviour
+            this.ConfigureOAuth(services);
+
+            // Register the API's dependencies
+            this.ConfigureBaseDependencies(services);
             this.ConfigureApiDependencies(services);
         }
 
@@ -94,17 +98,19 @@
         }
 
         /*
-         * Set up API dependencies
+         * customize OAuth handling to use a library, and set up a global authorization filter
          */
-        private void ConfigureApiDependencies(IServiceCollection services)
+        private void ConfigureOAuth(IServiceCollection services)
         {
-            // Configure common code
-            this.ConfigureBaseDependencies(services);
+            string scheme = "Bearer";
+            services.AddAuthentication(scheme)
+                    .AddScheme<AuthenticationSchemeOptions, CustomAuthenticationHandler>(scheme, null);
 
-            // Register dependencies specific to this service
-            services.AddScoped<JsonReader>();
-            services.AddTransient<CompanyRepository>();
-            services.AddTransient<CompanyService>();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(new AuthorizeFilter(
+                    new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+            });
         }
 
         /*
@@ -112,19 +118,6 @@
          */
         private void ConfigureBaseDependencies(IServiceCollection services)
         {
-            // Customise the whole of the OAuth processing
-            string scheme = "Bearer";
-            services.AddAuthentication(scheme)
-                    .AddScheme<AuthenticationSchemeOptions, CustomAuthenticationHandler>(scheme, null);
-
-            // Add a global filter to ensure that all API requests are authorized
-            services.AddMvc(options =>
-            {
-                options.Filters.Add(new AuthorizeFilter(
-                    new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
-            });
-
-            // Register dependencies used to implement cross cutting concerns
             new BaseCompositionRoot()
                 .UseOAuth(this.configuration.OAuth)
                 .WithClaimsProvider(new SampleClaimsProvider())
@@ -132,6 +125,16 @@
                 .WithProxyConfiguration(this.configuration.Api.UseProxy, this.configuration.Api.ProxyUrl)
                 .WithServices(services)
                 .Register();
+        }
+
+        /*
+         * Set up API dependencies
+         */
+        private void ConfigureApiDependencies(IServiceCollection services)
+        {
+            services.AddScoped<JsonReader>();
+            services.AddTransient<CompanyRepository>();
+            services.AddTransient<CompanyService>();
         }
     }
 }
