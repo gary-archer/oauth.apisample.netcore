@@ -18,17 +18,15 @@ namespace SampleApi.Plumbing.Logging
     internal sealed class LoggerFactory : ILoggerFactory
     {
         private static readonly string InstanceName = "Production";
-        private readonly IList<PerformanceThreshold> thresholdOverrides;
         private string apiName;
+        private int performanceThresholdMilliseconds;
         private bool isInitialized;
-        private int defaultPerformanceThresholdMilliseconds;
 
         public LoggerFactory()
         {
-            this.thresholdOverrides = new List<PerformanceThreshold>();
             this.apiName = string.Empty;
+            this.performanceThresholdMilliseconds = 1000;
             this.isInitialized = false;
-            this.defaultPerformanceThresholdMilliseconds = 0;
         }
 
         /*
@@ -72,7 +70,7 @@ namespace SampleApi.Plumbing.Logging
          */
         public LogEntry CreateLogEntry()
         {
-            return new LogEntry(this.apiName, this.GetProductionLogger(), this.GetPerformanceThreshold);
+            return new LogEntry(this.apiName, this.GetProductionLogger(), this.performanceThresholdMilliseconds);
         }
 
         /*
@@ -92,7 +90,8 @@ namespace SampleApi.Plumbing.Logging
 
             // Create a repository for production JSON logging
             var repository = (Hierarchy)LogManager.CreateRepository($"{InstanceName}Repository", typeof(Hierarchy));
-            repository.Root.Level = repository.LevelMap[loggingConfiguration["level"].ToString()];
+            repository.Root.Level = repository.LevelMap["Info"];
+            this.performanceThresholdMilliseconds = loggingConfiguration["performanceThresholdMilliseconds"].ToObject<int>();
 
             #pragma warning disable S125
             /* Uncomment to view internal messages such as problems creating log files
@@ -103,9 +102,6 @@ namespace SampleApi.Plumbing.Logging
             // Create appenders from configuration
             var appenders = this.CreateProductionAppenders((JArray)loggingConfiguration["appenders"]);
             BasicConfigurator.Configure(repository, appenders);
-
-            // Load performance threshold data
-            this.LoadPerformanceThresholds((JObject)loggingConfiguration["performanceThresholdsMilliseconds"]);
         }
 
         /*
@@ -232,45 +228,6 @@ namespace SampleApi.Plumbing.Logging
             }
 
             return LogLevel.Information;
-        }
-
-        /*
-         * Read any performance overrides into objects
-         */
-        private void LoadPerformanceThresholds(JObject thresholdData)
-        {
-            // Read the default
-            this.defaultPerformanceThresholdMilliseconds = thresholdData["default"].ToObject<int>();
-
-            // Process any overrides
-            var operationOverrides = (JObject)thresholdData["operationOverrides"];
-            if (operationOverrides != null)
-            {
-                foreach (var operationOverride in operationOverrides)
-                {
-                    var thresholdOverride = new PerformanceThreshold
-                    {
-                        Name = operationOverride.Key.ToString(),
-                        Milliseconds = operationOverride.Value.ToObject<int>(),
-                    };
-
-                    this.thresholdOverrides.Add(thresholdOverride);
-                }
-            }
-        }
-
-        /*
-         * Look up a performance threshold for an operation name
-         */
-        private int GetPerformanceThreshold(string operationName)
-        {
-            var found = this.thresholdOverrides.FirstOrDefault(o => o.Name.ToLowerInvariant() == operationName.ToLowerInvariant());
-            if (found != null)
-            {
-                return found.Milliseconds;
-            }
-
-            return this.defaultPerformanceThresholdMilliseconds;
         }
     }
 }

@@ -16,19 +16,8 @@ namespace SampleApi.Plumbing.Logging
     internal sealed class LogEntry : ILogEntry
     {
         private readonly ILog productionLogger;
-        private readonly Func<string, int> performanceThresholdCallback;
         private readonly LogEntryData data;
         private bool started;
-
-        /*
-         * The default constructor
-         */
-        public LogEntry(
-            string apiName,
-            ILog productionLogger)
-                : this(apiName, productionLogger, null)
-        {
-        }
 
         /*
          * The main constructor
@@ -36,16 +25,16 @@ namespace SampleApi.Plumbing.Logging
         public LogEntry(
             string apiName,
             ILog productionLogger,
-            Func<string, int> performanceThresholdCallback)
+            int performanceThresholdMilliseconds = 1000)
         {
             // Store the logger reference
             this.productionLogger = productionLogger;
-            this.performanceThresholdCallback = performanceThresholdCallback;
 
             // Initialise data
             this.data = new LogEntryData();
             this.data.ApiName = apiName;
             this.data.HostName = Environment.MachineName;
+            this.data.PerformanceThresholdMilliseconds = performanceThresholdMilliseconds;
 
             // Set a flag to prevent re-entrancy
             this.started = false;
@@ -186,12 +175,6 @@ namespace SampleApi.Plumbing.Logging
             if (operationName != null)
             {
                 this.data.OperationName = operationName.ToString();
-
-                // Look up the performance threshold for the operation
-                if (this.performanceThresholdCallback != null)
-                {
-                    this.data.PerformanceThresholdMilliseconds = this.performanceThresholdCallback(this.data.OperationName);
-                }
             }
 
             // Capture template ids in URL path segments
