@@ -11,8 +11,7 @@ The Final OAuth secured .NET API code sample, referenced in my blog at https://a
 
 ### Quick Start
 
-Ensure that .NET 5 is installed  
-Run the start script to begin listening over SSL, then run the start script to begin listening over HTTPS.\
+Ensure that .NET 5 is installed , then run the start script to begin listening on SSL port 445.\
 You need to run the script at least once in order to download development SSL certificates.
 
 - ./start.sh
