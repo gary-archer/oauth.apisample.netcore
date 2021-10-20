@@ -3,8 +3,10 @@ namespace SampleApi.Plumbing.Security
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Security.Claims;
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
+    using IdentityModel;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.Extensions.Options;
     using SampleApi.Plumbing.Claims;
@@ -53,8 +55,11 @@ namespace SampleApi.Plumbing.Security
                 // Add identity details to logs
                 logEntry.SetIdentity(claims.Base);
 
-                // Get the base principal, containing the claims in the access token
-                var principal = claims.Base.Principal;
+                // Create the final claims principal
+                var claimsList = new List<Claim>();
+                claimsList.Add(new Claim(JwtClaimTypes.Subject, claims.Base.Subject));
+                var identity = new ClaimsIdentity(claimsList, "Bearer", JwtClaimTypes.Subject, string.Empty);
+                var principal = new ClaimsPrincipal(identity);
 
                 // Set up .Net security from this principal
                 var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), this.Scheme.Name);

@@ -13,11 +13,11 @@ namespace SampleApi.Plumbing.OAuth
     internal sealed class StandardAuthorizer : IAuthorizer
     {
         private readonly OAuthAuthenticator authenticator;
-        private readonly ClaimsProvider customClaimsProvider;
+        private readonly CustomClaimsProvider customClaimsProvider;
 
         public StandardAuthorizer(
             OAuthAuthenticator authenticator,
-            ClaimsProvider customClaimsProvider)
+            CustomClaimsProvider customClaimsProvider)
         {
             this.authenticator = authenticator;
             this.customClaimsProvider = customClaimsProvider;
@@ -35,11 +35,14 @@ namespace SampleApi.Plumbing.OAuth
                 throw ErrorFactory.CreateClient401Error("No access token was received in the bearer header");
             }
 
-            // Do the token validation work
+            // On every API request we validate the JWT, in a zero trust manner
             var payload = await this.authenticator.ValidateTokenAsync(accessToken);
 
-            // Ask the claims provider to read the payload and supply the final claims object
-            return this.customClaimsProvider.ReadClaims(payload);
+            // Then read all claims from the token
+            var baseClaims = ClaimsReader.BaseClaims(payload);
+            var userInfo = ClaimsReader.UserInfoClaims(payload);
+            var customClaims = await this.customClaimsProvider.GetAsync(accessToken, baseClaims, userInfo);
+            return new ApiClaims(baseClaims, userInfo, customClaims);
         }
     }
 }

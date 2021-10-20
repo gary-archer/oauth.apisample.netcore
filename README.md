@@ -4,14 +4,16 @@
 
 ### Overview
 
-The final API code sample using OAuth and Open Id Connect, referenced in my blog at https://authguidance.com:
+The Final OAuth secured .NET API code sample, referenced in my blog at https://authguidance.com:
 
-- The API takes finer control over OAuth processing via a filter, implemented with a certified library
-- The API also implements other [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/), to enable productivity and quality
+- The API takes finer control over OAuth processing via a certified library, and uses domain specific claims
+- The API also implements other [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/), for good technical quality
 
 ### Quick Start
 
-Run the start script to begin listening over SSL:
+Ensure that .NET 5 is installed  
+Run the start script to begin listening over SSL, then run the start script to begin listening over HTTPS.\
+You need to run the script at least once in order to download development SSL certificates.
 
 - ./start.sh
 
@@ -22,11 +24,11 @@ Run the start script to begin listening over SSL:
 
 ### Programming Languages
 
-* C# and .Net 5 are used to implement the OAuth Secured REST API
+* C# and .NET 5 are used to implement the REST API
 
 ### Middleware Used
 
-* The Kestrel web server is used to host the API over SSL
+* The Kestrel web server is used to host the API over SSL port 443
 * AWS Cognito is used as the default Authorization Server
 * The [IdentityModel Library](https://github.com/IdentityModel/IdentityModel) is used to implement the OAuth custom filter
 * API logs can be aggregated to [Elastic Search](https://authguidance.com/2019/07/19/log-aggregation-setup/) to support [Query Use Cases](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/)

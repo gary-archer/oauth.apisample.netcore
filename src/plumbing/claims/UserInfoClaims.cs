@@ -1,6 +1,5 @@
 namespace SampleApi.Plumbing.Claims
 {
-    using System.Security.Claims;
     using IdentityModel;
     using Newtonsoft.Json.Linq;
 
@@ -9,16 +8,6 @@ namespace SampleApi.Plumbing.Claims
      */
     public class UserInfoClaims
     {
-        /*
-         * Receive a claims principal
-         */
-        public UserInfoClaims(ClaimsPrincipal principal)
-        {
-            this.GivenName = principal.GetClaim(JwtClaimTypes.GivenName);
-            this.FamilyName = principal.GetClaim(JwtClaimTypes.FamilyName);
-            this.Email = principal.GetClaim(JwtClaimTypes.Email);
-        }
-
         /*
          * Receive individual claims values
          */

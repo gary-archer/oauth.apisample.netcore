@@ -8,7 +8,6 @@
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Logging;
     using SampleApi.Plumbing.OAuth;
-    using SampleApi.Plumbing.OAuth.TokenValidation;
     using SampleApi.Plumbing.Security;
     using SampleApi.Plumbing.Utilities;
 
@@ -18,7 +17,7 @@
     public sealed class BaseCompositionRoot
     {
         private OAuthConfiguration oauthConfiguration;
-        private ClaimsProvider claimsProvider;
+        private CustomClaimsProvider customClaimsProvider;
         private LoggingConfiguration loggingConfiguration;
         private LoggerFactory loggerFactory;
         private HttpProxy httpProxy;
@@ -36,9 +35,9 @@
         /*
          * Receive an object to manage processing claims
          */
-        public BaseCompositionRoot WithClaimsProvider(ClaimsProvider provider)
+        public BaseCompositionRoot WithCustomClaimsProvider(CustomClaimsProvider customClaimsProvider)
         {
-            this.claimsProvider = provider;
+            this.customClaimsProvider = customClaimsProvider;
             return this;
         }
 
@@ -114,11 +113,10 @@
          */
         private void RegisterOAuthDependencies()
         {
-            // Register singletons
             this.services.AddSingleton(this.oauthConfiguration);
 
             // Register the authorizer, depending on the configured strategy
-            if (this.oauthConfiguration.Strategy == "claims-caching")
+            if (this.oauthConfiguration.Provider == "cognito")
             {
                 this.services.AddScoped<IAuthorizer, ClaimsCachingAuthorizer>();
             }
@@ -127,16 +125,7 @@
                 this.services.AddScoped<IAuthorizer, StandardAuthorizer>();
             }
 
-            // Register the authenticator and the token validator, which depends on the configured strategy
             this.services.AddScoped<OAuthAuthenticator>();
-            if (this.oauthConfiguration.TokenValidationStrategy == "introspection")
-            {
-                this.services.AddScoped<ITokenValidator, IntrospectionValidator>();
-            }
-            else
-            {
-                this.services.AddScoped<ITokenValidator, JwtValidator>();
-            }
 
             // Tell Microsoft claims handling to use OAuth claim names and not those from WS-Federation
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -148,7 +137,7 @@
         private void RegisterClaimsDependencies(ServiceProvider container)
         {
             // Register the singleton cache if using claims caching
-            if (this.oauthConfiguration.Strategy == "claims-caching")
+            if (this.oauthConfiguration.Provider == "cognito")
             {
                 this.services.AddDistributedMemoryCache();
                 var cache = container.GetService<IDistributedCache>();
@@ -156,13 +145,13 @@
                 var claimsCache = new ClaimsCache(
                     cache,
                     this.oauthConfiguration.ClaimsCacheTimeToLiveMinutes,
-                    this.claimsProvider,
+                    this.customClaimsProvider,
                     container);
                 this.services.AddSingleton(claimsCache);
             }
 
-            // Register an object to manage overall claims
-            this.services.AddSingleton(this.claimsProvider);
+            // Register an object to manage custom claims
+            this.services.AddSingleton(this.customClaimsProvider);
 
             // Claims are injected into this holder at runtime
             this.services.AddScoped<ClaimsHolder>();

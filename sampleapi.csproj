@@ -12,18 +12,15 @@
 
   <ItemGroup>
     <!-- OAuth security -->
-    <PackageReference Include="IdentityModel" Version="5.1.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.10.0" />
+    <PackageReference Include="IdentityModel" Version="5.2.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.13.1" />
 
     <!-- API logging -->
     <PackageReference Include="log4net" Version="2.0.12" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="5.0.4" />
 
     <!-- JSON handling -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-
-    <!-- Fix a code vulnerability by using a newer than default version -->
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 
     <!-- Code quality checks -->
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">

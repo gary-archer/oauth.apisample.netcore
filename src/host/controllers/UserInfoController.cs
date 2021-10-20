@@ -3,6 +3,7 @@ namespace SampleApi.Host.Controllers
     using Microsoft.AspNetCore.Mvc;
     using SampleApi.Logic.Entities;
     using SampleApi.Plumbing.Claims;
+    using SampleApi.Plumbing.OAuth;
 
     /*
      * A simple API controller to return user info
@@ -26,7 +27,7 @@ namespace SampleApi.Host.Controllers
         public ClientUserInfo GetUserClaims()
         {
             // First check we have access to this level of data
-            this.baseClaims.VerifyScope("profile");
+            ScopeVerifier.Enforce(this.baseClaims.Scopes, "profile");
 
             // Next return the user info
             return new ClientUserInfo(this.userInfoClaims.GivenName, this.userInfoClaims.FamilyName);

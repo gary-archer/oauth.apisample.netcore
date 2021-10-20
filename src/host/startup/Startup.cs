@@ -42,7 +42,7 @@
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) && ctx.Request.Method == "OPTIONS",
                 api => app.UseCors("api"));
 
-            // Configure .Net Core authentication to run on all paths except those marked with [AllowAnonymous]
+            // Configure .Net Core authentication to run on all paths except particular exceptions
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) &&
                        !ctx.Request.Path.StartsWithSegments(new PathString("/api/customclaims")) &&
@@ -120,7 +120,7 @@
         {
             new BaseCompositionRoot()
                 .UseOAuth(this.configuration.OAuth)
-                .WithClaimsProvider(new SampleClaimsProvider())
+                .WithCustomClaimsProvider(new SampleCustomClaimsProvider())
                 .WithLogging(this.configuration.Logging, this.loggerFactory)
                 .WithProxyConfiguration(this.configuration.Api.UseProxy, this.configuration.Api.ProxyUrl)
                 .WithServices(services)

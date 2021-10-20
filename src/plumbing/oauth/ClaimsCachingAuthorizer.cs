@@ -16,12 +16,12 @@ namespace SampleApi.Plumbing.OAuth
     {
         private readonly ClaimsCache cache;
         private readonly OAuthAuthenticator authenticator;
-        private readonly ClaimsProvider customClaimsProvider;
+        private readonly CustomClaimsProvider customClaimsProvider;
 
         public ClaimsCachingAuthorizer(
             ClaimsCache cache,
             OAuthAuthenticator authenticator,
-            ClaimsProvider customClaimsProvider)
+            CustomClaimsProvider customClaimsProvider)
         {
             this.cache = cache;
             this.authenticator = authenticator;
@@ -33,33 +33,35 @@ namespace SampleApi.Plumbing.OAuth
          */
         public async Task<ApiClaims> ExecuteAsync(HttpRequest request)
         {
-            // First handle missing tokens
+            // Read the token first
             var accessToken = BearerToken.Read(request);
             if (string.IsNullOrWhiteSpace(accessToken))
             {
                 throw ErrorFactory.CreateClient401Error("No access token was received in the bearer header");
             }
 
+            // On every API request we validate the JWT, in a zero trust manner
+            var payload = await this.authenticator.ValidateTokenAsync(accessToken);
+            var baseClaims = ClaimsReader.BaseClaims(payload);
+
             // If cached results already exist for this token then return them immediately
             var accessTokenHash = this.Sha256(accessToken);
-            var cachedClaims = await this.cache.GetClaimsForTokenAsync(accessTokenHash);
+            var cachedClaims = await this.cache.GetExtraUserClaimsAsync(accessTokenHash);
             if (cachedClaims != null)
             {
-                return cachedClaims;
+                return new ApiClaims(baseClaims, cachedClaims.UserInfo, cachedClaims.Custom);
             }
 
-            // Validate the token and read token claims
-            var token = await this.authenticator.ValidateTokenAsync(accessToken);
-
-            // Do the work for user info lookup
+            // In Cognito we cannot issue custom claims so the API looks them up when the access token is first received
             var userInfo = await this.authenticator.GetUserInfoAsync(accessToken);
-
-            // Ask the provider to supply the final claims object
-            var claims = await this.customClaimsProvider.SupplyClaimsAsync(token, userInfo);
+            var customClaims = await this.customClaimsProvider.GetAsync(accessToken, baseClaims, userInfo);
+            var claimsToCache = new CachedClaims(userInfo, customClaims);
 
             // Cache the claims against the token hash until the token's expiry time
-            await this.cache.AddClaimsForTokenAsync(accessTokenHash, claims);
-            return claims;
+            await this.cache.SetExtraUserClaimsAsync(accessTokenHash, claimsToCache, baseClaims.Expiry);
+
+            // Return the final claims
+            return new ApiClaims(baseClaims, userInfo, customClaims);
         }
 
         /*

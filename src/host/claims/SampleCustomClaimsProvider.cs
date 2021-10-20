@@ -1,8 +1,6 @@
 namespace SampleApi.Host.Claims
 {
-    using System.Security.Claims;
     using System.Threading.Tasks;
-    using IdentityModel;
     using Newtonsoft.Json.Linq;
     using SampleApi.Logic.Entities;
     using SampleApi.Plumbing.Claims;
@@ -10,45 +8,32 @@ namespace SampleApi.Host.Claims
     /*
      * This class provides any API specific custom claims
      */
-    public class SampleClaimsProvider : ClaimsProvider
+    public class SampleCustomClaimsProvider : CustomClaimsProvider
     {
         /*
-         * When using the StandardAuthorizer this is called at the time of token issuance, via the ClaimsController
-         * My Authorization Server setup currently sends the user's email as the subject claim
+         * When using the StandardAuthorizer this is called at the time of token issuance by the ClaimsController
          */
         #pragma warning disable 1998
-        public async Task<SampleCustomClaims> SupplyCustomClaimsFromSubjectAsync(string subject)
+        public override async Task<CustomClaims> IssueAsync(string subject)
         {
-            return this.SupplyCustomClaims(subject) as SampleCustomClaims;
+            return this.GetCustomClaims(subject);
         }
         #pragma warning restore 1998
 
         /*
-         * When using the ClaimsCachingAuthorizer, claims are added when the access token is first received
-         * This would typically involve a call to a database or another API
+         * When using the ClaimsCachingAuthorizer this is called when an API first receives the access token
          */
         #pragma warning disable 1998
-        protected override async Task<CustomClaims> SupplyCustomClaimsAsync(
-            ClaimsPrincipal tokenData,
-            ClaimsPrincipal userInfoData)
+        public override async Task<CustomClaims> GetAsync(string accessToken, BaseClaims baseClaims, UserInfoClaims userInfo)
         {
-            var email = userInfoData.GetClaim(JwtClaimTypes.Email);
-            return this.SupplyCustomClaims(email);
+            return this.GetCustomClaims(userInfo.Email);
         }
         #pragma warning restore 1998
 
         /*
-         * When using the StandardAuthorizer we read all claims directly from the token
+         * Ensure that custom claims are correctly deserialized
          */
-        protected override CustomClaims ReadCustomClaims(ClaimsPrincipal principal)
-        {
-            return new SampleCustomClaims(principal);
-        }
-
-        /*
-         * Override to call the correct concrete class for this API
-         */
-        protected override CustomClaims DeserializeCustomClaims(JObject claimsNode)
+        public override CustomClaims Deserialize(JObject claimsNode)
         {
             return SampleCustomClaims.ImportData(claimsNode);
         }
@@ -57,7 +42,7 @@ namespace SampleApi.Host.Claims
          * Simulate some API logic for identifying the user from OAuth data, via either the subject or email claims
          * A real API would then do a database lookup to find the user's custom claims
          */
-        private CustomClaims SupplyCustomClaims(string email)
+        private CustomClaims GetCustomClaims(string email)
         {
             var isAdmin = email.ToLowerInvariant().Contains("admin");
             if (isAdmin)

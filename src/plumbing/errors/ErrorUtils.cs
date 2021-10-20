@@ -49,44 +49,6 @@
         }
 
         /*
-         * Report failures in introspection responses
-         */
-        public static ServerError FromIntrospectionError(TokenIntrospectionResponse response, string url)
-        {
-            var data = ReadOAuthErrorResponse(response.Json);
-            var error = CreateOAuthServerError(
-                ErrorCodes.IntrospectionFailure,
-                "Token validation failed",
-                data.Item1);
-
-            error.SetDetails(GetOAuthErrorDetails(data.Item2, response.Error, url));
-            return error;
-        }
-
-        /*
-         * Handle exceptions when performing introspection
-         */
-        public static Exception FromIntrospectionError(Exception ex, string url)
-        {
-            // Avoid reprocessing
-            var serverError = TryConvertToServerError(ex);
-            if (serverError != null)
-            {
-                return serverError;
-            }
-
-            var clientError = TryConvertToClientError(ex);
-            if (clientError != null)
-            {
-                return clientError;
-            }
-
-            var error = CreateServerError(ex, ErrorCodes.IntrospectionFailure, "Token validation failed");
-            error.SetDetails($"URL: {url}");
-            return error;
-        }
-
-        /*
          * Handle failures in JWKS key responses
          */
         public static ServerError FromTokenSigningKeysDownloadError(JsonWebKeySetResponse response, string url)

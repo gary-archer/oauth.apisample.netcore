@@ -10,6 +10,7 @@
     using SampleApi.Logic.Repositories;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
+    using SampleApi.Plumbing.OAuth;
 
     /*
      * A controller for our company resources
@@ -33,7 +34,7 @@
         public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
             // First check we have access to this level of data
-            this.baseClaims.VerifyScope("transactions_read");
+            ScopeVerifier.Enforce(this.baseClaims.Scopes, "transactions_read");
 
             // Then return the list of companies
             return await this.service.GetCompanyListAsync();
@@ -46,7 +47,7 @@
         public async Task<CompanyTransactions> GetCompanyTransactionsAsync(string id)
         {
             // First check we have access to this level of data
-            this.baseClaims.VerifyScope("transactions_read");
+            ScopeVerifier.Enforce(this.baseClaims.Scopes, "transactions_read");
 
             // Return a 400 if the id is not a number
             int idValue;
