@@ -3,10 +3,8 @@ namespace SampleApi.Plumbing.Security
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using System.Security.Claims;
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
-    using IdentityModel;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.Extensions.Options;
     using SampleApi.Plumbing.Claims;
@@ -44,25 +42,19 @@ namespace SampleApi.Plumbing.Security
                 var logEntry = (LogEntry)this.Context.RequestServices.GetService(typeof(ILogEntry));
                 logEntry.Start(this.Request);
 
-                // Do the authorization work and get claims
+                // Do the authorization work and get claims, including those not in the token
                 IAuthorizer authorizer = (IAuthorizer)this.Context.RequestServices.GetService(typeof(IAuthorizer));
                 var claims = await authorizer.ExecuteAsync(this.Request);
 
                 // Update the claims holder so that other classes can resolve the claims directly
                 var holder = (ClaimsHolder)this.Context.RequestServices.GetService(typeof(ClaimsHolder));
-                holder.Value = claims;
+                holder.Value = claims.ApiClaims;
 
                 // Add identity details to logs
-                logEntry.SetIdentity(claims.Base);
+                logEntry.SetIdentity(claims.ApiClaims.Base);
 
-                // Create the final claims principal
-                var claimsList = new List<Claim>();
-                claimsList.Add(new Claim(JwtClaimTypes.Subject, claims.Base.Subject));
-                var identity = new ClaimsIdentity(claimsList, "Bearer", JwtClaimTypes.Subject, string.Empty);
-                var principal = new ClaimsPrincipal(identity);
-
-                // Set up .Net security from this principal
-                var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), this.Scheme.Name);
+                // Set up .Net security from the token principal
+                var ticket = new AuthenticationTicket(claims.Principal, new AuthenticationProperties(), this.Scheme.Name);
                 return AuthenticateResult.Success(ticket);
             }
             catch (ClientError clientError)
