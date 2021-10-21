@@ -36,7 +36,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * The entry point for validating an access token
          */
-        public async Task<ClaimsPrincipal> ValidateTokenAsync(string accessToken)
+        public async Task<ClaimsPayload> ValidateTokenAsync(string accessToken)
         {
             using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
@@ -44,7 +44,8 @@ namespace SampleApi.Plumbing.OAuth
                 var keys = await this.GetTokenSigningPublicKeysAsync();
 
                 // Use it to validate the token and read a claims principal
-                return this.ValidateJsonWebToken(accessToken, keys);
+                var principal = this.ValidateJsonWebToken(accessToken, keys);
+                return new ClaimsPayload(principal);
             }
         }
 
