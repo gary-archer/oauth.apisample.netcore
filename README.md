@@ -6,7 +6,7 @@
 
 The Final OAuth secured .NET API code sample, referenced in my blog at https://authguidance.com:
 
-- The API takes finer control over OAuth processing via a certified library, and uses domain specific claims
+- The API takes finer control over OAuth domain specific claims via the Microsoft library
 - The API also implements other [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/), for good technical quality
 
 ### Quick Start
