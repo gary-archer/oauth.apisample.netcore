@@ -8,7 +8,7 @@ namespace SampleApi.Plumbing.OAuth
     /*
      * A class to customize cryptographic validation of JWTs using a jose library
      */
-    internal class CustomJwtSecurityTokenHandler : JwtSecurityTokenHandler
+    internal sealed class CustomJwtSecurityTokenHandler : JwtSecurityTokenHandler
     {
         /*
          * The Jose library could use more advanced algorithms such as PS256 if needed

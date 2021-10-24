@@ -11,7 +11,7 @@ namespace SampleApi.Plumbing.Claims
     /*
      * A wrapper for a thread safe memory cache
      */
-    internal sealed class ClaimsCache
+    public sealed class ClaimsCache
     {
         private readonly IDistributedCache cache;
         private readonly int timeToLiveMinutes;

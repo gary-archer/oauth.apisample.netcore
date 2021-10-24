@@ -7,7 +7,7 @@ namespace SampleApi.Plumbing.Errors
      * A utility to read JSON and ignore errors, to make the calling code simpler
      * This prevents 'double faults' during error handling
      */
-    public static class ErrorResponseReader
+    internal static class ErrorResponseReader
     {
         public static JObject ReadJson(string jsonText)
         {

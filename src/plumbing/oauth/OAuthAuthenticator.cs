@@ -16,7 +16,7 @@ namespace SampleApi.Plumbing.OAuth
     /*
      * The class from which OAuth calls are initiated
      */
-    internal sealed class OAuthAuthenticator
+    public sealed class OAuthAuthenticator
     {
         private readonly OAuthConfiguration configuration;
         private readonly JsonWebKeyResolver jsonWebKeyResolver;

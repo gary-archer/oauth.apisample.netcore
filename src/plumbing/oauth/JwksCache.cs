@@ -8,7 +8,7 @@ namespace SampleApi.Plumbing.Claims
     /*
      * A thread safe cache of JWKS keys
      */
-    internal sealed class JwksCache
+    public sealed class JwksCache
     {
         private readonly IDistributedCache cache;
         private readonly int timeToLiveMinutes;

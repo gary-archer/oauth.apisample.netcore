@@ -6,7 +6,7 @@
     /*
      * A class to manage error translation
      */
-    internal static class ErrorUtils
+    public static class ErrorUtils
     {
         /*
          * Translate a general exception to a known format

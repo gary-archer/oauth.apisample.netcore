@@ -7,7 +7,7 @@ namespace SampleApi.Plumbing.Middleware
     /*
      * Middleware to do API request logging
      */
-    internal sealed class LoggerMiddleware
+    public sealed class LoggerMiddleware
     {
         private readonly RequestDelegate next;
 

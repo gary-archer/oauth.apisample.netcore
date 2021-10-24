@@ -12,7 +12,7 @@ namespace SampleApi.Plumbing.OAuth
     /*
      * An authorizer that manages claims in an extensible manner, with the ability to use claims from the API's own data
      */
-    internal sealed class ClaimsCachingAuthorizer : IAuthorizer
+    public sealed class ClaimsCachingAuthorizer : IAuthorizer
     {
         private readonly ClaimsCache cache;
         private readonly OAuthAuthenticator authenticator;

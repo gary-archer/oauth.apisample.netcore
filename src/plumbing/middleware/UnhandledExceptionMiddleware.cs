@@ -11,7 +11,7 @@ namespace SampleApi.Plumbing.Middleware
     /*
      * The unhandled exception handler, primarily called when an ASP.Net request fails
      */
-    internal sealed class UnhandledExceptionMiddleware
+    public sealed class UnhandledExceptionMiddleware
     {
         private readonly RequestDelegate next;
 

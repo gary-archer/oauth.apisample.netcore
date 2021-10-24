@@ -10,7 +10,7 @@ namespace SampleApi.Plumbing.OAuth
      * An authorizer that relies on the advanced features of the Authorization Server to provide claims
      * This is the preferred option when supported, since it leads to simpler code and better security
      */
-    internal sealed class StandardAuthorizer : IAuthorizer
+    public sealed class StandardAuthorizer : IAuthorizer
     {
         private readonly OAuthAuthenticator authenticator;
         private readonly CustomClaimsProvider customClaimsProvider;

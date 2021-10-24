@@ -14,7 +14,7 @@ namespace SampleApi.Plumbing.OAuth
     /*
     * Do the signing key download without needing to plug a website library into an API
     */
-    internal sealed class JsonWebKeyResolver
+    public sealed class JsonWebKeyResolver
     {
         private readonly OAuthConfiguration configuration;
         private readonly JwksCache cache;

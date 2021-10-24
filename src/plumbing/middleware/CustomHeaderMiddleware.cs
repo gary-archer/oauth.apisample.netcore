@@ -9,7 +9,7 @@ namespace SampleApi.Plumbing.Middleware
     /*
      * A class to process custom headers to enable testers to control non functional behaviour
      */
-    internal sealed class CustomHeaderMiddleware
+    public sealed class CustomHeaderMiddleware
     {
         private readonly RequestDelegate next;
 
