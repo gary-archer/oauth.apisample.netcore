@@ -34,7 +34,7 @@
         "Microsoft.AspNetCore.Server.Kestrel": "Error",
         "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
         "SampleApi.Plumbing.Security.CustomAuthenticationHandler": "Error",
-        "SampleApi.Plumbing.Claims.ClaimsCache": "Info"
+        "SampleApi.Plumbing.Cache.ClaimsCache": "Info"
       }
     }
   },

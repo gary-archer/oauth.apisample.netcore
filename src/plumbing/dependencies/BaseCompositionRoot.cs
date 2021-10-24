@@ -1,6 +1,5 @@
 ﻿namespace SampleApi.Host.Startup
 {
-    using System.IdentityModel.Tokens.Jwt;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
@@ -79,14 +78,18 @@
                 // Register dependencies for logging and error handling
                 this.RegisterBaseDependencies();
 
+                // Register the Microsoft thread safe memory cache
+                this.services.AddDistributedMemoryCache();
+                var cache = container.GetService<IDistributedCache>();
+
                 // Register dependencies for OAuth processing
                 if (this.oauthConfiguration != null)
                 {
-                    this.RegisterOAuthDependencies();
+                    this.RegisterOAuthDependencies(cache);
                 }
 
                 // Register claims related dependencies
-                this.RegisterClaimsDependencies(container);
+                this.RegisterClaimsDependencies(cache, container);
             }
         }
 
@@ -111,11 +114,11 @@
         /*
          * Register OAuth dependencies
          */
-        private void RegisterOAuthDependencies()
+        private void RegisterOAuthDependencies(IDistributedCache cache)
         {
             this.services.AddSingleton(this.oauthConfiguration);
 
-            // Register the authorizer, depending on the configured strategy
+            // Register the authorizer as a per request dependency
             if (this.oauthConfiguration.Provider == "cognito")
             {
                 this.services.AddScoped<IAuthorizer, ClaimsCachingAuthorizer>();
@@ -125,23 +128,22 @@
                 this.services.AddScoped<IAuthorizer, StandardAuthorizer>();
             }
 
+            // The authenticator is a per request dependency
             this.services.AddScoped<OAuthAuthenticator>();
 
-            // Tell Microsoft claims handling to use OAuth claim names and not those from WS-Federation
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            // The JWT handling uses a singleton thread safe cache
+            var jwksCache = new JwksCache(cache);
+            this.services.AddSingleton(new JsonWebKeyResolver(this.oauthConfiguration, jwksCache, this.httpProxy));
         }
 
         /*
          * Register Claims related dependencies
          */
-        private void RegisterClaimsDependencies(ServiceProvider container)
+        private void RegisterClaimsDependencies(IDistributedCache cache, ServiceProvider container)
         {
             // Register the singleton cache if using claims caching
             if (this.oauthConfiguration.Provider == "cognito")
             {
-                this.services.AddDistributedMemoryCache();
-                var cache = container.GetService<IDistributedCache>();
-
                 var claimsCache = new ClaimsCache(
                     cache,
                     this.oauthConfiguration.ClaimsCacheTimeToLiveMinutes,

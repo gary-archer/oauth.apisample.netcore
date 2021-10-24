@@ -9,7 +9,7 @@ namespace SampleApi.Plumbing.Claims
     using Newtonsoft.Json.Linq;
 
     /*
-     * Encapsulate getting and setting claims from the cache
+     * A wrapper for a thread safe memory cache
      */
     internal sealed class ClaimsCache
     {

@@ -3,6 +3,7 @@ namespace SampleApi.Plumbing.Security
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Security.Claims;
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authentication;
@@ -48,13 +49,15 @@ namespace SampleApi.Plumbing.Security
 
                 // Update the claims holder so that other classes can resolve the claims directly
                 var holder = (ClaimsHolder)this.Context.RequestServices.GetService(typeof(ClaimsHolder));
-                holder.Value = claims.ApiClaims;
+                holder.Value = claims;
 
                 // Add identity details to logs
-                logEntry.SetIdentity(claims.ApiClaims.Base);
+                logEntry.SetIdentity(claims.Base);
 
-                // Set up .Net security from the token principal
-                var ticket = new AuthenticationTicket(claims.Principal, new AuthenticationProperties(), this.Scheme.Name);
+                // Set up .Net security
+                var identity = new ClaimsIdentity(this.Scheme.Name);
+                var principal = new ClaimsPrincipal(identity);
+                var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), this.Scheme.Name);
                 return AuthenticateResult.Success(ticket);
             }
             catch (ClientError clientError)

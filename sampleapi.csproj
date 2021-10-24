@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <!-- OAuth security -->
-    <PackageReference Include="IdentityModel" Version="5.2.0" />
+    <PackageReference Include="jose-jwt" Version="3.2.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.13.1" />
 
     <!-- API logging -->

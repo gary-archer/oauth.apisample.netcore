@@ -1,6 +1,5 @@
 namespace SampleApi.Plumbing.Claims
 {
-    using IdentityModel;
     using Newtonsoft.Json.Linq;
 
     /*
@@ -29,9 +28,9 @@ namespace SampleApi.Plumbing.Claims
          */
         public static UserInfoClaims ImportData(JObject data)
         {
-            var givenName = data.GetValue(JwtClaimTypes.GivenName).Value<string>();
-            var familyName = data.GetValue(JwtClaimTypes.FamilyName).Value<string>();
-            var email = data.GetValue(JwtClaimTypes.Email).Value<string>();
+            var givenName = data.GetValue("given_name").Value<string>();
+            var familyName = data.GetValue("family_name").Value<string>();
+            var email = data.GetValue("email").Value<string>();
             return new UserInfoClaims(givenName, familyName, email);
         }
 
