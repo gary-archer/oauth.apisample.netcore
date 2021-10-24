@@ -82,13 +82,8 @@
                 this.services.AddDistributedMemoryCache();
                 var cache = container.GetService<IDistributedCache>();
 
-                // Register dependencies for OAuth processing
-                if (this.oauthConfiguration != null)
-                {
-                    this.RegisterOAuthDependencies(cache);
-                }
-
-                // Register claims related dependencies
+                // Register dependencies for OAuth processing and claims handling
+                this.RegisterOAuthDependencies(cache);
                 this.RegisterClaimsDependencies(cache, container);
             }
         }

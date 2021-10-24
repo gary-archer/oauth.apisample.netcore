@@ -11,16 +11,6 @@ namespace SampleApi.Logic.Entities
     public class SampleCustomClaims : CustomClaims
     {
         /*
-         * Used with the standard authorizer
-         */
-        public SampleCustomClaims(ClaimsPrincipal principal)
-        {
-            this.UserId = principal.GetClaim("user_id");
-            this.UserRole = principal.GetClaim("user_role");
-            this.UserRegions = principal.FindAll(c => c.Type == "user_regions").Select(c => c.Value).ToArray();
-        }
-
-        /*
          * Used with the claims caching authorizer
          */
         public SampleCustomClaims(string userId, string userRole, string[] userRegions)

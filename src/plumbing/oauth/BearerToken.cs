@@ -1,6 +1,5 @@
 namespace SampleApi.Plumbing.OAuth
 {
-    using System.Linq;
     using Microsoft.AspNetCore.Http;
     using SampleApi.Plumbing.Utilities;
 
