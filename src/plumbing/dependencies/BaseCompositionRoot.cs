@@ -1,6 +1,5 @@
 ﻿namespace SampleApi.Host.Startup
 {
-    using System.IdentityModel.Tokens.Jwt;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
@@ -115,7 +114,7 @@
         {
             this.services.AddSingleton(this.oauthConfiguration);
 
-            // Register the authorizer, depending on the configured strategy
+            // Register the authorizer as a per request dependency
             if (this.oauthConfiguration.Provider == "cognito")
             {
                 this.services.AddScoped<IAuthorizer, ClaimsCachingAuthorizer>();
@@ -125,10 +124,9 @@
                 this.services.AddScoped<IAuthorizer, StandardAuthorizer>();
             }
 
+            // The authenticator is a per request dependency but uses cached JWKS keys
+            this.services.AddSingleton(new JsonWebKeyResolver(this.oauthConfiguration, this.httpProxy));
             this.services.AddScoped<OAuthAuthenticator>();
-
-            // Tell Microsoft claims handling to use OAuth claim names and not those from WS-Federation
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
         }
 
         /*

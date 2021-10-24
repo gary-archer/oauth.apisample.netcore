@@ -1,0 +1,17 @@
+CODE IMPROVEMENTS
+-----------------
+1. Get basics working to check it is on track
+
+2. Get rid of Identity Model - but reuse bits of their code
+
+3. Implement JWT checks and see what Microsoft code does
+
+MINOR
+-----
+1. ConfigureAwait(false)
+
+2. Thread safety when downloading keys via a concurrent type in .Net
+
+3. Compare download logic to MS library
+
+4. Keep a copy of the original code in my backup USB stick and add this to the blog post

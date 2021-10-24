@@ -6,7 +6,7 @@
 
 The final OAuth secured .NET API code sample, referenced in my blog at https://authguidance.com:
 
-- The API takes finer control over OAuth domain specific claims via the Microsoft library
+- The API takes finer control over OAuth domain specific claims and uses a certified JOSE library
 - The API also implements other [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/), for good technical quality
 
 ### Quick Start
@@ -29,5 +29,5 @@ You need to run the script at least once in order to download development SSL ce
 
 * The Kestrel web server is used to host the API over SSL port 443
 * AWS Cognito is used as the default Authorization Server
-* The [IdentityModel Library](https://github.com/IdentityModel/IdentityModel) is used to implement the OAuth custom filter
+* The [jose-jwt Library](https://github.com/dvsekhvalnov/jose-jwt) is used to manage in memory validation of JWTs
 * API logs can be aggregated to [Elastic Search](https://authguidance.com/2019/07/19/log-aggregation-setup/) to support [Query Use Cases](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/)

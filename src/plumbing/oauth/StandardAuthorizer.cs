@@ -26,7 +26,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * OAuth authorization involves token validation and claims lookup
          */
-        public async Task<ClaimsPayload> ExecuteAsync(HttpRequest request)
+        public async Task<ApiClaims> ExecuteAsync(HttpRequest request)
         {
             // First handle missing tokens
             var accessToken = BearerToken.Read(request);
@@ -39,13 +39,10 @@ namespace SampleApi.Plumbing.OAuth
             var payload = await this.authenticator.ValidateTokenAsync(accessToken);
 
             // Then read all claims from the token
-            var baseClaims = ClaimsReader.BaseClaims(payload.Principal);
-            var userInfo = ClaimsReader.UserInfoClaims(payload.Principal);
+            var baseClaims = ClaimsReader.BaseClaims(payload);
+            var userInfo = ClaimsReader.UserInfoClaims(payload);
             var customClaims = await this.customClaimsProvider.GetAsync(accessToken, baseClaims, userInfo);
-
-            // Return both the original claims principal and our object based claims
-            payload.ApiClaims = new ApiClaims(baseClaims, userInfo, customClaims);
-            return payload;
+            return new ApiClaims(baseClaims, userInfo, customClaims);
         }
     }
 }

@@ -1,13 +1,12 @@
 namespace SampleApi.Plumbing.OAuth
 {
     using System;
-    using System.IdentityModel.Tokens.Jwt;
     using System.Net.Http;
-    using System.Security.Claims;
+    using System.Security.Cryptography;
     using System.Threading.Tasks;
     using IdentityModel;
     using IdentityModel.Client;
-    using Microsoft.IdentityModel.Tokens;
+    using Newtonsoft.Json.Linq;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
@@ -20,32 +19,61 @@ namespace SampleApi.Plumbing.OAuth
     internal sealed class OAuthAuthenticator
     {
         private readonly OAuthConfiguration configuration;
+        private readonly JsonWebKeyResolver jsonWebKeyResolver;
         private readonly HttpProxy httpProxy;
         private readonly LogEntry logEntry;
 
         public OAuthAuthenticator(
             OAuthConfiguration configuration,
+            JsonWebKeyResolver jsonWebKeyResolver,
             HttpProxy httpProxy,
             ILogEntry logEntry)
         {
             this.configuration = configuration;
+            this.jsonWebKeyResolver = jsonWebKeyResolver;
             this.httpProxy = httpProxy;
             this.logEntry = (LogEntry)logEntry;
         }
 
         /*
-         * The entry point for validating an access token
+         * Validate the access token using the jose-jwt library
          */
-        public async Task<ClaimsPayload> ValidateTokenAsync(string accessToken)
+        public async Task<JObject> ValidateTokenAsync(string accessToken)
         {
             using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
-                // Get the token signing public key
-                var keys = await this.GetTokenSigningPublicKeysAsync();
+                try
+                {
+                    // Read the kid field from the JWT header
+                    var headers = Jose.JWT.Headers(accessToken);
+                    var kid = headers["kid"]?.ToString();
+                    if (string.IsNullOrWhiteSpace(kid))
+                    {
+                        var context = $"The access token had no kid in its JWT header";
+                        throw ErrorFactory.CreateClient401Error(context);
+                    }
 
-                // Use it to validate the token and read a claims principal
-                var principal = this.ValidateJsonWebToken(accessToken, keys);
-                return new ClaimsPayload(principal);
+                    // Get the token signing public key as a JSON web key
+                    var jwk = await this.jsonWebKeyResolver.GetKeyForId(kid);
+
+                    // Convert to an RSA public key object as required by the library
+                    var rsaKey = new System.Security.Cryptography.RSACryptoServiceProvider();
+                    rsaKey.ImportParameters(new RSAParameters
+                    {
+                        Modulus = Base64Url.Decode(jwk.N),
+                        Exponent = Base64Url.Decode(jwk.E),
+                    });
+
+                    // Do the token validation and return the claims in a generic security object
+                    var claims = Jose.JWT.Decode(accessToken, rsaKey);
+                    return JObject.Parse(claims);
+                }
+                catch (Exception ex)
+                {
+                    // Handle failures and log the error details
+                    var details = $"JWT verification failed: ${ex.Message}";
+                    throw ErrorFactory.CreateClient401Error(details);
+                }
             }
         }
 
@@ -82,11 +110,7 @@ namespace SampleApi.Plumbing.OAuth
                             }
                         }
 
-                        // Read values into a claims principal
-                        var givenName = this.GetClaim(response, JwtClaimTypes.GivenName);
-                        var familyName = this.GetClaim(response, JwtClaimTypes.FamilyName);
-                        var email = this.GetClaim(response, JwtClaimTypes.Email);
-                        return new UserInfoClaims(givenName, familyName, email);
+                        return ClaimsReader.UserInfoClaims(response);
                     }
                 }
                 catch (Exception ex)
@@ -94,84 +118,6 @@ namespace SampleApi.Plumbing.OAuth
                     throw ErrorUtils.FromUserInfoError(ex, this.configuration.UserInfoEndpoint);
                 }
             }
-        }
-
-        /*
-         * Get the keys from the JWKS endpoint
-         */
-        private async Task<string> GetTokenSigningPublicKeysAsync()
-        {
-            try
-            {
-                using (var client = new HttpClient(this.httpProxy.GetHandler()))
-                {
-                    // Make the HTTPS request
-                    var response = await client.GetJsonWebKeySetAsync(this.configuration.JwksEndpoint);
-                    if (response.IsError)
-                    {
-                        if (response.Exception != null)
-                        {
-                            throw ErrorUtils.FromTokenSigningKeysDownloadError(response.Exception, this.configuration.JwksEndpoint);
-                        }
-                        else
-                        {
-                            throw ErrorUtils.FromTokenSigningKeysDownloadError(response, this.configuration.JwksEndpoint);
-                        }
-                    }
-
-                    // Return the JSON data
-                    return response.Json.ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ErrorUtils.FromTokenSigningKeysDownloadError(ex, this.configuration.JwksEndpoint);
-            }
-        }
-
-        /*
-        * Do the work of verifying the access token
-        */
-        private ClaimsPrincipal ValidateJsonWebToken(string accessToken, string keys)
-        {
-            try
-            {
-                // Set parameters, and Cognito does not provide an audience claim in access tokens
-                var tokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidIssuer = this.configuration.Issuer,
-                    IssuerSigningKeys = new JsonWebKeySet(keys).Keys,
-                    ValidateAudience = string.IsNullOrWhiteSpace(this.configuration.Audience) ? false : true,
-                    ValidAudience = this.configuration.Audience,
-                    ValidAlgorithms = new[] { "RS256" },
-                };
-
-                // Do the technical validation, including checking the digital signature via the public key
-                var handler = new JwtSecurityTokenHandler();
-                SecurityToken result;
-                return handler.ValidateToken(accessToken, tokenValidationParameters, out result);
-            }
-            catch (Exception ex)
-            {
-                // Handle failures and log the error details
-                var details = $"JWT verification failed: ${ex.Message}";
-                throw ErrorFactory.CreateClient401Error(details);
-            }
-        }
-
-        /*
-         * Read a claim and report missing errors clearly
-         */
-        private string GetClaim(UserInfoResponse response, string name)
-        {
-            var value = response.TryGet(name);
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                throw ErrorUtils.FromMissingClaim(name);
-            }
-
-            return value;
         }
     }
 }

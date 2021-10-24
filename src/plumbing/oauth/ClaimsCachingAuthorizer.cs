@@ -31,7 +31,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * The entry point to populate claims from an access token
          */
-        public async Task<ClaimsPayload> ExecuteAsync(HttpRequest request)
+        public async Task<ApiClaims> ExecuteAsync(HttpRequest request)
         {
             // Read the token first
             var accessToken = BearerToken.Read(request);
@@ -42,15 +42,14 @@ namespace SampleApi.Plumbing.OAuth
 
             // On every API request we validate the JWT, in a zero trust manner
             var payload = await this.authenticator.ValidateTokenAsync(accessToken);
-            var baseClaims = ClaimsReader.BaseClaims(payload.Principal);
+            var baseClaims = ClaimsReader.BaseClaims(payload);
 
             // If cached results already exist for this token then return them immediately
             var accessTokenHash = this.Sha256(accessToken);
             var cachedClaims = await this.cache.GetExtraUserClaimsAsync(accessTokenHash);
             if (cachedClaims != null)
             {
-                payload.ApiClaims = new ApiClaims(baseClaims, cachedClaims.UserInfo, cachedClaims.Custom);
-                return payload;
+                return new ApiClaims(baseClaims, cachedClaims.UserInfo, cachedClaims.Custom);
             }
 
             // In Cognito we cannot issue custom claims so the API looks them up when the access token is first received
@@ -62,8 +61,7 @@ namespace SampleApi.Plumbing.OAuth
             await this.cache.SetExtraUserClaimsAsync(accessTokenHash, claimsToCache, baseClaims.Expiry);
 
             // Return the final claims
-            payload.ApiClaims = new ApiClaims(baseClaims, userInfo, customClaims);
-            return payload;
+            return new ApiClaims(baseClaims, userInfo, customClaims);
         }
 
         /*
