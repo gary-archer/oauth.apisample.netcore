@@ -78,14 +78,18 @@
                 // Register dependencies for logging and error handling
                 this.RegisterBaseDependencies();
 
+                // Register the Microsoft thread safe memory cache
+                this.services.AddDistributedMemoryCache();
+                var cache = container.GetService<IDistributedCache>();
+
                 // Register dependencies for OAuth processing
                 if (this.oauthConfiguration != null)
                 {
-                    this.RegisterOAuthDependencies();
+                    this.RegisterOAuthDependencies(cache);
                 }
 
                 // Register claims related dependencies
-                this.RegisterClaimsDependencies(container);
+                this.RegisterClaimsDependencies(cache, container);
             }
         }
 
@@ -110,7 +114,7 @@
         /*
          * Register OAuth dependencies
          */
-        private void RegisterOAuthDependencies()
+        private void RegisterOAuthDependencies(IDistributedCache cache)
         {
             this.services.AddSingleton(this.oauthConfiguration);
 
@@ -124,22 +128,22 @@
                 this.services.AddScoped<IAuthorizer, StandardAuthorizer>();
             }
 
-            // The authenticator is a per request dependency but uses cached JWKS keys
-            this.services.AddSingleton(new JsonWebKeyResolver(this.oauthConfiguration, this.httpProxy));
+            // The authenticator is a per request dependency
             this.services.AddScoped<OAuthAuthenticator>();
+
+            // The JWT handling uses a singleton thread safe cache
+            var jwksCache = new JwksCache(cache);
+            this.services.AddSingleton(new JsonWebKeyResolver(this.oauthConfiguration, jwksCache, this.httpProxy));
         }
 
         /*
          * Register Claims related dependencies
          */
-        private void RegisterClaimsDependencies(ServiceProvider container)
+        private void RegisterClaimsDependencies(IDistributedCache cache, ServiceProvider container)
         {
             // Register the singleton cache if using claims caching
             if (this.oauthConfiguration.Provider == "cognito")
             {
-                this.services.AddDistributedMemoryCache();
-                var cache = container.GetService<IDistributedCache>();
-
                 var claimsCache = new ClaimsCache(
                     cache,
                     this.oauthConfiguration.ClaimsCacheTimeToLiveMinutes,

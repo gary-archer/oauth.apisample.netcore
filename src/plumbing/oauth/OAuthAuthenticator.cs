@@ -74,9 +74,7 @@ namespace SampleApi.Plumbing.OAuth
                 }
                 catch (Exception ex)
                 {
-                    // Handle failures and log the error details
-                    var details = $"JWT verification failed: {ex.Message}";
-                    throw ErrorFactory.CreateClient401Error(details);
+                    throw ErrorUtils.FromTokenValidationError(ex);
                 }
             }
         }
@@ -101,7 +99,9 @@ namespace SampleApi.Plumbing.OAuth
                         // Report errors with a response
                         if (!response.IsSuccessStatusCode)
                         {
-                            throw ErrorUtils.FromUserInfoError(response, this.configuration.UserInfoEndpoint);
+                            var status = (int)response.StatusCode;
+                            var text = await response.Content.ReadAsStringAsync();
+                            throw ErrorUtils.FromUserInfoError(status, text, this.configuration.UserInfoEndpoint);
                         }
 
                         // Return the claims

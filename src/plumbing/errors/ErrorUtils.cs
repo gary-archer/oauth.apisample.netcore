@@ -2,8 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Net.Http;
-    using System.Text.Json;
 
     /*
      * A class to manage error translation
@@ -51,19 +49,13 @@
         /*
          * Handle failures in JWKS key responses
          */
-        public static ServerError FromTokenSigningKeysDownloadError(HttpResponseMessage response, string url)
+        public static ServerError FromTokenSigningKeysDownloadError(int status, string url)
         {
-            /*var data = ReadOAuthErrorResponse(response.Json);
-            var error = CreateOAuthServerError(
+            var error = ErrorFactory.CreateServerError(
                 ErrorCodes.TokenSigningKeysDownloadError,
-                "Problem downloading JWKS keys",
-                data.Item1);
-            error.SetDetails(GetOAuthErrorDetails(data.Item2, response.Error, url));
-            */
-
-            return ErrorFactory.CreateServerError(
-                ErrorCodes.TokenSigningKeysDownloadError,
-                "Problem downloading JWKS keys");
+                "Problem encountered downloading JWKS keys");
+            error.SetDetails($"Status: {status}, URL: {url}");
+            return error;
         }
 
         /*
@@ -71,34 +63,81 @@
          */
         public static ServerError FromTokenSigningKeysDownloadError(Exception ex, string url)
         {
-            return CreateServerError(ex, ErrorCodes.TokenSigningKeysDownloadError,  "Problem downloading JWKS keys");
+            var serverError = TryConvertToServerError(ex);
+            if (serverError != null)
+            {
+                return serverError;
+            }
+
+            return CreateServerError(ex, ErrorCodes.TokenSigningKeysDownloadError,  "Problem encountered downloading JWKS keys");
+        }
+
+        /*
+         * Handle errors validating tokens
+         */
+        public static Exception FromTokenValidationError(Exception ex)
+        {
+            // Avoid reprocessing
+            var serverError = TryConvertToServerError(ex);
+            if (serverError != null)
+            {
+                return serverError;
+            }
+
+            var clientError = TryConvertToClientError(ex);
+            if (clientError != null)
+            {
+                return clientError;
+            }
+
+            // Record the details behind the verification error
+            var context = $"JWT verification failed: {ex.Message}";
+            throw ErrorFactory.CreateClient401Error(context);
         }
 
         /*
          * Report user info failures clearly
          */
-        public static Exception FromUserInfoError(HttpResponseMessage response, string url)
+        public static Exception FromUserInfoError(int status, string responseData, string url)
         {
-            // Read the OAuth error code
-            /*var data = ReadOAuthErrorResponse(response.Json);
+            // Add base details
+            var parts = new List<string>();
+            parts.Add("User info lookup failed");
+            parts.Add($"Status: {status}");
 
-            // Handle a race condition where the access token expires during user info lookup
-            if (data.Item1 == ErrorCodes.UserInfoTokenExpired)
+            // Read the standard OAuth error fields
+            var json = ErrorResponseReader.ReadJson(responseData);
+            if (json != null)
             {
-                return ErrorFactory.CreateClient401Error("Access token expired during user info lookup");
+                var code = json.GetValue("error");
+                if (code != null)
+                {
+                    parts.Add($"Code: {code}");
+                }
+
+                var description = json.GetValue("error_description");
+                if (description != null)
+                {
+                    parts.Add($"Description: {description}");
+                }
             }
 
-            // Report other errors
-            var error = CreateOAuthServerError(
-                ErrorCodes.UserInfoFailure,
-                "User info lookup failed",
-                data.Item1);
-            error.SetDetails(GetOAuthErrorDetails(data.Item2, response.Error, url));
-            return error;*/
+            // Finalize details
+            parts.Add($"URL: {url}");
+            var details = string.Join(", ", parts);
 
-            return ErrorFactory.CreateServerError(
+            // If there is a race condition and the access token is expired return a 401
+            if (status == 401)
+            {
+                return ErrorFactory.CreateClient401Error(details);
+            }
+
+            // Otherwise return a 500
+            var error = ErrorFactory.CreateServerError(
                 ErrorCodes.UserInfoFailure,
                 "User info lookup failed");
+            error.SetDetails(details);
+            return error;
         }
 
         /*
@@ -183,54 +222,5 @@
 
             return null;
         }
-
-        /*
-         * Return any OAuth protocol error details
-         */
-        /*private static Tuple<string, string> ReadOAuthErrorResponse(JsonElement jsonBody)
-        {
-            string code = jsonBody.TryGetString("error");
-            string description = jsonBody.TryGetString("error_description");
-            return Tuple.Create(code, description);
-        }*/
-
-        /*
-         * Create an error object from an error code and include the OAuth error code in the user message
-         */
-        /*private static ServerError CreateOAuthServerError(string errorCode, string userMessage, string oauthErrorCode)
-        {
-            string message = userMessage;
-            if (!string.IsNullOrWhiteSpace(oauthErrorCode))
-            {
-                message += $" : {oauthErrorCode}";
-            }
-
-            return ErrorFactory.CreateServerError(errorCode, message);
-        }*/
-
-        /*
-         * A helper to concatenate error parts
-         */
-        /*private static string GetOAuthErrorDetails(string oauthErrorDescription, string details, string url)
-        {
-            var parts = new List<string>();
-
-            if (!string.IsNullOrWhiteSpace(details))
-            {
-                parts.Add(details);
-            }
-
-            if (!string.IsNullOrWhiteSpace(oauthErrorDescription))
-            {
-                parts.Add(oauthErrorDescription);
-            }
-
-            if (!string.IsNullOrWhiteSpace(url))
-            {
-                parts.Add(url);
-            }
-
-            return string.Join(", ", parts);
-        }*/
     }
 }

@@ -1,8 +1,0 @@
-CODE IMPROVEMENTS
------------------
-1. Errors to improve in line with other APIs
-   Test failure conditions
-
-2. Claims principal must be more standard so that annotations work - separate claims objects are naff
-
-3. Store JSON Web Keys in a thread safe manner - in the cache

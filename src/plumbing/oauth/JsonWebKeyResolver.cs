@@ -6,6 +6,7 @@ namespace SampleApi.Plumbing.OAuth
     using System.Net.Http.Headers;
     using System.Threading.Tasks;
     using Microsoft.IdentityModel.Tokens;
+    using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
     using SampleApi.Plumbing.Utilities;
@@ -16,14 +17,14 @@ namespace SampleApi.Plumbing.OAuth
     internal sealed class JsonWebKeyResolver
     {
         private readonly OAuthConfiguration configuration;
+        private readonly JwksCache cache;
         private readonly HttpProxy httpProxy;
-        private JsonWebKeySet keyset;
 
-        public JsonWebKeyResolver(OAuthConfiguration configuration, HttpProxy httpProxy)
+        public JsonWebKeyResolver(OAuthConfiguration configuration, JwksCache cache, HttpProxy httpProxy)
         {
             this.configuration = configuration;
+            this.cache = cache;
             this.httpProxy = httpProxy;
-            this.keyset = null;
         }
 
         /*
@@ -33,20 +34,34 @@ namespace SampleApi.Plumbing.OAuth
         {
             try
             {
-                var found = this.FindKey(kid);
+                // Try to load keys from the cache
+                var cachedJson = await this.cache.GetJwksKeysAsync();
+                if (cachedJson != null)
+                {
+                    var cachedKeySet = new JsonWebKeySet(cachedJson);
+                    var foundInCache = cachedKeySet.Keys.First(k => k.KeyId == kid);
+                    if (foundInCache != null)
+                    {
+                        System.Console.WriteLine("*** FOUND EXISTING");
+                        return foundInCache;
+                    }
+                }
+
+                // If not found then do a new download
+                System.Console.WriteLine("*** LOOKUP");
+                var json = await this.DownloadKeys();
+                var keyset = new JsonWebKeySet(json);
+                var found = keyset.Keys.First(k => k.KeyId == kid);
+
+                // If found then update the cache
                 if (found != null)
                 {
+                    System.Console.WriteLine("*** ADDING TO CACHE");
+                    await this.cache.SetJwksKeysAsync(json);
                     return found;
                 }
 
-                await this.DownloadKeys();
-
-                found = this.FindKey(kid);
-                if (found != null)
-                {
-                    return found;
-                }
-
+                // Indicate not found, in which case we expect invalid input
                 return null;
             }
             catch (Exception ex)
@@ -58,7 +73,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Do the download when a new kid is received
          */
-        private async Task DownloadKeys()
+        private async Task<string> DownloadKeys()
         {
             try
                 {
@@ -70,12 +85,14 @@ namespace SampleApi.Plumbing.OAuth
                     var response = await client.SendAsync(request);
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw ErrorUtils.FromTokenSigningKeysDownloadError(response, this.configuration.JwksEndpoint);
+                        var status = (int)response.StatusCode;
+                        throw ErrorUtils.FromTokenSigningKeysDownloadError(status, this.configuration.JwksEndpoint);
                     }
 
-                    // Return results
+                    // Get and cache results
                     var json = await response.Content.ReadAsStringAsync();
-                    this.keyset = new JsonWebKeySet(json);
+                    await this.cache.SetJwksKeysAsync(json);
+                    return json;
                 }
             }
             catch (Exception ex)
@@ -83,19 +100,6 @@ namespace SampleApi.Plumbing.OAuth
                 // Report connectivity errors
                 throw ErrorUtils.FromTokenSigningKeysDownloadError(ex, this.configuration.JwksEndpoint);
             }
-        }
-
-        /*
-         * Find a key in the keyset from the key identifier received in a JWT
-         */
-        private JsonWebKey FindKey(string kid)
-        {
-            if (this.keyset == null)
-            {
-                return null;
-            }
-
-            return this.keyset.Keys.First(k => k.KeyId == kid);
         }
     }
 }
