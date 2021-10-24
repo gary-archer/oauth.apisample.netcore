@@ -55,7 +55,7 @@ namespace SampleApi.Plumbing.Security
                 logEntry.SetIdentity(claims.Base);
 
                 // Set up .Net security
-                var identity = new CustomClaimsIdentity(claims);
+                var identity = new ClaimsIdentity(this.Scheme.Name);
                 var principal = new ClaimsPrincipal(identity);
                 var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), this.Scheme.Name);
                 return AuthenticateResult.Success(ticket);

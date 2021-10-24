@@ -1,11 +1,11 @@
 namespace SampleApi.Plumbing.OAuth
 {
     using System;
+    using System.IdentityModel.Tokens.Jwt;
     using System.Net.Http;
     using System.Net.Http.Headers;
-    using System.Security.Cryptography;
     using System.Threading.Tasks;
-    using Jose;
+    using Microsoft.IdentityModel.Tokens;
     using Newtonsoft.Json.Linq;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
@@ -38,40 +38,39 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Validate the access token using the jose-jwt library
          */
-        public async Task<JObject> ValidateTokenAsync(string accessToken)
+        public async Task<JwtPayload> ValidateTokenAsync(string accessToken)
         {
             using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
                 try
                 {
-                    // Read the kid field from the JWT header
-                    var headers = Jose.JWT.Headers(accessToken);
-                    if (!headers.ContainsKey("kid"))
-                    {
-                        var context = $"The access token had no kid in its JWT header";
-                        throw ErrorFactory.CreateClient401Error(context);
-                    }
+                    // Read the token without validating it, to get its key identifier
+                    var handler = new CustomJwtSecurityTokenHandler();
+                    var token = handler.ReadJwtToken(accessToken);
 
                     // Get the token signing public key as a JSON web key
-                    var kid = headers["kid"].ToString();
-                    var jwk = await this.jsonWebKeyResolver.GetKeyForId(kid);
+                    var jwk = await this.jsonWebKeyResolver.GetKeyForId(token.Header.Kid);
                     if (jwk == null)
                     {
                         var context = $"The access token kid was not found at the JWKS endpoint";
                         throw ErrorFactory.CreateClient401Error(context);
                     }
 
-                    // Convert to an RSA public key object as required by the library
-                    var rsaKey = new System.Security.Cryptography.RSACryptoServiceProvider();
-                    rsaKey.ImportParameters(new RSAParameters
+                    // Set token validation parameters, and note that Cognito does not provide an audience claim in access tokens
+                    var tokenValidationParameters = new TokenValidationParameters
                     {
-                        Modulus = Base64Url.Decode(jwk.N),
-                        Exponent = Base64Url.Decode(jwk.E),
-                    });
+                        IssuerSigningKey = jwk,
+                        ValidateIssuer = true,
+                        ValidIssuer = this.configuration.Issuer,
+                        ValidateAudience = string.IsNullOrWhiteSpace(this.configuration.Audience) ? false : true,
+                        ValidAudience = this.configuration.Audience,
+                    };
 
-                    // Do the token validation and return the claims in a generic security object
-                    var claims = Jose.JWT.Decode(accessToken, rsaKey);
-                    return JObject.Parse(claims);
+                    // The base JwtSecurityTokenHandler checks the above fields and the jose library validates the signature
+                    SecurityToken result;
+                    handler.ValidateToken(accessToken, tokenValidationParameters, out result);
+                    var jwt = result as JwtSecurityToken;
+                    return jwt.Payload;
                 }
                 catch (Exception ex)
                 {

@@ -1,13 +1,8 @@
 CODE IMPROVEMENTS
 -----------------
-1. Get compiling
-   Errors to improve in line with other APIs
+1. Errors to improve in line with other APIs
    Test failure conditions
 
-2. Use a custom JWT security handler
-   Compare logic to MS Azure library
+2. Claims principal must be more standard so that annotations work - separate claims objects are naff
 
-3. Update claims to use claims principal
-   Fits naturally with other Microsoft authorization code
-
-4. Store JSON Web Keys in a thread safe manner - in the cache
+3. Store JSON Web Keys in a thread safe manner - in the cache

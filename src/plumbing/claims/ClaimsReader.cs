@@ -2,6 +2,7 @@ namespace SampleApi.Plumbing.Claims
 {
     using System;
     using System.Globalization;
+    using System.IdentityModel.Tokens.Jwt;
     using Newtonsoft.Json.Linq;
     using SampleApi.Plumbing.Errors;
 
@@ -13,7 +14,7 @@ namespace SampleApi.Plumbing.Claims
         /*
          * Return the base claims in a JWT that the API is interested in
          */
-        public static BaseClaims BaseClaims(JObject claimsSet)
+        public static BaseClaims BaseClaims(JwtPayload claimsSet)
         {
             var subject = ClaimsReader.GetClaim(claimsSet, "sub");
             var scopes = ClaimsReader.GetClaim(claimsSet, "scope").Split(' ');
@@ -24,12 +25,38 @@ namespace SampleApi.Plumbing.Claims
         /*
          * Return user info claims from a JWT
          */
+        public static UserInfoClaims UserInfoClaims(JwtPayload claimsSet)
+        {
+            var givenName = ClaimsReader.GetClaim(claimsSet, "given_name");
+            var familyName = ClaimsReader.GetClaim(claimsSet, "family_name");
+            var email = ClaimsReader.GetClaim(claimsSet, "email");
+            return new UserInfoClaims(givenName, familyName, email);
+        }
+
+        /*
+         * Return user info claims from an HTTP response
+         */
         public static UserInfoClaims UserInfoClaims(JObject claimsSet)
         {
             var givenName = ClaimsReader.GetClaim(claimsSet, "given_name");
             var familyName = ClaimsReader.GetClaim(claimsSet, "family_name");
             var email = ClaimsReader.GetClaim(claimsSet, "email");
             return new UserInfoClaims(givenName, familyName, email);
+        }
+
+        /*
+         * Read a claim and report missing errors clearly
+         */
+        private static string GetClaim(JwtPayload claimsSet, string name)
+        {
+            object value;
+            claimsSet.TryGetValue(name, out value);
+            if (value == null)
+            {
+                throw ErrorUtils.FromMissingClaim(name);
+            }
+
+            return value.ToString();
         }
 
         /*
