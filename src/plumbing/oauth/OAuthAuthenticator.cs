@@ -2,10 +2,10 @@ namespace SampleApi.Plumbing.OAuth
 {
     using System;
     using System.Net.Http;
+    using System.Net.Http.Headers;
     using System.Security.Cryptography;
     using System.Threading.Tasks;
-    using IdentityModel;
-    using IdentityModel.Client;
+    using Jose;
     using Newtonsoft.Json.Linq;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
@@ -46,15 +46,20 @@ namespace SampleApi.Plumbing.OAuth
                 {
                     // Read the kid field from the JWT header
                     var headers = Jose.JWT.Headers(accessToken);
-                    var kid = headers["kid"]?.ToString();
-                    if (string.IsNullOrWhiteSpace(kid))
+                    if (!headers.ContainsKey("kid"))
                     {
                         var context = $"The access token had no kid in its JWT header";
                         throw ErrorFactory.CreateClient401Error(context);
                     }
 
                     // Get the token signing public key as a JSON web key
+                    var kid = headers["kid"].ToString();
                     var jwk = await this.jsonWebKeyResolver.GetKeyForId(kid);
+                    if (jwk == null)
+                    {
+                        var context = $"The access token kid was not found at the JWKS endpoint";
+                        throw ErrorFactory.CreateClient401Error(context);
+                    }
 
                     // Convert to an RSA public key object as required by the library
                     var rsaKey = new System.Security.Cryptography.RSACryptoServiceProvider();
@@ -71,7 +76,7 @@ namespace SampleApi.Plumbing.OAuth
                 catch (Exception ex)
                 {
                     // Handle failures and log the error details
-                    var details = $"JWT verification failed: ${ex.Message}";
+                    var details = $"JWT verification failed: {ex.Message}";
                     throw ErrorFactory.CreateClient401Error(details);
                 }
             }
@@ -89,32 +94,25 @@ namespace SampleApi.Plumbing.OAuth
                     using (var client = new HttpClient(this.httpProxy.GetHandler()))
                     {
                         // Send the request
-                        var request = new UserInfoRequest
-                        {
-                            Address = this.configuration.UserInfoEndpoint,
-                            Token = accessToken,
-                        };
-                        var response = await client.GetUserInfoAsync(request);
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var request = new HttpRequestMessage(HttpMethod.Get, this.configuration.UserInfoEndpoint);
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                        var response = await client.SendAsync(request);
 
-                        // Handle errors
-                        if (response.IsError)
+                        // Report errors with a response
+                        if (!response.IsSuccessStatusCode)
                         {
-                            // Handle technical errors
-                            if (response.Exception != null)
-                            {
-                                throw ErrorUtils.FromUserInfoError(response.Exception, this.configuration.UserInfoEndpoint);
-                            }
-                            else
-                            {
-                                throw ErrorUtils.FromUserInfoError(response, this.configuration.UserInfoEndpoint);
-                            }
+                            throw ErrorUtils.FromUserInfoError(response, this.configuration.UserInfoEndpoint);
                         }
 
-                        return ClaimsReader.UserInfoClaims(response);
+                        // Return the claims
+                        var json = await response.Content.ReadAsStringAsync();
+                        return ClaimsReader.UserInfoClaims(JObject.Parse(json));
                     }
                 }
                 catch (Exception ex)
                 {
+                    // Report connectity errors
                     throw ErrorUtils.FromUserInfoError(ex, this.configuration.UserInfoEndpoint);
                 }
             }

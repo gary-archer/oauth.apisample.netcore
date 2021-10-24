@@ -3,8 +3,8 @@ namespace SampleApi.Plumbing.OAuth
     using System;
     using System.Linq;
     using System.Net.Http;
+    using System.Net.Http.Headers;
     using System.Threading.Tasks;
-    using IdentityModel.Client;
     using Microsoft.IdentityModel.Tokens;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
@@ -60,22 +60,28 @@ namespace SampleApi.Plumbing.OAuth
          */
         private async Task DownloadKeys()
         {
-            using (var client = new HttpClient(this.httpProxy.GetHandler()))
-            {
-                var response = await client.GetJsonWebKeySetAsync(this.configuration.JwksEndpoint);
-                if (response.IsError)
+            try
                 {
-                    if (response.Exception != null)
-                    {
-                        throw ErrorUtils.FromTokenSigningKeysDownloadError(response.Exception, this.configuration.JwksEndpoint);
-                    }
-                    else
+                using (var client = new HttpClient(this.httpProxy.GetHandler()))
+                {
+                    // Send the request
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var request = new HttpRequestMessage(HttpMethod.Get, this.configuration.JwksEndpoint);
+                    var response = await client.SendAsync(request);
+                    if (!response.IsSuccessStatusCode)
                     {
                         throw ErrorUtils.FromTokenSigningKeysDownloadError(response, this.configuration.JwksEndpoint);
                     }
-                }
 
-                this.keyset = new JsonWebKeySet(response.Json.ToString());
+                    // Return results
+                    var json = await response.Content.ReadAsStringAsync();
+                    this.keyset = new JsonWebKeySet(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Report connectivity errors
+                throw ErrorUtils.FromTokenSigningKeysDownloadError(ex, this.configuration.JwksEndpoint);
             }
         }
 

@@ -1,17 +1,13 @@
 CODE IMPROVEMENTS
 -----------------
-1. Get basics working to check it is on track
+1. Get compiling
+   Errors to improve in line with other APIs
+   Test failure conditions
 
-2. Get rid of Identity Model - but reuse bits of their code
+2. Use a custom JWT security handler
+   Compare logic to MS Azure library
 
-3. Implement JWT checks and see what Microsoft code does
+3. Update claims to use claims principal
+   Fits naturally with other Microsoft authorization code
 
-MINOR
------
-1. ConfigureAwait(false)
-
-2. Thread safety when downloading keys via a concurrent type in .Net
-
-3. Compare download logic to MS library
-
-4. Keep a copy of the original code in my backup USB stick and add this to the blog post
+4. Store JSON Web Keys in a thread safe manner - in the cache

@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Net.Http;
     using System.Text.Json;
-    using IdentityModel.Client;
 
     /*
      * A class to manage error translation
@@ -51,20 +51,23 @@
         /*
          * Handle failures in JWKS key responses
          */
-        public static ServerError FromTokenSigningKeysDownloadError(JsonWebKeySetResponse response, string url)
+        public static ServerError FromTokenSigningKeysDownloadError(HttpResponseMessage response, string url)
         {
-            var data = ReadOAuthErrorResponse(response.Json);
+            /*var data = ReadOAuthErrorResponse(response.Json);
             var error = CreateOAuthServerError(
                 ErrorCodes.TokenSigningKeysDownloadError,
                 "Problem downloading JWKS keys",
                 data.Item1);
-
             error.SetDetails(GetOAuthErrorDetails(data.Item2, response.Error, url));
-            return error;
+            */
+
+            return ErrorFactory.CreateServerError(
+                ErrorCodes.TokenSigningKeysDownloadError,
+                "Problem downloading JWKS keys");
         }
 
         /*
-         * Handle exceptions downloading JWKS keys
+         * Report connectivity exceptions trying to downloading JWKS keys
          */
         public static ServerError FromTokenSigningKeysDownloadError(Exception ex, string url)
         {
@@ -74,10 +77,10 @@
         /*
          * Report user info failures clearly
          */
-        public static Exception FromUserInfoError(UserInfoResponse response, string url)
+        public static Exception FromUserInfoError(HttpResponseMessage response, string url)
         {
             // Read the OAuth error code
-            var data = ReadOAuthErrorResponse(response.Json);
+            /*var data = ReadOAuthErrorResponse(response.Json);
 
             // Handle a race condition where the access token expires during user info lookup
             if (data.Item1 == ErrorCodes.UserInfoTokenExpired)
@@ -91,11 +94,15 @@
                 "User info lookup failed",
                 data.Item1);
             error.SetDetails(GetOAuthErrorDetails(data.Item2, response.Error, url));
-            return error;
+            return error;*/
+
+            return ErrorFactory.CreateServerError(
+                ErrorCodes.UserInfoFailure,
+                "User info lookup failed");
         }
 
         /*
-         * Handle exceptions when getting User Info
+         * Report connectivity exceptions trying to downloading user info
          */
         public static Exception FromUserInfoError(Exception ex, string url)
         {
@@ -180,17 +187,17 @@
         /*
          * Return any OAuth protocol error details
          */
-        private static Tuple<string, string> ReadOAuthErrorResponse(JsonElement jsonBody)
+        /*private static Tuple<string, string> ReadOAuthErrorResponse(JsonElement jsonBody)
         {
             string code = jsonBody.TryGetString("error");
             string description = jsonBody.TryGetString("error_description");
             return Tuple.Create(code, description);
-        }
+        }*/
 
         /*
          * Create an error object from an error code and include the OAuth error code in the user message
          */
-        private static ServerError CreateOAuthServerError(string errorCode, string userMessage, string oauthErrorCode)
+        /*private static ServerError CreateOAuthServerError(string errorCode, string userMessage, string oauthErrorCode)
         {
             string message = userMessage;
             if (!string.IsNullOrWhiteSpace(oauthErrorCode))
@@ -199,12 +206,12 @@
             }
 
             return ErrorFactory.CreateServerError(errorCode, message);
-        }
+        }*/
 
         /*
          * A helper to concatenate error parts
          */
-        private static string GetOAuthErrorDetails(string oauthErrorDescription, string details, string url)
+        /*private static string GetOAuthErrorDetails(string oauthErrorDescription, string details, string url)
         {
             var parts = new List<string>();
 
@@ -224,6 +231,6 @@
             }
 
             return string.Join(", ", parts);
-        }
+        }*/
     }
 }
