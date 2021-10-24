@@ -42,13 +42,11 @@ namespace SampleApi.Plumbing.OAuth
                     var foundInCache = cachedKeySet.Keys.First(k => k.KeyId == kid);
                     if (foundInCache != null)
                     {
-                        System.Console.WriteLine("*** FOUND EXISTING");
                         return foundInCache;
                     }
                 }
 
                 // If not found then do a new download
-                System.Console.WriteLine("*** LOOKUP");
                 var json = await this.DownloadKeys();
                 var keyset = new JsonWebKeySet(json);
                 var found = keyset.Keys.First(k => k.KeyId == kid);
@@ -56,7 +54,6 @@ namespace SampleApi.Plumbing.OAuth
                 // If found then update the cache
                 if (found != null)
                 {
-                    System.Console.WriteLine("*** ADDING TO CACHE");
                     await this.cache.SetJwksKeysAsync(json);
                     return found;
                 }
