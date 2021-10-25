@@ -1,6 +1,8 @@
 namespace SampleApi.Plumbing.Claims
 {
     using System;
+    using System.Collections.Generic;
+    using System.Security.Claims;
     using System.Text;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Caching.Distributed;
@@ -35,7 +37,7 @@ namespace SampleApi.Plumbing.Claims
         /*
          * Add our custom claims to the cache
          */
-        public async Task SetExtraUserClaimsAsync(string accessTokenHash, CachedClaims claims, int expiry)
+        public async Task SetExtraUserClaimsAsync(string accessTokenHash, IEnumerable<Claim> extraClaims, int expiry)
         {
             // Check for a race condition where the token passes validation but it expired when it gets here
             var now = DateTimeOffset.UtcNow;
@@ -73,7 +75,7 @@ namespace SampleApi.Plumbing.Claims
         /*
          * Read our custom claims from the cache or return null if not found
          */
-        public async Task<CachedClaims> GetExtraUserClaimsAsync(string accessTokenHash)
+        public async Task<IEnumerable<Claim>> GetExtraUserClaimsAsync(string accessTokenHash)
         {
             // Get the hash as a cache key and see if it exists in the cache
             var bytes = await this.cache.GetAsync(accessTokenHash);

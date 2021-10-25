@@ -1,0 +1,10 @@
+1. Read in custom claims when needed and use a collection
+
+2. ClaimsCache to handle serialization and deserialization of claims
+   Claims extension methods may help, to write claims with the 4 main fields
+
+3. Do I need something like ClaimsHolder?
+
+4. Verify array behaviour for scope and user regions
+
+5. Test sending Authorization header in lower case

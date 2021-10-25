@@ -3,12 +3,10 @@ namespace SampleApi.Plumbing.Security
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using System.Security.Claims;
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.Extensions.Options;
-    using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
     using SampleApi.Plumbing.Logging;
     using SampleApi.Plumbing.Middleware;
@@ -43,21 +41,15 @@ namespace SampleApi.Plumbing.Security
                 var logEntry = (LogEntry)this.Context.RequestServices.GetService(typeof(ILogEntry));
                 logEntry.Start(this.Request);
 
-                // Do the authorization work and get claims, including those not in the token
+                // Do the authorization work and get a claims principal
                 IAuthorizer authorizer = (IAuthorizer)this.Context.RequestServices.GetService(typeof(IAuthorizer));
-                var claims = await authorizer.ExecuteAsync(this.Request);
-
-                // Update the claims holder so that other classes can resolve the claims directly
-                var holder = (ClaimsHolder)this.Context.RequestServices.GetService(typeof(ClaimsHolder));
-                holder.Value = claims;
+                var claimsPrincipal = await authorizer.ExecuteAsync(this.Request);
 
                 // Add identity details to logs
-                logEntry.SetIdentity(claims.Base);
+                logEntry.SetIdentity(claimsPrincipal);
 
                 // Set up .Net security
-                var identity = new ClaimsIdentity(this.Scheme.Name);
-                var principal = new ClaimsPrincipal(identity);
-                var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), this.Scheme.Name);
+                var ticket = new AuthenticationTicket(claimsPrincipal, new AuthenticationProperties(), this.Scheme.Name);
                 return AuthenticateResult.Success(ticket);
             }
             catch (ClientError clientError)

@@ -1,8 +1,8 @@
 namespace SampleApi.Plumbing.OAuth
 {
+    using System.Security.Claims;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
-    using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
     using SampleApi.Plumbing.Security;
 
@@ -13,20 +13,16 @@ namespace SampleApi.Plumbing.OAuth
     public sealed class StandardAuthorizer : IAuthorizer
     {
         private readonly OAuthAuthenticator authenticator;
-        private readonly CustomClaimsProvider customClaimsProvider;
 
-        public StandardAuthorizer(
-            OAuthAuthenticator authenticator,
-            CustomClaimsProvider customClaimsProvider)
+        public StandardAuthorizer(OAuthAuthenticator authenticator)
         {
             this.authenticator = authenticator;
-            this.customClaimsProvider = customClaimsProvider;
         }
 
         /*
          * OAuth authorization involves token validation and claims lookup
          */
-        public async Task<ApiClaims> ExecuteAsync(HttpRequest request)
+        public async Task<ClaimsPrincipal> ExecuteAsync(HttpRequest request)
         {
             // First handle missing tokens
             var accessToken = BearerToken.Read(request);
@@ -35,14 +31,8 @@ namespace SampleApi.Plumbing.OAuth
                 throw ErrorFactory.CreateClient401Error("No access token was received in the bearer header");
             }
 
-            // On every API request we validate the JWT, in a zero trust manner
-            var payload = await this.authenticator.ValidateTokenAsync(accessToken);
-
-            // Then read all claims from the token
-            var baseClaims = ClaimsReader.BaseClaims(payload);
-            var userInfo = ClaimsReader.UserInfoClaims(payload);
-            var customClaims = await this.customClaimsProvider.GetAsync(accessToken, baseClaims, userInfo);
-            return new ApiClaims(baseClaims, userInfo, customClaims);
+            // On every API request we validate the JWT, in a zero trust manner, and read all claims from it
+            return await this.authenticator.ValidateTokenAsync(accessToken);
         }
     }
 }

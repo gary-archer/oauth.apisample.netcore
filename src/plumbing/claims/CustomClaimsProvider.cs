@@ -1,5 +1,7 @@
 ﻿namespace SampleApi.Plumbing.Claims
 {
+    using System.Collections.Generic;
+    using System.Security.Claims;
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
 
@@ -12,9 +14,9 @@
          * This can be overridden by derived classes and is used at the time of token issuance
          */
         #pragma warning disable 1998
-        public virtual async Task<CustomClaims> IssueAsync(string subject)
+        public virtual async Task<IEnumerable<Claim>> IssueAsync(string subject)
         {
-            return new CustomClaims();
+            return new List<Claim>();
         }
         #pragma warning restore 1998
 
@@ -22,9 +24,9 @@
          * Alternatively, this can be overridden by derived classes to get custom claims when a token is first received
          */
         #pragma warning disable 1998
-        public virtual async Task<CustomClaims> GetAsync(string accessToken, BaseClaims baseClaims, UserInfoClaims userInfo)
+        public virtual async Task<IEnumerable<Claim>> GetAsync(string accessToken, ClaimsPrincipal principal, IEnumerable<Claim> userInfo)
         {
-            return new CustomClaims();
+            return new List<Claim>();
         }
         #pragma warning restore 1998
 

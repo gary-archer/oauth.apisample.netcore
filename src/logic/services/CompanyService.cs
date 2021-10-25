@@ -3,6 +3,7 @@ namespace SampleApi.Logic.Repositories
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
+    using System.Security.Claims;
     using System.Threading.Tasks;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Errors;
@@ -16,11 +17,13 @@ namespace SampleApi.Logic.Repositories
     {
         private readonly CompanyRepository repository;
         private readonly SampleCustomClaims claims;
+        private readonly ClaimsPrincipal principal;
 
-        public CompanyService(CompanyRepository repository, CustomClaims claims)
+        public CompanyService(CompanyRepository repository, CustomClaims claims, ClaimsPrincipal principal)
         {
             this.repository = repository;
             this.claims = (SampleCustomClaims)claims;
+            this.principal = principal;
         }
 
         /*

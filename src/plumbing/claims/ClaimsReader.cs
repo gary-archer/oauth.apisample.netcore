@@ -1,8 +1,7 @@
 namespace SampleApi.Plumbing.Claims
 {
-    using System;
-    using System.Globalization;
-    using System.IdentityModel.Tokens.Jwt;
+    using System.Collections.Generic;
+    using System.Security.Claims;
     using Newtonsoft.Json.Linq;
     using SampleApi.Plumbing.Errors;
 
@@ -12,57 +11,22 @@ namespace SampleApi.Plumbing.Claims
     public static class ClaimsReader
     {
         /*
-         * Return the base claims in a JWT that the API is interested in
+         * Return user info claims from a JSON object received in an HTTP response
          */
-        public static BaseClaims BaseClaims(JwtPayload claimsSet)
+        public static IEnumerable<Claim> UserInfoClaims(string json)
         {
-            var subject = ClaimsReader.GetClaim(claimsSet, "sub");
-            var scopes = ClaimsReader.GetClaim(claimsSet, "scope").Split(' ');
-            var expiry = Convert.ToInt32(ClaimsReader.GetClaim(claimsSet, "exp"), CultureInfo.InvariantCulture);
-            return new BaseClaims(subject, scopes, expiry);
+            var claimsSet = JObject.Parse(json);
+            var claims = new List<Claim>();
+            claims.Add(ReadClaim(claimsSet, StandardClaimNames.GivenName));
+            claims.Add(ReadClaim(claimsSet, StandardClaimNames.FamilyName));
+            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Email));
+            return claims;
         }
 
         /*
-         * Return user info claims from a JWT
+         * Read a claim from JSON and report missing errors clearly
          */
-        public static UserInfoClaims UserInfoClaims(JwtPayload claimsSet)
-        {
-            var givenName = ClaimsReader.GetClaim(claimsSet, "given_name");
-            var familyName = ClaimsReader.GetClaim(claimsSet, "family_name");
-            var email = ClaimsReader.GetClaim(claimsSet, "email");
-            return new UserInfoClaims(givenName, familyName, email);
-        }
-
-        /*
-         * Return user info claims from an HTTP response
-         */
-        public static UserInfoClaims UserInfoClaims(JObject claimsSet)
-        {
-            var givenName = ClaimsReader.GetClaim(claimsSet, "given_name");
-            var familyName = ClaimsReader.GetClaim(claimsSet, "family_name");
-            var email = ClaimsReader.GetClaim(claimsSet, "email");
-            return new UserInfoClaims(givenName, familyName, email);
-        }
-
-        /*
-         * Read a claim and report missing errors clearly
-         */
-        private static string GetClaim(JwtPayload claimsSet, string name)
-        {
-            object value;
-            claimsSet.TryGetValue(name, out value);
-            if (value == null)
-            {
-                throw ErrorUtils.FromMissingClaim(name);
-            }
-
-            return value.ToString();
-        }
-
-        /*
-         * Read a claim and report missing errors clearly
-         */
-        private static string GetClaim(JObject claimsSet, string name)
+        private static Claim ReadClaim(JObject claimsSet, string name)
         {
             var value = claimsSet.GetValue(name);
             if (value == null)
@@ -70,7 +34,7 @@ namespace SampleApi.Plumbing.Claims
                 throw ErrorUtils.FromMissingClaim(name);
             }
 
-            return value.ToString();
+            return new Claim(name, value.ToString());
         }
     }
 }

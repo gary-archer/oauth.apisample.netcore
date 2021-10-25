@@ -1,12 +1,12 @@
 namespace SampleApi.Plumbing.OAuth
 {
     using System;
-    using System.IdentityModel.Tokens.Jwt;
+    using System.Collections.Generic;
     using System.Net.Http;
     using System.Net.Http.Headers;
+    using System.Security.Claims;
     using System.Threading.Tasks;
     using Microsoft.IdentityModel.Tokens;
-    using Newtonsoft.Json.Linq;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
@@ -38,7 +38,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Validate the access token using the jose-jwt library
          */
-        public async Task<JwtPayload> ValidateTokenAsync(string accessToken)
+        public async Task<ClaimsPrincipal> ValidateTokenAsync(string accessToken)
         {
             using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
             {
@@ -68,9 +68,7 @@ namespace SampleApi.Plumbing.OAuth
 
                     // The base JwtSecurityTokenHandler checks the above fields and the jose library validates the signature
                     SecurityToken result;
-                    handler.ValidateToken(accessToken, tokenValidationParameters, out result);
-                    var jwt = result as JwtSecurityToken;
-                    return jwt.Payload;
+                    return handler.ValidateToken(accessToken, tokenValidationParameters, out result);
                 }
                 catch (Exception ex)
                 {
@@ -82,7 +80,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Perform OAuth user info lookup
          */
-        public async Task<UserInfoClaims> GetUserInfoAsync(string accessToken)
+        public async Task<IEnumerable<Claim>> GetUserInfoAsync(string accessToken)
         {
             using (this.logEntry.CreatePerformanceBreakdown("userInfoLookup"))
             {
@@ -104,9 +102,9 @@ namespace SampleApi.Plumbing.OAuth
                             throw ErrorUtils.FromUserInfoError(status, text, this.configuration.UserInfoEndpoint);
                         }
 
-                        // Return the claims
+                        // Convert from JSON data to an array of claims
                         var json = await response.Content.ReadAsStringAsync();
-                        return ClaimsReader.UserInfoClaims(JObject.Parse(json));
+                        return ClaimsReader.UserInfoClaims(json);
                     }
                 }
                 catch (Exception ex)

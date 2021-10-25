@@ -2,6 +2,7 @@ namespace SampleApi.Plumbing.Logging
 {
     using System;
     using System.Collections.Generic;
+    using System.Security.Claims;
     using log4net;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Routing;
@@ -91,9 +92,9 @@ namespace SampleApi.Plumbing.Logging
         /*
          * Add identity details for secured requests
          */
-        public void SetIdentity(BaseClaims claims)
+        public void SetIdentity(ClaimsPrincipal claims)
         {
-            this.data.UserOAuthId = claims.Subject;
+            this.data.UserOAuthId = claims.GetSubject();
         }
 
         /*

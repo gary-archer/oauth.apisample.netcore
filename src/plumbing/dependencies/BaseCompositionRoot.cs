@@ -150,13 +150,8 @@
             // Register an object to manage custom claims
             this.services.AddSingleton(this.customClaimsProvider);
 
-            // Claims are injected into this holder at runtime
-            this.services.AddScoped<ClaimsHolder>();
-
-            // The underlying claims objects can then be retrieved via these factory methods
-            this.services.AddScoped(ctx => ctx.GetService<ClaimsHolder>().Value.Base);
-            this.services.AddScoped(ctx => ctx.GetService<ClaimsHolder>().Value.UserInfo);
-            this.services.AddScoped(ctx => ctx.GetService<ClaimsHolder>().Value.Custom);
+            // Make the claims principal injectable
+            this.services.AddScoped(ctx => ctx.GetService<IHttpContextAccessor>().HttpContext.User);
         }
     }
 }

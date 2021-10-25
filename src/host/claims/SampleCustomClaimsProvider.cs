@@ -1,5 +1,7 @@
 namespace SampleApi.Host.Claims
 {
+    using System.Collections.Generic;
+    using System.Security.Claims;
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
     using SampleApi.Logic.Entities;
@@ -14,7 +16,7 @@ namespace SampleApi.Host.Claims
          * When using the StandardAuthorizer this is called at the time of token issuance by the ClaimsController
          */
         #pragma warning disable 1998
-        public override async Task<CustomClaims> IssueAsync(string subject)
+        public override async Task<IEnumerable<Claim>> IssueAsync(string subject)
         {
             return this.GetCustomClaims(subject);
         }
@@ -24,7 +26,7 @@ namespace SampleApi.Host.Claims
          * When using the ClaimsCachingAuthorizer this is called when an API first receives the access token
          */
         #pragma warning disable 1998
-        public override async Task<CustomClaims> GetAsync(string accessToken, BaseClaims baseClaims, UserInfoClaims userInfo)
+        public override async Task<Enumerable<Claim>> GetAsync(string accessToken, BaseClaims baseClaims, UserInfoClaims userInfo)
         {
             return this.GetCustomClaims(userInfo.Email);
         }
