@@ -11,15 +11,6 @@ namespace SampleApi.Host.Controllers
     [Route("api/userinfo")]
     public class UserInfoController : Controller
     {
-        private readonly BaseClaims baseClaims;
-        private readonly UserInfoClaims userInfoClaims;
-
-        public UserInfoController(BaseClaims baseClaims, UserInfoClaims userInfoClaims)
-        {
-            this.baseClaims = baseClaims;
-            this.userInfoClaims = userInfoClaims;
-        }
-
         /*
          * Return user info to the UI
          */
@@ -27,10 +18,10 @@ namespace SampleApi.Host.Controllers
         public ClientUserInfo GetUserClaims()
         {
             // First check we have access to this level of data
-            ScopeVerifier.Enforce(this.baseClaims.Scopes, "profile");
+            ScopeVerifier.Enforce(this.User.GetScopes(), "profile");
 
             // Next return the user info
-            return new ClientUserInfo(this.userInfoClaims.GivenName, this.userInfoClaims.FamilyName);
+            return new ClientUserInfo(this.User.GetGivenName(), this.User.GetFamilyName());
         }
     }
 }

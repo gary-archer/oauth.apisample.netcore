@@ -23,7 +23,7 @@ fi
 #
 # Then start listening
 #
-dotnet run
+dotnet watch run
 if [ $? -ne 0 ]; then
     echo 'Problem encountered running the API'
     exit

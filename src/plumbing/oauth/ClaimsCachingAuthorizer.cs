@@ -1,6 +1,9 @@
 namespace SampleApi.Plumbing.OAuth
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Security.Claims;
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
@@ -31,7 +34,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * The entry point to populate claims from an access token
          */
-        public async Task<ApiClaims> ExecuteAsync(HttpRequest request)
+        public async Task<ClaimsPrincipal> ExecuteAsync(HttpRequest request)
         {
             // Read the token first
             var accessToken = BearerToken.Read(request);
@@ -41,27 +44,29 @@ namespace SampleApi.Plumbing.OAuth
             }
 
             // On every API request we validate the JWT, in a zero trust manner
-            var payload = await this.authenticator.ValidateTokenAsync(accessToken);
-            var baseClaims = ClaimsReader.BaseClaims(payload);
+            var basePrincipal = await this.authenticator.ValidateTokenAsync(accessToken);
 
             // If cached results already exist for this token then return them immediately
             var accessTokenHash = this.Sha256(accessToken);
-            var cachedClaims = await this.cache.GetExtraUserClaimsAsync(accessTokenHash);
-            if (cachedClaims != null)
+            var cachedExtraClaims = await this.cache.GetExtraUserClaimsAsync(accessTokenHash);
+            if (cachedExtraClaims.Count() > 0)
             {
-                return new ApiClaims(baseClaims, cachedClaims.UserInfo, cachedClaims.Custom);
+                // Extend the claims principal with the additional claims
+                return basePrincipal.ExtendClaims(cachedExtraClaims);
             }
 
             // In Cognito we cannot issue custom claims so the API looks them up when the access token is first received
             var userInfo = await this.authenticator.GetUserInfoAsync(accessToken);
-            var customClaims = await this.customClaimsProvider.GetAsync(accessToken, baseClaims, userInfo);
-            var claimsToCache = new CachedClaims(userInfo, customClaims);
+            var customClaims = await this.customClaimsProvider.GetAsync(accessToken, basePrincipal, userInfo);
 
             // Cache the claims against the token hash until the token's expiry time
-            await this.cache.SetExtraUserClaimsAsync(accessTokenHash, claimsToCache, baseClaims.Expiry);
+            var extraClaims = new List<Claim>();
+            extraClaims.AddRange(userInfo);
+            extraClaims.AddRange(customClaims);
+            await this.cache.SetExtraUserClaimsAsync(accessTokenHash, extraClaims, basePrincipal.GetExpiry());
 
-            // Return the final claims
-            return new ApiClaims(baseClaims, userInfo, customClaims);
+            // Extend the claims principal with the additional claims
+            return basePrincipal.ExtendClaims(extraClaims);
         }
 
         /*
