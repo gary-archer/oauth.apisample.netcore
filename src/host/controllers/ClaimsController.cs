@@ -5,7 +5,6 @@
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json;
     using SampleApi.Host.Claims;
-    using SampleApi.Logic.Entities;
 
     /*
      * A controller called during token issuing to ask the API for custom claim values
