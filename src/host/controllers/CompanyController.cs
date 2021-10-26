@@ -19,12 +19,10 @@
     public class CompanyController : Controller
     {
         private readonly CompanyService service;
-        private readonly BaseClaims baseClaims;
 
-        public CompanyController(CompanyService service, BaseClaims baseClaims)
+        public CompanyController(CompanyService service)
         {
             this.service = service;
-            this.baseClaims = baseClaims;
         }
 
         /*
@@ -34,7 +32,7 @@
         public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
             // First check we have access to this level of data
-            ScopeVerifier.Enforce(this.baseClaims.Scopes, "transactions_read");
+            ScopeVerifier.Enforce(this.User.GetScopes(), "transactions_read");
 
             // Then return the list of companies
             return await this.service.GetCompanyListAsync();
@@ -47,7 +45,7 @@
         public async Task<CompanyTransactions> GetCompanyTransactionsAsync(string id)
         {
             // First check we have access to this level of data
-            ScopeVerifier.Enforce(this.baseClaims.Scopes, "transactions_read");
+            ScopeVerifier.Enforce(this.User.GetScopes(), "transactions_read");
 
             // Return a 400 if the id is not a number
             int idValue;

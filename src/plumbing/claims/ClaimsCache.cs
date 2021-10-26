@@ -8,7 +8,6 @@ namespace SampleApi.Plumbing.Claims
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json.Linq;
 
     /*
      * A wrapper for a thread safe memory cache
@@ -17,18 +16,15 @@ namespace SampleApi.Plumbing.Claims
     {
         private readonly IDistributedCache cache;
         private readonly int timeToLiveMinutes;
-        private readonly CustomClaimsProvider customClaimsProvider;
         private readonly ILogger traceLogger;
 
         public ClaimsCache(
             IDistributedCache cache,
             int timeToLiveMinutes,
-            CustomClaimsProvider customClaimsProvider,
             ServiceProvider container)
         {
             this.cache = cache;
             this.timeToLiveMinutes = timeToLiveMinutes;
-            this.customClaimsProvider = customClaimsProvider;
 
             // Get a development trace logger for this class
             this.traceLogger = container.GetService<ILoggerFactory>().CreateLogger<ClaimsCache>();
@@ -55,10 +51,7 @@ namespace SampleApi.Plumbing.Claims
                 }
 
                 // Serialize claims to bytes
-                dynamic data = new JObject();
-                data.userInfo = claims.UserInfo.ExportData();
-                data.custom = claims.Custom.ExportData();
-                var json = data.ToString();
+                var json = ClaimsSerializer.Serialize(extraClaims);
                 var bytes = Encoding.UTF8.GetBytes(json);
 
                 // Cache the token until the above time
@@ -85,13 +78,10 @@ namespace SampleApi.Plumbing.Claims
                 return null;
             }
 
-            // Deserialization requires the claims class to have public setter properties
+            // Deserialize bytes to claims
             this.traceLogger.LogDebug($"Found existing token in claims cache (hash: {accessTokenHash})");
             var json = Encoding.UTF8.GetString(bytes);
-            var data = JObject.Parse(json);
-            var userInfo = UserInfoClaims.ImportData(data.GetValue("userInfo").Value<JObject>());
-            var custom = this.customClaimsProvider.Deserialize(data.GetValue("custom").Value<JObject>());
-            return new CachedClaims(userInfo, custom);
+            return ClaimsSerializer.Deserialize(json);
         }
     }
 }

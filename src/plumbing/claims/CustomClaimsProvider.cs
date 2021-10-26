@@ -3,7 +3,6 @@
     using System.Collections.Generic;
     using System.Security.Claims;
     using System.Threading.Tasks;
-    using Newtonsoft.Json.Linq;
 
     /*
      * The claims provider class is responsible for providing the final claims object
@@ -29,13 +28,5 @@
             return new List<Claim>();
         }
         #pragma warning restore 1998
-
-        /*
-         * This default implementation can be overridden to manage deserialization when claims are read from the cache
-         */
-        public virtual CustomClaims Deserialize(JObject claimsNode)
-        {
-            return CustomClaims.ImportData(claimsNode);
-        }
     }
 }

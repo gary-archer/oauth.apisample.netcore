@@ -51,20 +51,21 @@ namespace SampleApi.Plumbing.OAuth
             var cachedExtraClaims = await this.cache.GetExtraUserClaimsAsync(accessTokenHash);
             if (cachedExtraClaims.Count() > 0)
             {
+                // Extend the claims principal with the additional claims
                 return basePrincipal.ExtendClaims(cachedExtraClaims);
             }
 
             // In Cognito we cannot issue custom claims so the API looks them up when the access token is first received
             var userInfo = await this.authenticator.GetUserInfoAsync(accessToken);
             var customClaims = await this.customClaimsProvider.GetAsync(accessToken, basePrincipal, userInfo);
-            
+
             // Cache the claims against the token hash until the token's expiry time
             var extraClaims = new List<Claim>();
             extraClaims.AddRange(userInfo);
             extraClaims.AddRange(customClaims);
             await this.cache.SetExtraUserClaimsAsync(accessTokenHash, extraClaims, basePrincipal.GetExpiry());
 
-            // Extend the claims principal with all claims
+            // Extend the claims principal with the additional claims
             return basePrincipal.ExtendClaims(extraClaims);
         }
 

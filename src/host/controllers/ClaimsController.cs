@@ -1,5 +1,6 @@
 ﻿namespace SampleApi.Host.Controllers
 {
+    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json;
@@ -27,13 +28,17 @@
         [HttpGet("{subject}")]
         public async Task<ContentResult> GetCustomClaims(string subject)
         {
-            var customClaims = (SampleCustomClaims)await this.customClaimsProvider.IssueAsync(subject);
+            var customClaims = await this.customClaimsProvider.IssueAsync(subject);
+
+            var userId = customClaims.First(c => c.Type == CustomClaimNames.UserId).Value;
+            var userRole = customClaims.First(c => c.Type == CustomClaimNames.UserRole).Value;
+            var userRegions = customClaims.First(c => c.Type == CustomClaimNames.UserRegions).Value;
 
             var data = new
             {
-                user_id = customClaims.UserId,
-                user_role = customClaims.UserRole,
-                user_regions = customClaims.UserRegions,
+                user_id = userId,
+                user_role = userRole,
+                user_regions = userRegions.Split(' '),
             };
 
             return this.Content(JsonConvert.SerializeObject(data), "application/json");

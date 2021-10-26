@@ -5,9 +5,9 @@ namespace SampleApi.Logic.Repositories
     using System.Net;
     using System.Security.Claims;
     using System.Threading.Tasks;
+    using SampleApi.Host.Claims;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Errors;
-    using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
 
     /*
@@ -16,14 +16,12 @@ namespace SampleApi.Logic.Repositories
     public class CompanyService
     {
         private readonly CompanyRepository repository;
-        private readonly SampleCustomClaims claims;
-        private readonly ClaimsPrincipal principal;
+        private readonly ClaimsPrincipal claims;
 
-        public CompanyService(CompanyRepository repository, CustomClaims claims, ClaimsPrincipal principal)
+        public CompanyService(CompanyRepository repository, ClaimsPrincipal claims)
         {
             this.repository = repository;
-            this.claims = (SampleCustomClaims)claims;
-            this.principal = principal;
+            this.claims = claims;
         }
 
         /*
@@ -57,12 +55,12 @@ namespace SampleApi.Logic.Repositories
          */
         private bool IsUserAuthorizedForCompany(Company company)
         {
-            if (this.claims.UserRole.Contains("admin"))
+            if (this.claims.GetUserRole() == "admin")
             {
                 return true;
             }
 
-            return this.claims.UserRegions.AsEnumerable().Any(ur => ur == company.Region);
+            return this.claims.GetUserRegions().Any(ur => ur == company.Region);
         }
 
         /*
