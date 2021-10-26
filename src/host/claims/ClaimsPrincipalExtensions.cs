@@ -1,7 +1,7 @@
 namespace SampleApi.Host.Claims
 {
-    using System.Linq;
     using System.Security.Claims;
+    using SampleApi.Plumbing.Claims;
 
     /*
      * Extensions to read the claims of interest to this API
@@ -13,17 +13,18 @@ namespace SampleApi.Host.Claims
          */
         public static string GetUserId(this ClaimsPrincipal principal)
         {
-            return principal.Claims.First(c => c.Type == CustomClaimNames.UserId).Value;
+            return ClaimsReader.ReadClaim(principal, CustomClaimNames.UserId).Value;
         }
 
         public static string GetUserRole(this ClaimsPrincipal principal)
         {
-            return principal.Claims.First(c => c.Type == CustomClaimNames.UserRole).Value;
+            return ClaimsReader.ReadClaim(principal, CustomClaimNames.UserRole).Value;
         }
 
         public static string[] GetUserRegions(this ClaimsPrincipal principal)
         {
-            return principal.Claims.Where(c => c.Type == CustomClaimNames.UserRegions).Select(c => c.Value).ToArray();
+            var regionsValue = ClaimsReader.ReadClaim(principal, CustomClaimNames.UserRegions).Value;
+            return regionsValue.Split(' ');
         }
     }
 }

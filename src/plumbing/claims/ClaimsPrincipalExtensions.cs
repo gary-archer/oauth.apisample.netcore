@@ -39,34 +39,34 @@ namespace SampleApi.Plumbing.Claims
          */
         public static string GetSubject(this ClaimsPrincipal principal)
         {
-            return principal.Claims.First(c => c.Type == StandardClaimNames.Subject).Value;
+            return ClaimsReader.ReadClaim(principal, StandardClaimNames.Subject).Value;
         }
 
         public static string[] GetScopes(this ClaimsPrincipal principal)
         {
-            var scopeValue = principal.Claims.First(c => c.Type == StandardClaimNames.Scope).Value;
+            var scopeValue = ClaimsReader.ReadClaim(principal, StandardClaimNames.Scope).Value;
             return scopeValue.Split(' ');
         }
 
         public static int GetExpiry(this ClaimsPrincipal principal)
         {
-            var expValue = principal.Claims.First(c => c.Type == StandardClaimNames.Exp).Value;
+            var expValue = ClaimsReader.ReadClaim(principal, StandardClaimNames.Exp).Value;
             return Convert.ToInt32(expValue, CultureInfo.InvariantCulture);
         }
 
         public static string GetGivenName(this ClaimsPrincipal principal)
         {
-            return principal.Claims.First(c => c.Type == StandardClaimNames.GivenName).Value;
+            return ClaimsReader.ReadClaim(principal, StandardClaimNames.GivenName).Value;
         }
 
         public static string GetFamilyName(this ClaimsPrincipal principal)
         {
-            return principal.Claims.First(c => c.Type == StandardClaimNames.FamilyName).Value;
+            return ClaimsReader.ReadClaim(principal, StandardClaimNames.FamilyName).Value;
         }
 
         public static string GetEmail(this ClaimsPrincipal principal)
         {
-            return principal.Claims.First(c => c.Type == StandardClaimNames.Email).Value;
+            return ClaimsReader.ReadClaim(principal, StandardClaimNames.Email).Value;
         }
     }
 }

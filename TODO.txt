@@ -1,0 +1,3 @@
+2. Test sending Authorization header in lower case
+
+4. Remove WriteLine statements and this file

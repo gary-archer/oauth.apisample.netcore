@@ -1,6 +1,7 @@
 namespace SampleApi.Plumbing.Claims
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Security.Claims;
     using Newtonsoft.Json.Linq;
     using SampleApi.Plumbing.Errors;
@@ -24,7 +25,21 @@ namespace SampleApi.Plumbing.Claims
         }
 
         /*
-         * Read a claim from JSON and report missing errors clearly
+         * Read a claim from a ClaimsPrincipal and report missing claims clearly
+         */
+        public static Claim ReadClaim(ClaimsPrincipal principal, string name)
+        {
+            var found = principal.Claims.FirstOrDefault(c => c.Type == name);
+            if (found == null)
+            {
+                throw ErrorUtils.FromMissingClaim(name);
+            }
+
+            return found;
+        }
+
+        /*
+         * Read a claim from JSON and report missing claims clearly
          */
         private static Claim ReadClaim(JObject claimsSet, string name)
         {
