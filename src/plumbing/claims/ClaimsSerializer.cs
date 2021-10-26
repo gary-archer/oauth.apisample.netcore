@@ -18,14 +18,12 @@ namespace SampleApi.Plumbing.Claims
 
             foreach (var claim in claims)
             {
-                dynamic child = new JObject("claim");
+                dynamic child = new JObject();
                 child.name = claim.Type;
                 child.value = claim.Value;
                 data.Add(child);
             }
 
-            System.Console.WriteLine("*** SERIALIZING");
-            System.Console.WriteLine(data);
             return data.ToString();
         }
 

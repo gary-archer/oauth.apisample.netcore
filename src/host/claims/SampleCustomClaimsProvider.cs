@@ -55,7 +55,6 @@ namespace SampleApi.Host.Claims
                 // The CompanyService class will use these claims to return only transactions for the US region
                 claims.Add(new Claim(CustomClaimNames.UserId, "10345"));
                 claims.Add(new Claim(CustomClaimNames.UserRole, "user"));
-                claims.Add(new Claim(CustomClaimNames.UserRegions, string.Empty));
                 regions.Add("USA");
             }
 

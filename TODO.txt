@@ -1,7 +1,0 @@
-1. Verify array behaviour for scope and user regions
-
-2. Test sending Authorization header in lower case
-
-3. Add NameTypeClaim and RoleTypeClaim
-
-4. Remove WriteLine statements and this file

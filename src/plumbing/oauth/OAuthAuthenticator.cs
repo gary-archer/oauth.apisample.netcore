@@ -46,6 +46,7 @@ namespace SampleApi.Plumbing.OAuth
                 {
                     // Read the token without validating it, to get its key identifier
                     var handler = new CustomJwtSecurityTokenHandler();
+                    handler.InboundClaimTypeMap.Clear();
                     var token = handler.ReadJwtToken(accessToken);
 
                     // Get the token signing public key as a JSON web key

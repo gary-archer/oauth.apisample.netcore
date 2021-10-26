@@ -75,7 +75,7 @@ namespace SampleApi.Plumbing.Claims
             if (bytes == null)
             {
                 this.traceLogger.LogDebug($"New token will be added to claims cache (hash: {accessTokenHash})");
-                return null;
+                return new List<Claim>();
             }
 
             // Deserialize bytes to claims
