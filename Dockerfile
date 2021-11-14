@@ -7,7 +7,7 @@
 
 # Use the .Net Core Debian linux docker image
 # https://hub.docker.com/_/microsoft-dotnet-runtime
-FROM mcr.microsoft.com/dotnet/runtime:5.0
+FROM mcr.microsoft.com/dotnet/runtime:6.0
 
 # Install curl for troubleshooting purposes
 RUN apt-get update
@@ -18,7 +18,7 @@ RUN apt-get install curl -y
 WORKDIR /usr/api
 
 # Copy libraries and other files into our docker image
-COPY oauth.apisample/bin/Release/netcoreapp5/linux-x64/publish/*  /usr/api/
+COPY oauth.apisample/bin/Release/netcoreapp6/linux-x64/publish/*  /usr/api/
 COPY oauth.apisample/data/*                                       /usr/api/data/
 
 # Create a low privilege user, which will by default have read access to our files under /usr
