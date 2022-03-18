@@ -3,6 +3,7 @@ bin
 obj
 logs
 .DS_Store
+resources
 certs
 
 # Visual Studio files not needed by Visual Studio Code
