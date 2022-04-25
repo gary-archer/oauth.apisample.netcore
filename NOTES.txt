@@ -1,0 +1,4 @@
+
+1. dotnet new nunit
+
+2. dotnet test -l "console;verbosity=detailed"
