@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <IsPublishable>false</IsPublishable>
   </PropertyGroup>
 
   <ItemGroup>
 
     <!-- Libraries used by test code -->
-    <PackageReference Include="jose-jwt" Version="3.2.0" />
+    <PackageReference Include="jose-jwt" Version="4.0.0" />
 
     <!-- Test dependencies -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />

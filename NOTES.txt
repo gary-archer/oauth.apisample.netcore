@@ -1,4 +1,10 @@
+NOTES
+-----
+1. Created with 'dotnet new nunit'
 
-1. dotnet new nunit
+2. Use TestContext.Progress.WriteLine for debug output
 
-2. dotnet test -l "console;verbosity=detailed"
+3. Look at jose v4 latest invalid token errors and compare to previous
+   Also is there support for downloading JWKS or validating issuer + audience + expiry?
+
+4. Get publishing working without tests

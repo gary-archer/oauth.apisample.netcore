@@ -19,7 +19,7 @@ namespace SampleApi.Plumbing.OAuth
             var jwk = validationParameters.IssuerSigningKey as JsonWebKey;
 
             // We are using RS256 so convert the jwk to an RSA public key object as required by the jose library
-            var rsaKey = new System.Security.Cryptography.RSACryptoServiceProvider();
+            var rsaKey = new RSACryptoServiceProvider();
             rsaKey.ImportParameters(new RSAParameters
             {
                 Modulus = Base64Url.Decode(jwk.N),
