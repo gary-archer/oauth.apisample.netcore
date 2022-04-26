@@ -1,24 +1,25 @@
-.NET TODO
----------
-0. Get stylecop working for test code
+FIRST STEPS
+-----------
+1. First test fully stubbed out and failing using an APIClient and stubbed out Wiremock class
 
-1. Get publishing working without tests
+2. Fix it by completing Wiremock, so that first test passes
 
-2. Look at jose v4 latest invalid token errors and compare to previous
+3. Complete other tests
+
+ALSO
+----
+1. Get stylecop working for test code
+
+2. Get publishing working without tests
+
+3. Look at jose v4 latest invalid token errors and compare to previous
    Also is there support for downloading JWKS or validating issuer + audience + expiry?
 
-3. First test fully stubbed out
-   Write APIClient first version
+4. Separate load test to get running in the most basic way
 
-4. Wiremock C# working and first test passing
+5. README update + code merge
 
-5. Separate load test to get running in the most basic way
-
-6. All integration tests passing
-
-7. README update + code merge
-
-8. Blog overview update
+6. Blog overview update
 
 NOTES
 -----
