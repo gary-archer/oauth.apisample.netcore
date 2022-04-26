@@ -1,19 +1,23 @@
 STEP 1
 ------
-1. Understand how to include the HttpProxy class as a dependency
+1. Use HTTPS for Wiremock.NET
 
-2. Fix the failing test by getting Wiremock working
-
-3. Complete other tests
+2. Complete other tests
 
 STEP 2
 ------
-1. Ensure that publishing excludes test files and that Docker build looks OK
+1. Use Wiremock as a standalone process if possible, so that it can be deployed easier?
 
 2. Look at jose v4 latest invalid token errors and compare to previous
    Also is there support for downloading JWKS or validating issuer + audience + expiry?
+   Aim to use jose-jwt types as much as possible
 
-3. README update + code merge
+3. Test against SPA
+   README update + code merge
+
+3. Look at jose v4 latest invalid token errors and compare to previous
+   Also is there support for downloading JWKS or validating issuer + audience + expiry?
+   Aim to use jose-jwt types as much as possible
 
 STEP 3
 ------

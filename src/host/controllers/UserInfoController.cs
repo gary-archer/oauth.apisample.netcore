@@ -1,6 +1,7 @@
 namespace SampleApi.Host.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
+    using SampleApi.Host.Claims;
     using SampleApi.Logic.Entities;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.OAuth;
@@ -21,7 +22,7 @@ namespace SampleApi.Host.Controllers
             ScopeVerifier.Enforce(this.User.GetScopes(), "profile");
 
             // Next return the user info
-            return new ClientUserInfo(this.User.GetGivenName(), this.User.GetFamilyName());
+            return new ClientUserInfo(this.User.GetGivenName(), this.User.GetFamilyName(), this.User.GetUserRegions());
         }
     }
 }

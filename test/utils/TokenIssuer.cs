@@ -53,6 +53,11 @@ namespace SampleApi.Test.Utils
             var iat = now.AddMinutes(-30);
             var exp = now.AddMinutes(30);
 
+            var headers = new Dictionary<string, object>()
+            {
+                { "kid", this.keyId },
+            };
+
             var payload = new Dictionary<string, object>()
             {
                 { "sub", subject },
@@ -63,7 +68,7 @@ namespace SampleApi.Test.Utils
                 { "scope", "openid profile email https://api.authsamples.com/api/transactions_read" },
             };
 
-            return Jose.JWT.Encode(payload, this.tokenSigningPrivateKey, JwsAlgorithm.RS256);
+            return Jose.JWT.Encode(payload, this.tokenSigningPrivateKey, JwsAlgorithm.RS256, headers);
         }
 
         /*
@@ -81,6 +86,11 @@ namespace SampleApi.Test.Utils
                 var iat = now.AddMinutes(-30);
                 var exp = now.AddMinutes(30);
 
+                var headers = new Dictionary<string, object>()
+                {
+                    { "kid", this.keyId },
+                };
+
                 var payload = new Dictionary<string, object>()
                 {
                     { "sub", subject },
@@ -91,7 +101,7 @@ namespace SampleApi.Test.Utils
                     { "scope", "openid profile email https://api.authsamples.com/api/transactions_read" },
                 };
 
-                return Jose.JWT.Encode(payload, maliciousPrivateKey, JwsAlgorithm.RS256);
+                return Jose.JWT.Encode(payload, maliciousPrivateKey, JwsAlgorithm.RS256, headers);
             }
         }
 

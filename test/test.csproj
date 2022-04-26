@@ -5,9 +5,18 @@
     <IsPublishable>false</IsPublishable>
   </PropertyGroup>
 
+  <!-- The test code is more readable without the noise of generated doc -->
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
 
-    <!-- Libraries used by test code -->
+    <!-- Use utility classes from the main API-->
+    <ProjectReference Include="..\sampleapi.csproj" />
+
+    <!-- Import libraries used by test code -->
     <PackageReference Include="jose-jwt" Version="4.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 
@@ -21,7 +30,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
-    <PackageReference Include="coverlet.collector" Version="3.1.0" />
+    <PackageReference Include="WireMock.Net" Version="1.4.41" />
   </ItemGroup>
 
 </Project>

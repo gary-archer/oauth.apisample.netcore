@@ -39,7 +39,7 @@ namespace SampleApi.Plumbing.OAuth
                 if (cachedJson != null)
                 {
                     var cachedKeySet = new JsonWebKeySet(cachedJson);
-                    var foundInCache = cachedKeySet.Keys.First(k => k.KeyId == kid);
+                    var foundInCache = cachedKeySet.Keys.FirstOrDefault(k => k.KeyId == kid);
                     if (foundInCache != null)
                     {
                         return foundInCache;
@@ -49,7 +49,7 @@ namespace SampleApi.Plumbing.OAuth
                 // If not found then do a new download
                 var json = await this.DownloadKeys();
                 var keyset = new JsonWebKeySet(json);
-                var found = keyset.Keys.First(k => k.KeyId == kid);
+                var found = keyset.Keys.FirstOrDefault(k => k.KeyId == kid);
 
                 // If found then update the cache
                 if (found != null)

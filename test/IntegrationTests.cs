@@ -28,13 +28,13 @@ namespace SampleApi.Test.TokenIssuer
          * Initialize mock token issuing and wiremock
          */
         [OneTimeSetUp]
-        public async Task Setup()
+        public void Setup()
         {
             this.tokenIssuer = new TokenIssuer();
-            this.wiremockAdmin = new WiremockAdmin(false);
+            this.wiremockAdmin = new WiremockAdmin();
 
             var keyset = this.tokenIssuer.GetTokenSigningPublicKeys();
-            await this.wiremockAdmin.RegisterJsonWebWeys(keyset);
+            this.wiremockAdmin.RegisterJsonWebWeys(keyset);
 
             // Create the API client
             this.apiBaseUrl = "https://api.authsamples-dev.com:445";
@@ -45,11 +45,10 @@ namespace SampleApi.Test.TokenIssuer
          * Clean up resources after all tests have completed
          */
         [OneTimeTearDown]
-        public async Task Teardown()
+        public void Teardown()
         {
             this.tokenIssuer.Dispose();
-            await this.wiremockAdmin.UnregisterJsonWebWeys();
-            await this.wiremockAdmin.UnregisterUserInfo();
+            this.wiremockAdmin.Dispose();
         }
 
         /*
@@ -66,7 +65,7 @@ namespace SampleApi.Test.TokenIssuer
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            await this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -74,10 +73,9 @@ namespace SampleApi.Test.TokenIssuer
 
             // Assert expected results
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Unexpected HTTP status code");
-
-            /*
-            assert.strictEqual(response.body.regions.length, 1, 'Unexpected regions claim');
-            */
+            var claims = JObject.Parse(response.Body);
+            var regions = claims.Value<JArray>("regions");
+            Assert.AreEqual(1, regions.Count, "Unexpected regions claim");
         }
     }
 }

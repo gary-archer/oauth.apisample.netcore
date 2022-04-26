@@ -1,42 +1,48 @@
 namespace SampleApi.Test.Utils
 {
-    using System.Threading.Tasks;
+    using System;
+    using WireMock.RequestBuilders;
+    using WireMock.ResponseBuilders;
+    using WireMock.Server;
 
     /*
      * Manage updates to Wiremock
      */
-    public class WiremockAdmin
+    public class WiremockAdmin : IDisposable
     {
-        public WiremockAdmin(bool useProxy)
+        private readonly WireMockServer server;
+
+        public WiremockAdmin()
         {
+            this.server = WireMockServer.Start(446);
         }
 
         /*
          * Register our test JWKS values at the start of the test suite
          */
-        public async Task RegisterJsonWebWeys(string keysJson)
+        public void RegisterJsonWebWeys(string keysJson)
         {
-        }
-
-        /*
-         * Unregister our test JWKS values at the end of the test suite
-         */
-        public async Task UnregisterJsonWebWeys()
-        {
+            this.server
+                .Given(Request.Create().WithPath("/.well-known/jwks.json").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(keysJson));
         }
 
         /*
          * Register a user at the start of a test
          */
-        public async Task RegisterUserInfo(string userJson)
+        public void RegisterUserInfo(string userJson)
         {
+            this.server
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(userJson));
         }
 
         /*
-         * Unregister a user at the end of a test
+         * Stop the server
          */
-        public async Task UnregisterUserInfo()
+        public void Dispose()
         {
+            this.server.Stop();
         }
     }
 }
