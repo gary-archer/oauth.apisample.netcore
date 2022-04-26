@@ -7,7 +7,7 @@
 The final OAuth secured .NET API code sample, referenced in my blog at https://authguidance.com:
 
 - The API takes finer control over OAuth domain specific claims and uses a certified JOSE library
-- The API also implements other [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/), for good technical quality
+- The API uses JSON request logging and Elasticsearch log aggregation, for measurability
 
 ## API integrates with UI Clients
 
