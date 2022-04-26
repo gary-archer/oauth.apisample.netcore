@@ -1,34 +1,25 @@
 STEP 1
 ------
-1. Use HTTPS for Wiremock.NET
-
-2. Complete other tests
-
-STEP 2
-------
-1. Use Wiremock as a standalone process if possible, so that it can be deployed easier?
+1. Complete other integration tests and update README
+   Node and Java APIs: comments in test setup about test configuration are wrong
 
 2. Look at jose v4 latest invalid token errors and compare to previous
    Also is there support for downloading JWKS or validating issuer + audience + expiry?
    Aim to use jose-jwt types as much as possible
 
 3. Test against SPA
-   README update + code merge
+   Ensure that publishing still works, including cloud native deployment
+   
+4. README update + code merge
 
-3. Look at jose v4 latest invalid token errors and compare to previous
-   Also is there support for downloading JWKS or validating issuer + audience + expiry?
-   Aim to use jose-jwt types as much as possible
-
-STEP 3
+STEP 2
 ------
-1. Load test basics and ability to run an extra task
+1. Use Wiremock as a standalone process if possible, so that it can be deployed easier?
 
-2. Load test completion
+2. Load test basics and ability to run an extra task
 
-3. Blog overview update
+3. Load test completion
+
+4. Blog overview update
    Created with 'dotnet new nunit'
    Use TestContext.Progress.WriteLine for debug output
-
-GENERAL TODO
-------------
-1. Node and Java APIs: comments in test setup about test configuration are wrong

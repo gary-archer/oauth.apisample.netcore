@@ -4,6 +4,7 @@ namespace SampleApi.Test.Utils
     using WireMock.RequestBuilders;
     using WireMock.ResponseBuilders;
     using WireMock.Server;
+    using WireMock.Settings;
 
     /*
      * Manage updates to Wiremock
@@ -14,7 +15,17 @@ namespace SampleApi.Test.Utils
 
         public WiremockAdmin()
         {
-            this.server = WireMockServer.Start(446);
+            var settings = new WireMockServerSettings
+            {
+                Port = 446,
+                UseSSL = true,
+                CertificateSettings = new WireMockCertificateSettings
+                {
+                    X509CertificateFilePath = "../../../../certs/authsamples-dev.ssl.p12",
+                    X509CertificatePassword = "Password1",
+                },
+            };
+            this.server = WireMockServer.Start(settings);
         }
 
         /*

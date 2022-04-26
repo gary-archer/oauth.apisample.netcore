@@ -77,5 +77,32 @@ namespace SampleApi.Test.TokenIssuer
             var regions = claims.Value<JArray>("regions");
             Assert.AreEqual(1, regions.Count, "Unexpected regions claim");
         }
+
+        /*
+         * Test getting claims for the admin user
+         */
+        [Test]
+        public async Task GetUserClaims_ReturnsAllRegions_ForAdminUser()
+        {
+            // Get an access token for the end user of this test
+            var accessToken = this.tokenIssuer.IssueAccessToken(this.guestAdminId);
+
+            // The API will call the Authorization Server to get user info for the token, so register a mock response
+            dynamic data = new JObject();
+            data.given_name = "Admin";
+            data.family_name = "User";
+            data.email = "guestadmin@mycompany.com";
+            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+
+            // Call the API
+            var options = new ApiRequestOptions(accessToken);
+            var response = await this.apiClient.GetUserInfoClaims(options);
+
+            // Assert expected results
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Unexpected HTTP status code");
+            var claims = JObject.Parse(response.Body);
+            var regions = claims.Value<JArray>("regions");
+            Assert.AreEqual(3, regions.Count, "Unexpected regions claim");
+        }
     }
 }
