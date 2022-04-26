@@ -26,6 +26,20 @@ namespace SampleApi.Test.Utils
             return await this.CallApi(options);
         }
 
+        public async Task<ApiResponse> GetCompanies(ApiRequestOptions options)
+        {
+            options.HttpMethod = HttpMethod.Get;
+            options.ApiPath = "/api/companies";
+            return await this.CallApi(options);
+        }
+
+        public async Task<ApiResponse> GetCompanyTransactions(ApiRequestOptions options, int companyId)
+        {
+            options.HttpMethod = HttpMethod.Get;
+            options.ApiPath = $"/api/companies/{companyId}/transactions";
+            return await this.CallApi(options);
+        }
+
         private async Task<ApiResponse> CallApi(ApiRequestOptions options)
         {
             var url = $"{this.baseUrl}{options.ApiPath}";
@@ -35,6 +49,12 @@ namespace SampleApi.Test.Utils
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 var request = new HttpRequestMessage(options.HttpMethod, url);
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", options.AccessToken);
+
+                // Add custom headers for advanced testing if required
+                if (options.RehearseException)
+                {
+                    request.Headers.Add("x-mycompany-test-exception", "SampleApi");
+                }
 
                 // Send the request
                 var response = await client.SendAsync(request);

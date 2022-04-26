@@ -9,6 +9,7 @@ namespace SampleApi.Test.Utils
             this.AccessToken = accessToken;
             this.HttpMethod = HttpMethod.Get;
             this.ApiPath = string.Empty;
+            this.RehearseException = false;
         }
 
         public string AccessToken { get; private set; }
@@ -16,5 +17,7 @@ namespace SampleApi.Test.Utils
         public HttpMethod HttpMethod { get; set; }
 
         public string ApiPath { get; set; }
+
+        public bool RehearseException { get; set; }
     }
 }

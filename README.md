@@ -23,13 +23,6 @@ For productive test driven development, the API instead mocks the Authorization 
 
 ![Test Driven Development](./doc/tests.png)
 
-## API can be Load Tested
-
-A basic load test uses C# Tasks to fire 5 parallel requests at a time at the API.\
-This ensures no concurrency problems, and error rehearsal is used to verify that the API is supportable:
-
-![Load Test](./doc/loadtest.png)
-
 ### Further Details
 
 * See the [Overview Page](http://authguidance.com/2018/01/05/net-core-code-sample-overview/) for instructions on how to run the API

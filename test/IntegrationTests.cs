@@ -104,5 +104,159 @@ namespace SampleApi.Test.TokenIssuer
             var regions = claims.Value<JArray>("regions");
             Assert.AreEqual(3, regions.Count, "Unexpected regions claim");
         }
+
+        /*
+         * Test getting companies
+         */
+        [Test]
+        public async Task GetCompanies_ReturnsTwoItems_ForStandardUser()
+        {
+            // Get an access token for the end user of this test
+            var accessToken = this.tokenIssuer.IssueAccessToken(this.guestUserId);
+
+            // The API will call the Authorization Server to get user info for the token, so register a mock response
+            dynamic data = new JObject();
+            data.given_name = "Guest";
+            data.family_name = "User";
+            data.email = "guestuser@mycompany.com";
+            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+
+            // Call the API
+            var options = new ApiRequestOptions(accessToken);
+            var response = await this.apiClient.GetCompanies(options);
+
+            // Assert expected results
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Unexpected HTTP status code");
+            var companies = JArray.Parse(response.Body);
+            Assert.AreEqual(2, companies.Count, "Unexpected companies list");
+        }
+
+        /*
+         * Test getting companies for the admin user
+         */
+        [Test]
+        public async Task GetCompanies_ReturnsAllItems_ForAdminUser()
+        {
+            // Get an access token for the end user of this test
+            var accessToken = this.tokenIssuer.IssueAccessToken(this.guestAdminId);
+
+            // The API will call the Authorization Server to get user info for the token, so register a mock response
+            dynamic data = new JObject();
+            data.given_name = "Admin";
+            data.family_name = "User";
+            data.email = "guestadmin@mycompany.com";
+            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+
+            // Call the API
+            var options = new ApiRequestOptions(accessToken);
+            var response = await this.apiClient.GetCompanies(options);
+
+            // Assert expected results
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Unexpected HTTP status code");
+            var companies = JArray.Parse(response.Body);
+            Assert.AreEqual(4, companies.Count, "Unexpected companies list");
+        }
+
+        /*
+         * Test getting companies with a malicious JWT access token
+         */
+        [Test]
+        public async Task GetCompanies_Returns401_ForMaliciousJwt()
+        {
+            // Get a malicious access token for the end user of this test
+            var accessToken = this.tokenIssuer.IssueMaliciousAccessToken(this.guestUserId);
+
+            // Call the API
+            var options = new ApiRequestOptions(accessToken);
+            var response = await this.apiClient.GetCompanies(options);
+
+            // Assert expected results
+            Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, "Unexpected HTTP status code");
+            var error = JObject.Parse(response.Body);
+            var code = error.Value<string>("code");
+            Assert.AreEqual("unauthorized", code, "Unexpected error code");
+        }
+
+        /*
+         * Test getting allowed transactions
+         */
+        [Test]
+        public async Task GetTransactions_ReturnsAllowedItems_ForCompaniesMatchingTheRegionClaim()
+        {
+            // Get an access token for the end user of this test
+            var accessToken = this.tokenIssuer.IssueAccessToken(this.guestUserId);
+
+            // The API will call the Authorization Server to get user info for the token, so register a mock response
+            dynamic data = new JObject();
+            data.given_name = "Guest";
+            data.family_name = "User";
+            data.email = "guestuser@mycompany.com";
+            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+
+            // Call the API
+            var options = new ApiRequestOptions(accessToken);
+            var response = await this.apiClient.GetCompanyTransactions(options, 2);
+
+            // Assert expected results
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Unexpected HTTP status code");
+            var payload = JObject.Parse(response.Body);
+            var transactions = payload.Value<JArray>("transactions");
+            Assert.AreEqual(8, transactions.Count, "Unexpected transactions list");
+        }
+
+        /*
+         * Test getting unauthorized transactions
+         */
+        [Test]
+        public async Task GetTransactions_ReturnsNotFoundForUser_ForCompaniesNotMatchingTheRegionClaim()
+        {
+            // Get an access token for the end user of this test
+            var accessToken = this.tokenIssuer.IssueAccessToken(this.guestUserId);
+
+            // The API will call the Authorization Server to get user info for the token, so register a mock response
+            dynamic data = new JObject();
+            data.given_name = "Guest";
+            data.family_name = "User";
+            data.email = "guestuser@mycompany.com";
+            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+
+            // Call the API
+            var options = new ApiRequestOptions(accessToken);
+            var response = await this.apiClient.GetCompanyTransactions(options, 3);
+
+            // Assert expected results
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, "Unexpected HTTP status code");
+            var error = JObject.Parse(response.Body);
+            var code = error.Value<string>("code");
+            Assert.AreEqual("company_not_found", code, "Unexpected error code");
+        }
+
+        /*
+         * Test rehearsing a 500 error when there is an exception in the API
+         */
+        [Test]
+        public async Task FailedApiCall_ReturnsSupportable500Error_ForErrorRehearsalRequest()
+        {
+            // Get an access token for the end user of this test
+            var accessToken = this.tokenIssuer.IssueAccessToken(this.guestUserId);
+
+            // The API will call the Authorization Server to get user info for the token, so register a mock response
+            dynamic data = new JObject();
+            data.given_name = "Guest";
+            data.family_name = "User";
+            data.email = "guestuser@mycompany.com";
+            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+
+            // Call the API
+            var options = new ApiRequestOptions(accessToken);
+            options.RehearseException = true;
+            var response = await this.apiClient.GetCompanyTransactions(options, 3);
+
+            // Assert expected results
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode, "Unexpected HTTP status code");
+            var error = JObject.Parse(response.Body);
+            var code = error.Value<string>("code");
+            Assert.AreEqual("exception_simulation", code, "Unexpected error code");
+        }
     }
 }
