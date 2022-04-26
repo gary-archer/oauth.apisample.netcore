@@ -1,22 +1,20 @@
 STEP 1
 ------
-1. Complete other integration tests and update README
-   Node and Java APIs: comments in test setup about test configuration are wrong
-
-2. Look at jose v4 latest invalid token errors and compare to previous
-   Also is there support for downloading JWKS or validating issuer + audience + expiry?
-   Aim to use jose-jwt types as much as possible
-
-3. Test against SPA
+1. Look at jose v4 latest invalid token errors and see if any worse than master branch
+   Test against SPA
    Ensure that publishing still works, including cloud native deployment
-   
-4. README update + code merge
+   Then merge code   
 
 STEP 2
 ------
+1. Try to use jose.jwt for JWK objects
+   Try to use jose-jwt to validate issuer + audience + expiry?
+
+STEP 3
+------
 1. Use Wiremock as a standalone process if possible, so that it can be deployed easier?
 
-2. Load test basics and ability to run an extra task
+2. Load test basics and ability to run a custom task
 
 3. Load test completion
 
