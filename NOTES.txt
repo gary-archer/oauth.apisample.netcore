@@ -1,10 +1,31 @@
+.NET TODO
+---------
+0. Get stylecop working for test code
+
+1. Get publishing working without tests
+
+2. Look at jose v4 latest invalid token errors and compare to previous
+   Also is there support for downloading JWKS or validating issuer + audience + expiry?
+
+3. First test fully stubbed out
+   Write APIClient first version
+
+4. Wiremock C# working and first test passing
+
+5. Separate load test to get running in the most basic way
+
+6. All integration tests passing
+
+7. README update + code merge
+
+8. Blog overview update
+
 NOTES
 -----
 1. Created with 'dotnet new nunit'
 
 2. Use TestContext.Progress.WriteLine for debug output
 
-3. Look at jose v4 latest invalid token errors and compare to previous
-   Also is there support for downloading JWKS or validating issuer + audience + expiry?
-
-4. Get publishing working without tests
+GENERAL TODO
+------------
+1. Other samples - comments in test setup about test configuration are wrong
