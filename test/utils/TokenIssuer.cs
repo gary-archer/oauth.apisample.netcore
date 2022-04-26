@@ -26,11 +26,11 @@ namespace SampleApi.Test.Utils
 
             this.rsa = RSA.Create(2048);
 
-            this.tokenSigningPrivateKey = new Jwk(rsa, true);
+            this.tokenSigningPrivateKey = new Jwk(this.rsa, true);
             this.tokenSigningPrivateKey.Alg = this.algorithm;
             this.tokenSigningPrivateKey.KeyId = this.keyId;
-            
-            this.tokenSigningPublicKey = new Jwk(rsa, false);
+
+            this.tokenSigningPublicKey = new Jwk(this.rsa, false);
             this.tokenSigningPublicKey.Alg = this.algorithm;
             this.tokenSigningPublicKey.KeyId = this.keyId;
         }
@@ -60,7 +60,7 @@ namespace SampleApi.Test.Utils
                 { "aud", "api.mycompany.com" },
                 { "iat", iat.ToUnixTimeSeconds() },
                 { "exp", exp.ToUnixTimeSeconds() },
-                { "scope", "openid profile email https://api.authsamples.com/api/transactions_read" }
+                { "scope", "openid profile email https://api.authsamples.com/api/transactions_read" },
             };
 
             return Jose.JWT.Encode(payload, this.tokenSigningPrivateKey, JwsAlgorithm.RS256);
@@ -80,7 +80,7 @@ namespace SampleApi.Test.Utils
                 var now = DateTimeOffset.Now;
                 var iat = now.AddMinutes(-30);
                 var exp = now.AddMinutes(30);
-                
+
                 var payload = new Dictionary<string, object>()
                 {
                     { "sub", subject },
@@ -88,7 +88,7 @@ namespace SampleApi.Test.Utils
                     { "aud", "api.mycompany.com" },
                     { "iat", iat.ToUnixTimeSeconds() },
                     { "exp", exp.ToUnixTimeSeconds() },
-                    { "scope", "openid profile email https://api.authsamples.com/api/transactions_read" }
+                    { "scope", "openid profile email https://api.authsamples.com/api/transactions_read" },
                 };
 
                 return Jose.JWT.Encode(payload, maliciousPrivateKey, JwsAlgorithm.RS256);
@@ -98,7 +98,8 @@ namespace SampleApi.Test.Utils
         /*
          * Dispose the internal key
          */
-        public void Dispose() {
+        public void Dispose()
+        {
             this.rsa.Dispose();
         }
     }

@@ -1,32 +1,30 @@
-FIRST STEPS
------------
-1. First test fully stubbed out and failing using an APIClient and stubbed out Wiremock class
+STEP 1
+------
+1. Understand how to include the HttpProxy class as a dependency
 
-2. Fix it by completing Wiremock, so that first test passes
+2. Fix the failing test by getting Wiremock working
 
 3. Complete other tests
 
-ALSO
-----
-1. Get stylecop working for test code
+STEP 2
+------
+1. Ensure that publishing excludes test files and that Docker build looks OK
 
-2. Get publishing working without tests
-
-3. Look at jose v4 latest invalid token errors and compare to previous
+2. Look at jose v4 latest invalid token errors and compare to previous
    Also is there support for downloading JWKS or validating issuer + audience + expiry?
 
-4. Separate load test to get running in the most basic way
+3. README update + code merge
 
-5. README update + code merge
+STEP 3
+------
+1. Load test basics and ability to run an extra task
 
-6. Blog overview update
+2. Load test completion
 
-NOTES
------
-1. Created with 'dotnet new nunit'
-
-2. Use TestContext.Progress.WriteLine for debug output
+3. Blog overview update
+   Created with 'dotnet new nunit'
+   Use TestContext.Progress.WriteLine for debug output
 
 GENERAL TODO
 ------------
-1. Other samples - comments in test setup about test configuration are wrong
+1. Node and Java APIs: comments in test setup about test configuration are wrong

@@ -9,6 +9,13 @@
 
     <!-- Libraries used by test code -->
     <PackageReference Include="jose-jwt" Version="4.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+
+    <!-- Code quality checks -->
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
 
     <!-- Test dependencies -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
