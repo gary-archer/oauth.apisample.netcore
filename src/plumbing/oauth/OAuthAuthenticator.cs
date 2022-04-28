@@ -48,27 +48,27 @@ namespace SampleApi.Plumbing.OAuth
                     var kid = this.GetKeyIdentifier(accessToken);
                     if (kid == null)
                     {
-                        var context = "Unable to find a kid in the received access token";
-                        throw ErrorFactory.CreateClient401Error(context);
+                        throw ErrorFactory.CreateClient401Error("Unable to find a kid in the received access token");
                     }
 
                     // Get the token signing public key as a JSON web key
                     var jwk = await this.jsonWebKeyResolver.GetKeyForId(kid);
                     if (jwk == null)
                     {
-                        var context = "The access token kid was not found";
-                        throw ErrorFactory.CreateClient401Error(context);
+                        throw ErrorFactory.CreateClient401Error("The access token kid was not found in the JWKS");
                     }
 
                     // Do the cryptographic validation of the JWT signature using the JWK public key
                     var json = JWT.Decode(accessToken, jwk);
 
-                    // Read claims and make extra validation checks that jose4j does not support
-                    var claims = ClaimsReader.AccessTokenClaims(json);
-                    var identity = this.ValidateClaims(claims);
+                    // Read claims and create the Microsoft objects so that .NET logic can use the standard mechanisms
+                    var claims = ClaimsReader.AccessTokenClaims(json, this.configuration);
+                    var identity = new ClaimsIdentity(claims, "Bearer");
+                    var principal = new ClaimsPrincipal(identity);
 
-                    // Return the Microsoft object
-                    return new ClaimsPrincipal(identity);
+                    // Make extra validation checks that jose4j does not support, then return the principal
+                    this.ValidateProtocolClaims(principal);
+                    return principal;
                 }
                 catch (Exception ex)
                 {
@@ -130,14 +130,24 @@ namespace SampleApi.Plumbing.OAuth
         }
 
         /*
-         * jose-jwt does not support checking standard claims for iss, aud, exp, nbf so we do so here
+         * jose-jwt does not support checking standard claims for issuer, audience and expiry, so make those checks here instead
          */
-        private ClaimsIdentity ValidateClaims(IEnumerable<Claim> claims)
+        private void ValidateProtocolClaims(ClaimsPrincipal principal)
         {
-            // TODO: validate claims and ensure that the claims identity is in line with the master branch
+            if (principal.GetIssuer() != this.configuration.Issuer)
+            {
+                throw ErrorFactory.CreateClient401Error("The issuer claim had an unexpected value");
+            }
 
-            // Then return the claims identity
-            return new ClaimsIdentity(claims, "Bearer");
+            if (!string.IsNullOrWhiteSpace(this.configuration.Audience) && principal.GetAudience() != this.configuration.Audience)
+            {
+                throw ErrorFactory.CreateClient401Error("The audience claim had an unexpected value");
+            }
+
+            if (principal.GetExpiry() < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            {
+                throw ErrorFactory.CreateClient401Error("The access token is expired");
+            }
         }
     }
 }
