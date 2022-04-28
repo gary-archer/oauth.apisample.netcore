@@ -1,21 +1,15 @@
-STEP 1
-------
-1. Use ClaimsReader classes to process received claims
+DELIVERABLE 1
+-------------
+1. Finish claims validation and merge code
 
-STEP 2
-------
-1. Try to use jose.jwt for JWK objects
-   Try to use jose-jwt to validate issuer + audience + expiry?
+DELIVERABLE 2
+-------------
+1. Load test basics and ability to run a custom task
 
-STEP 3
-------
-1. Use Wiremock as a standalone process if possible, so that it can be deployed easier?
+2. Load test completion
 
-2. Load test basics and ability to run a custom task
-
-3. Load test completion
-
-4. Blog overview update
+3. Blog updates
+   OAuth integration update
    Created with 'dotnet new nunit'
    Use TestContext.Progress.WriteLine for debug output
    dotnet test -l "console;verbosity=normal"

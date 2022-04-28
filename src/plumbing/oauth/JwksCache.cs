@@ -6,7 +6,7 @@ namespace SampleApi.Plumbing.Claims
     using Microsoft.Extensions.Caching.Distributed;
 
     /*
-     * A thread safe cache of JWKS keys
+     * A thread safe cache of JWKS keys, since jose-jwt does not support this
      */
     public sealed class JwksCache
     {
