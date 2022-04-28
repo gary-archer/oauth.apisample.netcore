@@ -27,7 +27,7 @@ You need to run the script at least once in order to download development SSL ce
 
 ### Middleware Used
 
-* The Kestrel web server is used to host the API over SSL port 443
+* The Kestrel web server is used to host the API over SSL
 * AWS Cognito is used as the default Authorization Server
 * The [jose-jwt Library](https://github.com/dvsekhvalnov/jose-jwt) is used to manage in memory validation of JWTs
 * API logs can be aggregated to [Elasticsearch](https://authguidance.com/2019/07/19/log-aggregation-setup/) to support [Query Use Cases](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/)
