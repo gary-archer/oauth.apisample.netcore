@@ -12,6 +12,19 @@ namespace SampleApi.Plumbing.Claims
     public static class ClaimsReader
     {
         /*
+         * Read the claims from an access token
+         */
+        public static IEnumerable<Claim> AccessTokenClaims(string json)
+        {
+            var claimsSet = JObject.Parse(json);
+            var claims = new List<Claim>();
+            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Subject));
+            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Scope));
+            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Exp));
+            return claims;
+        }
+
+        /*
          * Return user info claims from a JSON object received in an HTTP response
          */
         public static IEnumerable<Claim> UserInfoClaims(string json)

@@ -1,9 +1,6 @@
 STEP 1
 ------
-1. Look at jose v4 latest invalid token errors and see if any worse than master branch
-   Test against SPA
-   Ensure that publishing still works, including cloud native deployment
-   Then merge code   
+1. Use ClaimsReader classes to process received claims
 
 STEP 2
 ------

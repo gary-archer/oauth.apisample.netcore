@@ -5,7 +5,7 @@ namespace SampleApi.Plumbing.OAuth
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Threading.Tasks;
-    using Microsoft.IdentityModel.Tokens;
+    using Jose;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
@@ -30,7 +30,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Return cached keys or download if a new kid is received
          */
-        public async Task<JsonWebKey> GetKeyForId(string kid)
+        public async Task<Jwk> GetKeyForId(string kid)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace SampleApi.Plumbing.OAuth
                 var cachedJson = await this.cache.GetJwksKeysAsync();
                 if (cachedJson != null)
                 {
-                    var cachedKeySet = new JsonWebKeySet(cachedJson);
+                    var cachedKeySet = JwkSet.FromJson(cachedJson, JWT.DefaultSettings.JsonMapper);
                     var foundInCache = cachedKeySet.Keys.FirstOrDefault(k => k.KeyId == kid);
                     if (foundInCache != null)
                     {
@@ -48,7 +48,7 @@ namespace SampleApi.Plumbing.OAuth
 
                 // If not found then do a new download
                 var json = await this.DownloadKeys();
-                var keyset = new JsonWebKeySet(json);
+                var keyset = JwkSet.FromJson(json, JWT.DefaultSettings.JsonMapper);
                 var found = keyset.Keys.FirstOrDefault(k => k.KeyId == kid);
 
                 // If found then update the cache
@@ -58,7 +58,7 @@ namespace SampleApi.Plumbing.OAuth
                     return found;
                 }
 
-                // Indicate not found, in which case we expect invalid input
+                // Indicate not found
                 return null;
             }
             catch (Exception ex)

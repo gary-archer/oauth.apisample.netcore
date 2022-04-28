@@ -6,7 +6,7 @@ namespace SampleApi.Plumbing.OAuth
     using System.Net.Http.Headers;
     using System.Security.Claims;
     using System.Threading.Tasks;
-    using Microsoft.IdentityModel.Tokens;
+    using Jose;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
@@ -45,31 +45,30 @@ namespace SampleApi.Plumbing.OAuth
                 try
                 {
                     // Read the token without validating it, to get its key identifier
-                    var handler = new CustomJwtSecurityTokenHandler();
-                    handler.InboundClaimTypeMap.Clear();
-                    var token = handler.ReadJwtToken(accessToken);
-
-                    // Get the token signing public key as a JSON web key
-                    var jwk = await this.jsonWebKeyResolver.GetKeyForId(token.Header.Kid);
-                    if (jwk == null)
+                    var kid = this.GetKeyIdentifier(accessToken);
+                    if (kid == null)
                     {
-                        var context = $"The access token kid was not found at the JWKS endpoint";
+                        var context = "Unable to find a kid in the received access token";
                         throw ErrorFactory.CreateClient401Error(context);
                     }
 
-                    // Set token validation parameters, and note that Cognito does not provide an audience claim in access tokens
-                    var tokenValidationParameters = new TokenValidationParameters
+                    // Get the token signing public key as a JSON web key
+                    var jwk = await this.jsonWebKeyResolver.GetKeyForId(kid);
+                    if (jwk == null)
                     {
-                        IssuerSigningKey = jwk,
-                        ValidateIssuer = true,
-                        ValidIssuer = this.configuration.Issuer,
-                        ValidateAudience = string.IsNullOrWhiteSpace(this.configuration.Audience) ? false : true,
-                        ValidAudience = this.configuration.Audience,
-                    };
+                        var context = "The access token kid was not found";
+                        throw ErrorFactory.CreateClient401Error(context);
+                    }
 
-                    // The base JwtSecurityTokenHandler checks the above fields and the jose library validates the signature
-                    SecurityToken result;
-                    return handler.ValidateToken(accessToken, tokenValidationParameters, out result);
+                    // Do the cryptographic validation of the JWT signature using the JWK public key
+                    var json = JWT.Decode(accessToken, jwk);
+
+                    // Read claims and make extra validation checks that jose4j does not support
+                    var claims = ClaimsReader.AccessTokenClaims(json);
+                    var identity = this.ValidateClaims(claims);
+
+                    // Return the Microsoft object
+                    return new ClaimsPrincipal(identity);
                 }
                 catch (Exception ex)
                 {
@@ -114,6 +113,31 @@ namespace SampleApi.Plumbing.OAuth
                     throw ErrorUtils.FromUserInfoError(ex, this.configuration.UserInfoEndpoint);
                 }
             }
+        }
+
+        /*
+         * Read the kid field from the JWT header
+         */
+        private string GetKeyIdentifier(string accessToken)
+        {
+            var headers = JWT.Headers(accessToken);
+            if (headers.ContainsKey("kid"))
+            {
+                return headers["kid"] as string;
+            }
+
+            return null;
+        }
+
+        /*
+         * jose-jwt does not support checking standard claims for iss, aud, exp, nbf so we do so here
+         */
+        private ClaimsIdentity ValidateClaims(IEnumerable<Claim> claims)
+        {
+            // TODO: validate claims and ensure that the claims identity is in line with the master branch
+
+            // Then return the claims identity
+            return new ClaimsIdentity(claims, "Bearer");
         }
     }
 }
