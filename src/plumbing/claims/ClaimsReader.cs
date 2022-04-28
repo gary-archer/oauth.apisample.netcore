@@ -4,6 +4,7 @@ namespace SampleApi.Plumbing.Claims
     using System.Linq;
     using System.Security.Claims;
     using Newtonsoft.Json.Linq;
+    using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
 
     /*
@@ -11,6 +12,27 @@ namespace SampleApi.Plumbing.Claims
      */
     public static class ClaimsReader
     {
+        /*
+         * Read the claims from an access token
+         */
+        public static IEnumerable<Claim> AccessTokenClaims(string json, OAuthConfiguration configuration)
+        {
+            var claimsSet = JObject.Parse(json);
+            var claims = new List<Claim>();
+            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Issuer));
+
+            if (!string.IsNullOrWhiteSpace(configuration.Audience))
+            {
+                claims.Add(ReadClaim(claimsSet, StandardClaimNames.Audience));
+            }
+
+            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Subject));
+            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Scope));
+            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Exp));
+            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Exp));
+            return claims;
+        }
+
         /*
          * Return user info claims from a JSON object received in an HTTP response
          */

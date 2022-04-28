@@ -48,6 +48,9 @@ namespace SampleApi.Host.Claims
                 // The CompanyService class will use these claims to return all transaction data
                 claims.Add(new Claim(CustomClaimNames.UserId, "20116"));
                 claims.Add(new Claim(CustomClaimNames.UserRole, "admin"));
+                regions.Add("Europe");
+                regions.Add("USA");
+                regions.Add("Asia");
             }
             else
             {

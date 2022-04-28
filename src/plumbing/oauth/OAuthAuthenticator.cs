@@ -6,7 +6,7 @@ namespace SampleApi.Plumbing.OAuth
     using System.Net.Http.Headers;
     using System.Security.Claims;
     using System.Threading.Tasks;
-    using Microsoft.IdentityModel.Tokens;
+    using Jose;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
@@ -45,31 +45,30 @@ namespace SampleApi.Plumbing.OAuth
                 try
                 {
                     // Read the token without validating it, to get its key identifier
-                    var handler = new CustomJwtSecurityTokenHandler();
-                    handler.InboundClaimTypeMap.Clear();
-                    var token = handler.ReadJwtToken(accessToken);
-
-                    // Get the token signing public key as a JSON web key
-                    var jwk = await this.jsonWebKeyResolver.GetKeyForId(token.Header.Kid);
-                    if (jwk == null)
+                    var kid = this.GetKeyIdentifier(accessToken);
+                    if (kid == null)
                     {
-                        var context = $"The access token kid was not found at the JWKS endpoint";
-                        throw ErrorFactory.CreateClient401Error(context);
+                        throw ErrorFactory.CreateClient401Error("Unable to find a kid in the received access token");
                     }
 
-                    // Set token validation parameters, and note that Cognito does not provide an audience claim in access tokens
-                    var tokenValidationParameters = new TokenValidationParameters
+                    // Get the token signing public key as a JSON web key
+                    var jwk = await this.jsonWebKeyResolver.GetKeyForId(kid);
+                    if (jwk == null)
                     {
-                        IssuerSigningKey = jwk,
-                        ValidateIssuer = true,
-                        ValidIssuer = this.configuration.Issuer,
-                        ValidateAudience = string.IsNullOrWhiteSpace(this.configuration.Audience) ? false : true,
-                        ValidAudience = this.configuration.Audience,
-                    };
+                        throw ErrorFactory.CreateClient401Error("The access token kid was not found in the JWKS");
+                    }
 
-                    // The base JwtSecurityTokenHandler checks the above fields and the jose library validates the signature
-                    SecurityToken result;
-                    return handler.ValidateToken(accessToken, tokenValidationParameters, out result);
+                    // Do the cryptographic validation of the JWT signature using the JWK public key
+                    var json = JWT.Decode(accessToken, jwk);
+
+                    // Read claims and create the Microsoft objects so that .NET logic can use the standard mechanisms
+                    var claims = ClaimsReader.AccessTokenClaims(json, this.configuration);
+                    var identity = new ClaimsIdentity(claims, "Bearer");
+                    var principal = new ClaimsPrincipal(identity);
+
+                    // Make extra validation checks that jose4j does not support, then return the principal
+                    this.ValidateProtocolClaims(principal);
+                    return principal;
                 }
                 catch (Exception ex)
                 {
@@ -113,6 +112,41 @@ namespace SampleApi.Plumbing.OAuth
                     // Report connectity errors
                     throw ErrorUtils.FromUserInfoError(ex, this.configuration.UserInfoEndpoint);
                 }
+            }
+        }
+
+        /*
+         * Read the kid field from the JWT header
+         */
+        private string GetKeyIdentifier(string accessToken)
+        {
+            var headers = JWT.Headers(accessToken);
+            if (headers.ContainsKey("kid"))
+            {
+                return headers["kid"] as string;
+            }
+
+            return null;
+        }
+
+        /*
+         * jose-jwt does not support checking standard claims for issuer, audience and expiry, so make those checks here instead
+         */
+        private void ValidateProtocolClaims(ClaimsPrincipal principal)
+        {
+            if (principal.GetIssuer() != this.configuration.Issuer)
+            {
+                throw ErrorFactory.CreateClient401Error("The issuer claim had an unexpected value");
+            }
+
+            if (!string.IsNullOrWhiteSpace(this.configuration.Audience) && principal.GetAudience() != this.configuration.Audience)
+            {
+                throw ErrorFactory.CreateClient401Error("The audience claim had an unexpected value");
+            }
+
+            if (principal.GetExpiry() < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            {
+                throw ErrorFactory.CreateClient401Error("The access token is expired");
             }
         }
     }

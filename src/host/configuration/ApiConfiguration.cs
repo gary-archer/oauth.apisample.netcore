@@ -1,7 +1,5 @@
 namespace SampleApi.Host.Configuration
 {
-    using System.Collections.Generic;
-
     /*
      * Application specific settings
      */
