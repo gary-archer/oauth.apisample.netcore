@@ -48,14 +48,20 @@ namespace SampleApi.Plumbing.OAuth
                     var kid = this.GetKeyIdentifier(accessToken);
                     if (kid == null)
                     {
-                        throw ErrorFactory.CreateClient401Error("Unable to find a kid in the received access token");
+                        throw ErrorFactory.CreateClient401Error("Unable to read the kid field from the access token");
                     }
 
                     // Get the token signing public key as a JSON web key
                     var jwk = await this.jsonWebKeyResolver.GetKeyForId(kid);
                     if (jwk == null)
                     {
-                        throw ErrorFactory.CreateClient401Error("The access token kid was not found in the JWKS");
+                        throw ErrorFactory.CreateClient401Error($"The token kid {kid} was not found in the JWKS");
+                    }
+
+                    // Only accept supported token signing algorithms
+                    if (jwk.Alg != "RS256")
+                    {
+                        throw ErrorFactory.CreateClient401Error($"The access token kid was not found in the JWKS");
                     }
 
                     // Do the cryptographic validation of the JWT signature using the JWK public key
