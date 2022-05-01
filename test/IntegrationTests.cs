@@ -1,4 +1,4 @@
-namespace SampleApi.Test.TokenIssuer
+namespace SampleApi.Test
 {
     using System.Net;
     using System.Threading.Tasks;
@@ -10,6 +10,7 @@ namespace SampleApi.Test.TokenIssuer
      * Test the API in isolation, without any dependencies on the Authorization Server
      */
     [TestFixture]
+    [Category("Integration")]
     public class IntegrationTests
     {
         // The real subject claim values for my two online test users
