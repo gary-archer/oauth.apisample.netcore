@@ -1,20 +1,38 @@
-namespace SampleApi.Test
+namespace SampleApi.LoadTest
 {
-    using System;
     using NUnit.Framework;
 
+    /*
+     * Run a basic load test
+     */
     [TestFixture]
     [Category("Load")]
     public class LoadTest
     {
-        [Test]
-        public void Execute()
+        /*
+         * Initialize mock token issuing and wiremock
+         */
+        [OneTimeSetUp]
+        public void Setup()
         {
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.SetError(TestContext.Progress);
-            Console.SetOut(TestContext.Progress);
-            TestContext.Progress.WriteLine("*** MY LOAD TEST");
-            //TestContext.Progress.WriteLine("*** MY LOAD TEST");
+        }
+
+        /*
+         * Clean up resources after all tests have completed
+         */
+        [OneTimeTearDown]
+        public void Teardown()
+        {
+        }
+
+        /*
+         * Run the load test
+         */
+        [Test]
+        public void Run()
+        {
+            System.Console.ForegroundColor = System.ConsoleColor.Blue;
+            TestContext.Progress.WriteLine("TEST OUTPUT");
             Assert.Pass();
         }
     }

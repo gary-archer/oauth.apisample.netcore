@@ -1,8 +1,8 @@
 #!/bin/bash
 
-######################################################
-# A script to run integration tests and output results
-######################################################
+#####################################
+# A script to run the basic load test
+#####################################
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 cd test
@@ -10,4 +10,4 @@ cd test
 #
 # Run tests with this category and with output verbosity that includes test names
 #
-dotnet test --filter TestCategory="Load"
+dotnet test --filter TestCategory="Load" -l "console;verbosity=normal"

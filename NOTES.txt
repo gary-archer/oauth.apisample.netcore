@@ -1,0 +1,9 @@
+1. Get XUnit test setup and teardown working
+
+2. Get main API code building
+
+3. Get categories working from the command line
+
+4. Migrate tests to XUnit
+
+5. Get Visual Studio Code intellisense working for macOS
