@@ -10,4 +10,4 @@ cd test
 #
 # Run tests with this category and with output verbosity that includes test names
 #
-dotnet test --filter TestCategory="Integration" -l "console;verbosity=normal"
+dotnet test --filter Category="Integration" -l "console;verbosity=normal"

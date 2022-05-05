@@ -1,39 +1,29 @@
-namespace SampleApi.LoadTest
+namespace Test2
 {
-    using NUnit.Framework;
+    using System;
+    using Xunit;
 
-    /*
-     * Run a basic load test
-     */
-    [TestFixture]
-    [Category("Load")]
-    public class LoadTest
+    public class LoadTest : IDisposable
     {
-        /*
-         * Initialize mock token issuing and wiremock
-         */
-        [OneTimeSetUp]
-        public void Setup()
+        public LoadTest()
         {
+            System.Console.WriteLine("SETUP");
         }
 
-        /*
-         * Clean up resources after all tests have completed
-         */
-        [OneTimeTearDown]
-        public void Teardown()
+        public void Dispose()
         {
+            System.Console.WriteLine("TEARDOWN");
         }
 
-        /*
-         * Run the load test
-         */
-        [Test]
+        [Fact]
+        [Trait("Category", "Load")]
         public void Run()
         {
             System.Console.ForegroundColor = System.ConsoleColor.Blue;
-            TestContext.Progress.WriteLine("TEST OUTPUT");
-            Assert.Pass();
+            System.Console.WriteLine("DEMO TEST");
+
+            System.Console.ForegroundColor = System.ConsoleColor.Yellow;
+            System.Console.WriteLine("DEMO TEST END");
         }
     }
 }
