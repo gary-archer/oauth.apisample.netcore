@@ -4,8 +4,8 @@ namespace SampleApi.Test
     using System.Net;
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
-    using Xunit;
     using SampleApi.Test.Utils;
+    using Xunit;
 
     /*
      * Test the API in isolation, without any dependencies on the Authorization Server
@@ -74,7 +74,7 @@ namespace SampleApi.Test
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
             var claims = JObject.Parse(response.Body);
             var regions = claims.Value<JArray>("regions");
-            Assert.True(regions.Count == 2, "Unexpected regions claim");
+            Assert.True(regions.Count == 1, "Unexpected regions claim");
         }
 
         /*
