@@ -1,60 +1,77 @@
-namespace SampleApi.Test.TokenIssuer
+namespace SampleApi.Test
 {
+    using System;
     using System.Net;
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
-    using NUnit.Framework;
     using SampleApi.Test.Utils;
+    using WireMock.RequestBuilders;
+    using WireMock.ResponseBuilders;
+    using WireMock.Server;
+    using WireMock.Settings;
+    using Xunit;
 
     /*
      * Test the API in isolation, without any dependencies on the Authorization Server
      */
-    [TestFixture]
-    public class IntegrationTests
+    public class IntegrationTests : IDisposable
     {
         // The real subject claim values for my two online test users
-        private string guestUserId = "a6b404b1-98af-41a2-8e7f-e4061dc0bf86";
-        private string guestAdminId = "77a97e5b-b748-45e5-bb6f-658e85b2df91";
+        private readonly string guestUserId = "a6b404b1-98af-41a2-8e7f-e4061dc0bf86";
+        private readonly string guestAdminId = "77a97e5b-b748-45e5-bb6f-658e85b2df91";
 
         // A class to issue our own JWTs for testing
-        private TokenIssuer tokenIssuer;
-        private WiremockAdmin wiremockAdmin;
+        private readonly TokenIssuer tokenIssuer;
+        private readonly WireMockServer wiremockServer;
 
         // API client details
-        private string apiBaseUrl;
-        private ApiClient apiClient;
+        private readonly ApiClient apiClient;
 
         /*
          * Initialize mock token issuing and wiremock
          */
-        [OneTimeSetUp]
-        public void Setup()
+        public IntegrationTests()
         {
-            this.tokenIssuer = new TokenIssuer();
-            this.wiremockAdmin = new WiremockAdmin();
+            // Start the Wiremock server
+            var settings = new WireMockServerSettings
+            {
+                Port = 446,
+                UseSSL = true,
+                CertificateSettings = new WireMockCertificateSettings
+                {
+                    X509CertificateFilePath = "../../../../certs/authsamples-dev.ssl.p12",
+                    X509CertificatePassword = "Password1",
+                },
+            };
+            this.wiremockServer = WireMockServer.Start(settings);
 
+            // Create the token issuer for these tests and issue some mock token signing keys
+            this.tokenIssuer = new TokenIssuer();
             var keyset = this.tokenIssuer.GetTokenSigningPublicKeys();
-            this.wiremockAdmin.RegisterJsonWebWeys(keyset);
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/.well-known/jwks.json").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(keyset));
 
             // Create the API client
-            this.apiBaseUrl = "https://api.authsamples-dev.com:445";
-            this.apiClient = new ApiClient(this.apiBaseUrl, false);
+            var apiBaseUrl = "https://api.authsamples-dev.com:445";
+            var sessionId = Guid.NewGuid().ToString();
+            this.apiClient = new ApiClient(apiBaseUrl, "IntegrationTests", sessionId);
         }
 
         /*
          * Clean up resources after all tests have completed
          */
-        [OneTimeTearDown]
-        public void Teardown()
+        public void Dispose()
         {
             this.tokenIssuer.Dispose();
-            this.wiremockAdmin.Dispose();
+            this.wiremockServer.Stop();
         }
 
         /*
          * Test getting claims
          */
-        [Test]
+        [Fact]
+        [Trait("Category", "Integration")]
         public async Task GetUserClaims_ReturnsSingleRegion_ForStandardUser()
         {
             // Get an access token for the end user of this test
@@ -65,23 +82,26 @@ namespace SampleApi.Test.TokenIssuer
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
             var response = await this.apiClient.GetUserInfoClaims(options);
 
             // Assert expected results
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Unexpected HTTP status code");
+            Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
             var claims = JObject.Parse(response.Body);
             var regions = claims.Value<JArray>("regions");
-            Assert.AreEqual(1, regions.Count, "Unexpected regions claim");
+            Assert.True(regions.Count == 1, "Unexpected regions claim");
         }
 
         /*
          * Test getting claims for the admin user
          */
-        [Test]
+        [Fact]
+        [Trait("Category", "Integration")]
         public async Task GetUserClaims_ReturnsAllRegions_ForAdminUser()
         {
             // Get an access token for the end user of this test
@@ -92,23 +112,26 @@ namespace SampleApi.Test.TokenIssuer
             data.given_name = "Admin";
             data.family_name = "User";
             data.email = "guestadmin@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
             var response = await this.apiClient.GetUserInfoClaims(options);
 
             // Assert expected results
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Unexpected HTTP status code");
+            Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
             var claims = JObject.Parse(response.Body);
             var regions = claims.Value<JArray>("regions");
-            Assert.AreEqual(3, regions.Count, "Unexpected regions claim");
+            Assert.True(regions.Count == 3, "Unexpected regions claim");
         }
 
         /*
          * Test getting companies
          */
-        [Test]
+        [Fact]
+        [Trait("Category", "Integration")]
         public async Task GetCompanies_ReturnsTwoItems_ForStandardUser()
         {
             // Get an access token for the end user of this test
@@ -119,22 +142,25 @@ namespace SampleApi.Test.TokenIssuer
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
             var response = await this.apiClient.GetCompanies(options);
 
             // Assert expected results
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Unexpected HTTP status code");
+            Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
             var companies = JArray.Parse(response.Body);
-            Assert.AreEqual(2, companies.Count, "Unexpected companies list");
+            Assert.True(companies.Count == 2, "Unexpected companies list");
         }
 
         /*
          * Test getting companies for the admin user
          */
-        [Test]
+        [Fact]
+        [Trait("Category", "Integration")]
         public async Task GetCompanies_ReturnsAllItems_ForAdminUser()
         {
             // Get an access token for the end user of this test
@@ -145,22 +171,25 @@ namespace SampleApi.Test.TokenIssuer
             data.given_name = "Admin";
             data.family_name = "User";
             data.email = "guestadmin@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
             var response = await this.apiClient.GetCompanies(options);
 
             // Assert expected results
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Unexpected HTTP status code");
+            Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
             var companies = JArray.Parse(response.Body);
-            Assert.AreEqual(4, companies.Count, "Unexpected companies list");
+            Assert.True(companies.Count == 4, "Unexpected companies list");
         }
 
         /*
          * Test getting companies with a malicious JWT access token
          */
-        [Test]
+        [Fact]
+        [Trait("Category", "Integration")]
         public async Task GetCompanies_Returns401_ForMaliciousJwt()
         {
             // Get a malicious access token for the end user of this test
@@ -171,16 +200,17 @@ namespace SampleApi.Test.TokenIssuer
             var response = await this.apiClient.GetCompanies(options);
 
             // Assert expected results
-            Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, "Unexpected HTTP status code");
+            Assert.True(response.StatusCode == HttpStatusCode.Unauthorized, "Unexpected HTTP status code");
             var error = JObject.Parse(response.Body);
             var code = error.Value<string>("code");
-            Assert.AreEqual("unauthorized", code, "Unexpected error code");
+            Assert.True(code == "unauthorized", "Unexpected error code");
         }
 
         /*
          * Test getting allowed transactions
          */
-        [Test]
+        [Fact]
+        [Trait("Category", "Integration")]
         public async Task GetTransactions_ReturnsAllowedItems_ForCompaniesMatchingTheRegionClaim()
         {
             // Get an access token for the end user of this test
@@ -191,23 +221,26 @@ namespace SampleApi.Test.TokenIssuer
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
             var response = await this.apiClient.GetCompanyTransactions(options, 2);
 
             // Assert expected results
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Unexpected HTTP status code");
+            Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
             var payload = JObject.Parse(response.Body);
             var transactions = payload.Value<JArray>("transactions");
-            Assert.AreEqual(8, transactions.Count, "Unexpected transactions list");
+            Assert.True(transactions.Count == 8, "Unexpected transactions list");
         }
 
         /*
          * Test getting unauthorized transactions
          */
-        [Test]
+        [Fact]
+        [Trait("Category", "Integration")]
         public async Task GetTransactions_ReturnsNotFoundForUser_ForCompaniesNotMatchingTheRegionClaim()
         {
             // Get an access token for the end user of this test
@@ -218,23 +251,26 @@ namespace SampleApi.Test.TokenIssuer
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
             var response = await this.apiClient.GetCompanyTransactions(options, 3);
 
             // Assert expected results
-            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, "Unexpected HTTP status code");
+            Assert.True(response.StatusCode == HttpStatusCode.NotFound, "Unexpected HTTP status code");
             var error = JObject.Parse(response.Body);
             var code = error.Value<string>("code");
-            Assert.AreEqual("company_not_found", code, "Unexpected error code");
+            Assert.True(code == "company_not_found", "Unexpected error code");
         }
 
         /*
          * Test rehearsing a 500 error when there is an exception in the API
          */
-        [Test]
+        [Fact]
+        [Trait("Category", "Integration")]
         public async Task FailedApiCall_ReturnsSupportable500Error_ForErrorRehearsalRequest()
         {
             // Get an access token for the end user of this test
@@ -245,7 +281,9 @@ namespace SampleApi.Test.TokenIssuer
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -253,10 +291,10 @@ namespace SampleApi.Test.TokenIssuer
             var response = await this.apiClient.GetCompanyTransactions(options, 3);
 
             // Assert expected results
-            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode, "Unexpected HTTP status code");
+            Assert.True(response.StatusCode == HttpStatusCode.InternalServerError, "Unexpected HTTP status code");
             var error = JObject.Parse(response.Body);
             var code = error.Value<string>("code");
-            Assert.AreEqual("exception_simulation", code, "Unexpected error code");
+            Assert.True(code == "exception_simulation", "Unexpected error code");
         }
     }
 }

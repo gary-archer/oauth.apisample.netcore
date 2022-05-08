@@ -40,46 +40,43 @@ namespace SampleApi.Plumbing.OAuth
          */
         public async Task<ClaimsPrincipal> ValidateTokenAsync(string accessToken)
         {
-            using (this.logEntry.CreatePerformanceBreakdown("validateToken"))
+            try
             {
-                try
+                // Read the token without validating it, to get its key identifier
+                var kid = this.GetKeyIdentifier(accessToken);
+                if (kid == null)
                 {
-                    // Read the token without validating it, to get its key identifier
-                    var kid = this.GetKeyIdentifier(accessToken);
-                    if (kid == null)
-                    {
-                        throw ErrorFactory.CreateClient401Error("Unable to read the kid field from the access token");
-                    }
-
-                    // Get the token signing public key as a JSON web key
-                    var jwk = await this.jsonWebKeyResolver.GetKeyForId(kid);
-                    if (jwk == null)
-                    {
-                        throw ErrorFactory.CreateClient401Error($"The token kid {kid} was not found in the JWKS");
-                    }
-
-                    // Only accept supported token signing algorithms
-                    if (jwk.Alg != "RS256")
-                    {
-                        throw ErrorFactory.CreateClient401Error($"The access token kid was not found in the JWKS");
-                    }
-
-                    // Do the cryptographic validation of the JWT signature using the JWK public key
-                    var json = JWT.Decode(accessToken, jwk);
-
-                    // Read claims and create the Microsoft objects so that .NET logic can use the standard mechanisms
-                    var claims = ClaimsReader.AccessTokenClaims(json, this.configuration);
-                    var identity = new ClaimsIdentity(claims, "Bearer");
-                    var principal = new ClaimsPrincipal(identity);
-
-                    // Make extra validation checks that jose4j does not support, then return the principal
-                    this.ValidateProtocolClaims(principal);
-                    return principal;
+                    throw ErrorFactory.CreateClient401Error("Unable to read the kid field from the access token");
                 }
-                catch (Exception ex)
+
+                // Get the token signing public key as a JSON web key
+                var jwk = await this.jsonWebKeyResolver.GetKeyForId(kid);
+                if (jwk == null)
                 {
-                    throw ErrorUtils.FromTokenValidationError(ex);
+                    throw ErrorFactory.CreateClient401Error($"The token kid {kid} was not found in the JWKS");
                 }
+
+                // Only accept supported token signing algorithms
+                if (jwk.Alg != "RS256")
+                {
+                    throw ErrorFactory.CreateClient401Error($"The access token kid was not found in the JWKS");
+                }
+
+                // Do the cryptographic validation of the JWT signature using the JWK public key
+                var json = JWT.Decode(accessToken, jwk);
+
+                // Read claims and create the Microsoft objects so that .NET logic can use the standard mechanisms
+                var claims = ClaimsReader.AccessTokenClaims(json, this.configuration);
+                var identity = new ClaimsIdentity(claims, "Bearer");
+                var principal = new ClaimsPrincipal(identity);
+
+                // Make extra validation checks that jose4j does not support, then return the principal
+                this.ValidateProtocolClaims(principal);
+                return principal;
+            }
+            catch (Exception ex)
+            {
+                throw ErrorUtils.FromTokenValidationError(ex);
             }
         }
 

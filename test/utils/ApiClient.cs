@@ -1,5 +1,6 @@
 namespace SampleApi.Test.Utils
 {
+    using System;
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Threading.Tasks;
@@ -11,11 +12,15 @@ namespace SampleApi.Test.Utils
     public sealed class ApiClient
     {
         private readonly string baseUrl;
+        private readonly string clientName;
+        private readonly string sessionId;
         private readonly HttpProxy httpProxy;
 
-        public ApiClient(string baseUrl, bool useProxy)
+        public ApiClient(string baseUrl, string clientName, string sessionId, bool useProxy = false)
         {
             this.baseUrl = baseUrl;
+            this.clientName = clientName;
+            this.sessionId = sessionId;
             this.httpProxy = new HttpProxy(useProxy, "http://127.0.0.1:8888");
         }
 
@@ -23,25 +28,40 @@ namespace SampleApi.Test.Utils
         {
             options.HttpMethod = HttpMethod.Get;
             options.ApiPath = "/api/userinfo";
-            return await this.CallApi(options);
+
+            var metrics = new ApiResponseMetrics("getUserInfoClaims");
+            return await this.CallApi(options, metrics);
         }
 
         public async Task<ApiResponse> GetCompanies(ApiRequestOptions options)
         {
             options.HttpMethod = HttpMethod.Get;
             options.ApiPath = "/api/companies";
-            return await this.CallApi(options);
+
+            var metrics = new ApiResponseMetrics("getCompanies");
+            return await this.CallApi(options, metrics);
         }
 
         public async Task<ApiResponse> GetCompanyTransactions(ApiRequestOptions options, int companyId)
         {
             options.HttpMethod = HttpMethod.Get;
             options.ApiPath = $"/api/companies/{companyId}/transactions";
-            return await this.CallApi(options);
+
+            var metrics = new ApiResponseMetrics("getCompanyTransactions");
+            return await this.CallApi(options, metrics);
         }
 
-        private async Task<ApiResponse> CallApi(ApiRequestOptions options)
+        /*
+         * Parameterized code to do the async work of calling the API
+         */
+        private async Task<ApiResponse> CallApi(ApiRequestOptions options, ApiResponseMetrics metrics)
         {
+            // Initialize metrics
+            var correlationId = Guid.NewGuid().ToString();
+            metrics.StartTime = DateTime.UtcNow;
+            metrics.CorrelationId = correlationId;
+
+            // Prepare the request
             var url = $"{this.baseUrl}{options.ApiPath}";
             using (var client = new HttpClient(this.httpProxy.GetHandler()))
             {
@@ -50,7 +70,10 @@ namespace SampleApi.Test.Utils
                 var request = new HttpRequestMessage(options.HttpMethod, url);
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", options.AccessToken);
 
-                // Add custom headers for advanced testing if required
+                // Add headers
+                request.Headers.Add("x-mycompany-api-client", this.clientName);
+                request.Headers.Add("x-mycompany-session-id", this.sessionId);
+                request.Headers.Add("x-mycompany-correlation-id", correlationId);
                 if (options.RehearseException)
                 {
                     request.Headers.Add("x-mycompany-test-exception", "SampleApi");
@@ -59,9 +82,12 @@ namespace SampleApi.Test.Utils
                 // Send the request
                 var response = await client.SendAsync(request);
 
-                // Return the status and body
+                // Record the time taken
+                metrics.MillisecondsTaken = (int)(DateTime.UtcNow - metrics.StartTime).TotalMilliseconds;
+
+                // Return response details
                 var body = await response.Content.ReadAsStringAsync();
-                return new ApiResponse(response.StatusCode, body);
+                return new ApiResponse(response.StatusCode, body, metrics);
             }
         }
     }
