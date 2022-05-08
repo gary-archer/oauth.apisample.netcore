@@ -89,7 +89,6 @@ namespace Test2
             Console.WriteLine();
             var startTime = DateTime.UtcNow;
             this.OutputMessage(ConsoleColor.Blue, $"Load test session {this.sessionId} starting at {startTime.ToString("s")}");
-            Console.WriteLine();
 
             // Show headings for API requests
             var headings = new string[]
@@ -104,7 +103,6 @@ namespace Test2
             };
             var header = string.Join(string.Empty, headings);
             this.OutputMessage(ConsoleColor.Yellow, header);
-            Console.WriteLine();
 
             // Get some access tokens to send to the API and send the API requests
             var accessTokens = this.GetAccessTokens();
@@ -140,7 +138,7 @@ namespace Test2
         {
             // Next produce some requests that will run in parallel
             var requests = new List<Func<Task<ApiResponse>>>();
-            for (var index = 0; index < 100; index++)
+            for (var index = 0; index < 10000; index++)
             {
                 // Get the access token
                 var accessToken = accessTokens[index % 5];

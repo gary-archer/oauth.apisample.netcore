@@ -25,7 +25,7 @@ For productive test driven development, the API instead mocks the Authorization 
 
 ## API can be Load Tested
 
-A basic load test uses Tasks to fire 5 parallel requests at a time at the API.
+A basic load test uses Tasks to fire 5 parallel requests at a time at the API.\
 This ensures no concurrency problems, and error rehearsal is used to verify that the API is supportable:
 
 ![Load Test](./doc/loadtest.png)
