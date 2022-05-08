@@ -44,7 +44,7 @@ else
 fi
 
 #
-# Wait for endpoints to become available
+# Wait for the API to become available
 #
 echo 'Waiting for API endpoints to come up ...'
 API_URL='https://api.authsamples-dev.com:445/api/companies'
