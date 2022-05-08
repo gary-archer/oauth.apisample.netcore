@@ -46,4 +46,4 @@ This ensures no concurrency problems, and error rehearsal is used to verify that
 * AWS Cognito is used as the default Authorization Server
 * The [jose-jwt Library](https://github.com/dvsekhvalnov/jose-jwt) is used to manage in memory validation of JWTs
 * API logs can be aggregated to [Elasticsearch](https://authguidance.com/2019/07/19/log-aggregation-setup/) to support [Query Use Cases](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/)
-* The API is designed for cloud native deployment to Kubernetes
+* The API is designed for [cloud native deployment](https://github.com/gary-archer/oauth.cloudnative.deployment) to Kubernetes
