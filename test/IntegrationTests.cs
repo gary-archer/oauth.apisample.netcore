@@ -5,6 +5,10 @@ namespace SampleApi.Test
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
     using SampleApi.Test.Utils;
+    using WireMock.RequestBuilders;
+    using WireMock.ResponseBuilders;
+    using WireMock.Server;
+    using WireMock.Settings;
     using Xunit;
 
     /*
@@ -18,10 +22,9 @@ namespace SampleApi.Test
 
         // A class to issue our own JWTs for testing
         private readonly TokenIssuer tokenIssuer;
-        private readonly WiremockAdmin wiremockAdmin;
+        private readonly WireMockServer wiremockServer;
 
         // API client details
-        private readonly string apiBaseUrl;
         private readonly ApiClient apiClient;
 
         /*
@@ -29,15 +32,30 @@ namespace SampleApi.Test
          */
         public IntegrationTests()
         {
-            this.tokenIssuer = new TokenIssuer();
-            this.wiremockAdmin = new WiremockAdmin();
+            // Start the Wiremock server
+            var settings = new WireMockServerSettings
+            {
+                Port = 446,
+                UseSSL = true,
+                CertificateSettings = new WireMockCertificateSettings
+                {
+                    X509CertificateFilePath = "../../../../certs/authsamples-dev.ssl.p12",
+                    X509CertificatePassword = "Password1",
+                },
+            };
+            this.wiremockServer = WireMockServer.Start(settings);
 
+            // Create the token issuer for these tests and issue some mock token signing keys
+            this.tokenIssuer = new TokenIssuer();
             var keyset = this.tokenIssuer.GetTokenSigningPublicKeys();
-            this.wiremockAdmin.RegisterJsonWebWeys(keyset);
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/.well-known/jwks.json").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(keyset));
 
             // Create the API client
-            this.apiBaseUrl = "https://api.authsamples-dev.com:445";
-            this.apiClient = new ApiClient(this.apiBaseUrl, false);
+            var apiBaseUrl = "https://api.authsamples-dev.com:445";
+            var sessionId = Guid.NewGuid().ToString();
+            this.apiClient = new ApiClient(apiBaseUrl, "IntegrationTests", sessionId);
         }
 
         /*
@@ -46,7 +64,7 @@ namespace SampleApi.Test
         public void Dispose()
         {
             this.tokenIssuer.Dispose();
-            this.wiremockAdmin.Dispose();
+            this.wiremockServer.Stop();
         }
 
         /*
@@ -64,7 +82,9 @@ namespace SampleApi.Test
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -92,7 +112,9 @@ namespace SampleApi.Test
             data.given_name = "Admin";
             data.family_name = "User";
             data.email = "guestadmin@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -120,7 +142,9 @@ namespace SampleApi.Test
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -147,7 +171,9 @@ namespace SampleApi.Test
             data.given_name = "Admin";
             data.family_name = "User";
             data.email = "guestadmin@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -195,7 +221,9 @@ namespace SampleApi.Test
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -223,7 +251,9 @@ namespace SampleApi.Test
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -251,7 +281,9 @@ namespace SampleApi.Test
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString());
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);

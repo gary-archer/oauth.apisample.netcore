@@ -11,11 +11,15 @@ namespace SampleApi.Test.Utils
     public sealed class ApiClient
     {
         private readonly string baseUrl;
+        private readonly string clientName;
+        private readonly string sessionId;
         private readonly HttpProxy httpProxy;
 
-        public ApiClient(string baseUrl, bool useProxy)
+        public ApiClient(string baseUrl, string clientName, string sessionId, bool useProxy = false)
         {
             this.baseUrl = baseUrl;
+            this.clientName = clientName;
+            this.sessionId = sessionId;
             this.httpProxy = new HttpProxy(useProxy, "http://127.0.0.1:8888");
         }
 

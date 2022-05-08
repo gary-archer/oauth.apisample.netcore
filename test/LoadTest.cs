@@ -1,6 +1,11 @@
 namespace Test2
 {
     using System;
+    using SampleApi.Test.Utils;
+    using WireMock.RequestBuilders;
+    using WireMock.ResponseBuilders;
+    using WireMock.Server;
+    using WireMock.Settings;
     using Xunit;
 
     /*
@@ -8,6 +13,9 @@ namespace Test2
      */
     public class LoadTest : IDisposable
     {
+        private readonly WireMockServer wiremockServer;
+        private readonly TokenIssuer tokenIssuer;
+        private readonly ApiClient apiClient;
         private readonly string sessionId;
         private readonly int totalCount;
         private readonly int errorCount;
@@ -17,7 +25,32 @@ namespace Test2
          */
         public LoadTest()
         {
+            // Start the Wiremock server
+            var settings = new WireMockServerSettings
+            {
+                Port = 446,
+                UseSSL = true,
+                CertificateSettings = new WireMockCertificateSettings
+                {
+                    X509CertificateFilePath = "../../../../certs/authsamples-dev.ssl.p12",
+                    X509CertificatePassword = "Password1",
+                },
+            };
+            this.wiremockServer = WireMockServer.Start(settings);
+
+            // Create the token issuer for these tests and issue some mock token signing keys
+            this.tokenIssuer = new TokenIssuer();
+            var keyset = this.tokenIssuer.GetTokenSigningPublicKeys();
+            this.wiremockServer
+                .Given(Request.Create().WithPath("/.well-known/jwks.json").UsingGet())
+                .RespondWith(Response.Create().WithStatusCode(200).WithBody(keyset));
+
+            // Create the API client
+            var apiBaseUrl = "https://api.authsamples-dev.com:445";
             this.sessionId = Guid.NewGuid().ToString();
+            this.apiClient = new ApiClient(apiBaseUrl, "LoadTest", this.sessionId);
+
+            // Initialise counts
             this.totalCount = 0;
             this.errorCount = 0;
         }
@@ -27,6 +60,7 @@ namespace Test2
          */
         public void Dispose()
         {
+            this.wiremockServer.Stop();
         }
 
         /*
