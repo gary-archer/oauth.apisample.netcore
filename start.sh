@@ -8,10 +8,11 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 #
 # Download development SSL certificates if required
+# You need to ensure that the operating system trusts the file downloaded to ./certs/authsamples-dev.ca.pem
 #
 ./downloadcerts.sh
 if [ $? -ne 0 ]; then
-    exit
+  exit
 fi
 
 #
@@ -19,15 +20,17 @@ fi
 #
 dotnet build
 if [ $? -ne 0 ]; then
-    echo 'Problem encountered building the API'
-    exit
+  echo 'Problem encountered building the API'
+  exit
 fi
 
 #
 # Then start listening
+# On Linux ensure that you have first granted Node.js permissions to listen on port 445:
+# - sudo setcap 'cap_net_bind_service=+ep' ./bin/Debug/netcoreapp6/sampleapi
 #
-dotnet watch run
+dotnet run
 if [ $? -ne 0 ]; then
-    echo 'Problem encountered running the API'
-    exit
+  echo 'Problem encountered running the API'
+  exit
 fi

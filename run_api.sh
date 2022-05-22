@@ -11,15 +11,15 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #
 dotnet build
 if [ $? -ne 0 ]; then
-    echo 'Problem encountered building the API'
-    exit
+  echo 'Problem encountered building the API'
+  exit
 fi
 
 #
-# Run the API
+# Run the API in this terminal
 #
 dotnet run
 if [ $? -ne 0 ]; then
-    echo 'Problem encountered running the API'
-    exit
+  echo 'Problem encountered running the API'
+  exit
 fi
