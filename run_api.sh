@@ -23,3 +23,10 @@ if [ $? -ne 0 ]; then
   echo 'Problem encountered running the API'
   exit
 fi
+
+#
+# Prevent automatic terminal closure on Linux
+#
+if [ "$(uname -s)" == 'Linux' ]; then
+  read -n 1
+fi
