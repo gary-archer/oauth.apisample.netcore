@@ -5,6 +5,7 @@ logs
 .DS_Store
 resources
 certs
+trusted.ca.pem
 
 # Visual Studio files not needed by Visual Studio Code
 .vs

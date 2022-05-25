@@ -1,0 +1,41 @@
+{
+    "api": {
+      "port": 8000,
+      "sslCertificateFileName": "./certs/authsamples-dev.ssl.p12",
+      "sslCertificatePassword": "Password1",
+      "useProxy": false,
+      "proxyUrl": "http://host.docker.internal:8888"
+    },
+    "logging": {
+      "apiName": "SampleApi",
+      "production": {
+        "level": "Info",
+        "performanceThresholdMilliseconds": 500,
+        "appenders": [
+          {
+            "type": "console",
+            "prettyPrint": true
+          }
+        ]
+      },
+      "development": {
+        "level": "Info",
+        "overrideLevels": {
+          "Microsoft": "Warning",
+          "Microsoft.AspNetCore.Server.Kestrel": "Error",
+          "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
+          "SampleApi.Plumbing.Security.CustomAuthenticationHandler": "Error",
+          "SampleApi.Plumbing.Claims.ClaimsCache": "Info"
+        }
+      }
+    },
+    "oauth": {
+      "provider":                      "cognito",
+      "issuer":                        "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_qqJgVeuTn",
+      "audience":                      "",
+      "jwksEndpoint":                  "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_qqJgVeuTn/.well-known/jwks.json",
+      "userInfoEndpoint":              "https://login.authsamples.com/oauth2/userInfo",
+      "claimsCacheTimeToLiveMinutes":  30
+    }
+  }
+  
