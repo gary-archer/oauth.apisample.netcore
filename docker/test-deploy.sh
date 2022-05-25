@@ -8,7 +8,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cd ..
 
 #
-# Build to the dist folder
+# Build the code
 #
 dotnet publish sampleapi.csproj -c Release -r linux-x64 --no-self-contained
 if [ $? -ne 0 ]; then
