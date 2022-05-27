@@ -111,11 +111,11 @@
         }
 
         /*
-         * Set up API dependencies
+         * These could be request scoped, but I prefer transient for non HTTP related classes
          */
         private void ConfigureApiDependencies(IServiceCollection services)
         {
-            services.AddScoped<JsonReader>();
+            services.AddTransient<JsonReader>();
             services.AddTransient<CompanyRepository>();
             services.AddTransient<CompanyService>();
         }
