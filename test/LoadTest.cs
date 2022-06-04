@@ -33,7 +33,7 @@ namespace Test2
             // Start the Wiremock server
             var settings = new WireMockServerSettings
             {
-                Port = 446,
+                Port = 447,
                 UseSSL = true,
                 CertificateSettings = new WireMockCertificateSettings
                 {
@@ -60,7 +60,7 @@ namespace Test2
                 .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
 
             // Create the API client
-            var apiBaseUrl = "https://api.authsamples-dev.com:445";
+            var apiBaseUrl = "https://api.authsamples-dev.com:446";
             this.sessionId = Guid.NewGuid().ToString();
             this.apiClient = new ApiClient(apiBaseUrl, "LoadTest", this.sessionId);
 

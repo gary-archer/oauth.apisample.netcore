@@ -25,8 +25,6 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Prevent automatic terminal closure on Linux
+# Prevent automatic terminal closure
 #
-if [ "$(uname -s)" == 'Linux' ]; then
-  read -n 1
-fi
+read -n 1
