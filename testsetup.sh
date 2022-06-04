@@ -48,6 +48,7 @@ if [ "$PLATFORM" == 'MACOS' ]; then
 
 elif [ "$PLATFORM" == 'WINDOWS' ]; then
   
+  GIT_BASH='C:\Program Files\Git\git-bash.exe'
   "$GIT_BASH" -c ./run_api.sh &
 
 elif [ "$PLATFORM" == 'LINUX' ]; then
@@ -60,7 +61,7 @@ fi
 # Wait for the API to become available
 #
 echo 'Waiting for API endpoints to come up ...'
-API_URL='https://api.authsamples-dev.com:445/api/companies'
+API_URL='https://api.authsamples-dev.com:446/api/companies'
 while [ "$(curl -k -s -X GET -o /dev/null -w '%{http_code}' "$API_URL")" != '401' ]; do
   sleep 2
 done
