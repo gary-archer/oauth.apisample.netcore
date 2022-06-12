@@ -30,6 +30,36 @@ This ensures no concurrency problems, and error rehearsal is used to verify that
 
 ![Load Test](./doc/loadtest.png)
 
+## Quick Start
+
+Run the API in isolation with this command:
+
+```bash
+./start.sh
+```
+
+Then call an endpoint over port 446:
+
+```bash
+curl -k https://localhost:446/api/companies
+```
+
+Configure DNS by adding these domains to your hosts file:
+
+```text
+127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
+::1       localhost
+```
+
+Configure [.NET SSL trust](https://authguidance.com/2017/11/11/developer-ssl-setup/#os-ssl-trust) for the root CA at `./certs/authsamples-dev.ca.pem`.\ 
+Then run API tests via these commands:
+
+```bash
+./testsetup.sh
+./integration_tests.sh
+./load_test.sh
+```
+
 ### Further Details
 
 * See the [Overview Page](http://authguidance.com/2018/01/05/net-core-code-sample-overview/) for instructions on how to run the API
