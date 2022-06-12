@@ -51,7 +51,7 @@ Configure DNS by adding these domains to your hosts file:
 ::1       localhost
 ```
 
-Configure [.NET SSL trust](https://authguidance.com/2017/11/11/developer-ssl-setup/#os-ssl-trust) for the root CA at `./certs/authsamples-dev.ca.pem`. 
+Configure [.NET SSL trust](https://authguidance.com/2017/11/11/developer-ssl-setup/#os-ssl-trust) for the root CA at `./certs/authsamples-dev.ca.pem`.\
 Then run API tests via these commands:
 
 ```bash
