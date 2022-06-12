@@ -30,7 +30,7 @@ This ensures no concurrency problems, and error rehearsal is used to verify that
 
 ![Load Test](./doc/loadtest.png)
 
-## Quick Start
+## Local Development Quick Start
 
 Run the API in isolation with this command:
 
