@@ -61,8 +61,8 @@ Then run API tests via these commands:
 
 ## Further Details
 
-* See the [Overview Page](http://authguidance.com/2018/01/05/net-core-code-sample-overview) for instructions on how to run the API
-* See the [OAuth Integration Page](http://authguidance.com/2018/01/06/net-core-api-key-coding-points) for the security implementation
+* See the [Overview Page](https://authguidance.com/2018/01/05/net-core-code-sample-overview) for instructions on how to run the API
+* See the [OAuth Integration Page](https://authguidance.com/2018/01/06/net-core-api-key-coding-points) for the security implementation
 * See the [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/) page for a summary of overall qualities
 
 ## Programming Languages
