@@ -38,23 +38,28 @@ Run the API in isolation with this command:
 ./start.sh
 ```
 
-Then call an endpoint over port 446:
-
-```bash
-curl -k https://localhost:446/api/companies
-```
-
 Configure DNS by adding these domains to your hosts file:
 
 ```text
 127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
 ```
 
+Then call an endpoint over port 446:
+
+```bash
+curl -k https://api.authsamples-dev.com:446/api/companies
+```
+
 Configure [.NET SSL trust](https://authguidance.com/2017/11/11/developer-ssl-setup/#os-ssl-trust) for the root CA at `./certs/authsamples-dev.ca.pem`.\
-Then run API tests via these commands:
+Next stop the API, then re-run it with a test configuration:
 
 ```bash
 ./testsetup.sh
+```
+
+Then run integration tests and a load test:
+
+```bash
 ./integration_tests.sh
 ./load_test.sh
 ```
