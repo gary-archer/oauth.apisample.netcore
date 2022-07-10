@@ -74,4 +74,4 @@ cp deployment/environments/dev.config.json ./api.config.json
 #
 # Indicate success
 #
-echo "Start tests via 'dotnet test' ..."
+echo "Start tests via './integration_tests.sh' or './load_test.sh' ..."
