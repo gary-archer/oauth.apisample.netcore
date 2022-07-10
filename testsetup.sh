@@ -17,7 +17,7 @@ fi
 #
 # Copy down the test configuration, to point the API to Wiremock rather than AWS Cognito
 #
-cp environments/test.config.json ./api.config.json
+cp deployment/environments/test.config.json ./api.config.json
 
 #
 # Get the platform
@@ -69,9 +69,9 @@ done
 #
 # Restore the development configuration once the API is loaded
 #
-cp environments/dev.config.json ./api.config.json
+cp deployment/environments/dev.config.json ./api.config.json
 
 #
 # Indicate success
 #
-echo "Start tests via 'dotnet test' ..."
+echo "Start tests via './integration_tests.sh' or './load_test.sh' ..."
