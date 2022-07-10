@@ -52,7 +52,7 @@ fi
 #
 # Build the Docker container
 #
-docker build --no-cache -f deployment/docker/Dockerfile --build-arg TRUSTED_CA_CERTS='deployment/kubernetes-local/trusted.ca.pem' -t finalapi:v1 .
+docker build --no-cache -f deployment/docker/Dockerfile --build-arg TRUSTED_CA_CERTS='deployment/kubernetes-local/trusted.ca.pem' -t finalnetcoreapi:v1 .
 if [ $? -ne 0 ]; then
   echo '*** API docker build problem encountered'
   exit 1
