@@ -40,7 +40,7 @@ fi
 #
 # Initialize extra trusted certificates to zero
 #
-touch ddeployment/kubernetes-local/trusted.ca.pem
+touch deployment/kubernetes-local/trusted.ca.pem
 
 #
 # On Windows, fix problems with trailing newline characters in Docker scripts

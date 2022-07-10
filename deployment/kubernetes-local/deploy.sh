@@ -11,11 +11,6 @@
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 #
-# Copy configuration into an api.config.json file
-#
-cp nodejs.config.json api.config.json
-
-#
 # Create a configmap for the API's JSON configuration file
 #
 kubectl -n deployed delete configmap api-config 2>/dev/null
