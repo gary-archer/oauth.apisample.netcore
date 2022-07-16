@@ -94,8 +94,6 @@ namespace SampleApi.Plumbing.Logging
             repository.Root.Level = repository.LevelMap[level];
             this.performanceThresholdMilliseconds = loggingConfiguration["performanceThresholdMilliseconds"].ToObject<int>();
 
-            log4net.Util.LogLog.InternalDebugging = true;
-
             #pragma warning disable S125
             /* Uncomment to view internal messages such as problems creating log files
             log4net.Util.LogLog.InternalDebugging = true;
