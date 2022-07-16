@@ -19,7 +19,7 @@
         {
           "type": "file",
           "filePrefix": "api",
-          "dirName": "./logs/",
+          "dirName": "../../../logs/",
           "maxSize": "10MB",
           "maxFiles": "100"
         }
