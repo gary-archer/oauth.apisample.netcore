@@ -61,6 +61,8 @@ kind: Service
 apiVersion: v1
 metadata:
   name: finalapi-svc
+  annotations:
+    konghq.com/protocol: https
 spec:
   selector:
     app: finalapi
@@ -72,11 +74,8 @@ kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
   name: finalapi-ingress
-  annotations:
-    kubernetes.io/ingress.class: 'nginx'
-    nginx.ingress.kubernetes.io/secure-backends: 'true'
-    nginx.ingress.kubernetes.io/backend-protocol: 'HTTPS'
 spec:
+  ingressClassName: kong
   tls:
     - hosts:
         - api.mycluster.com
