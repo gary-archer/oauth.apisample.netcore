@@ -138,7 +138,7 @@ namespace Test2
         {
             // Next produce some requests that will run in parallel
             var requests = new List<Func<Task<ApiResponse>>>();
-            for (var index = 0; index < 100; index++)
+            for (var index = 0; index < 100000; index++)
             {
                 // Get the access token
                 var accessToken = accessTokens[index % 5];
