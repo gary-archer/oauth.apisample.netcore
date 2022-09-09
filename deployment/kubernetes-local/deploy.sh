@@ -49,8 +49,8 @@ fi
 #
 # Trigger deployment of the API to the Kubernetes cluster
 #
-kubectl -n applications delete -f api.yaml 2>/dev/null
-kubectl -n applications apply  -f api.yaml
+kubectl -n applications delete -f ../shared/api.yaml 2>/dev/null
+kubectl -n applications apply  -f ../shared/api.yaml
 if [ $? -ne 0 ]; then
   echo '*** API Kubernetes deployment problem encountered'
   exit 1
