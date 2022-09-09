@@ -32,7 +32,6 @@ namespace SampleApi.Plumbing.Security
 
         /*
          * This is called once per API request to perform authorization
-         * Most requests just return cached results
          */
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {

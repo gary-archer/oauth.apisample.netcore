@@ -11,6 +11,14 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cd ../..
 
 #
+# Check preconditions
+#
+if [ "$DOCKERHUB_ACCOUNT" == '' ]; then
+  echo '*** The DOCKERHUB_ACCOUNT environment variable has not been configured'
+  exit 1
+fi
+
+#
 # Get the platform
 #
 case "$(uname -s)" in
@@ -52,16 +60,17 @@ fi
 #
 # Build the Docker container
 #
-docker build --no-cache -f deployment/shared/Dockerfile --build-arg TRUSTED_CA_CERTS='deployment/shared/trusted.ca.pem' -t finalnetcoreapi:v1 .
+docker build --no-cache -f deployment/shared/Dockerfile --build-arg TRUSTED_CA_CERTS='deployment/shared/trusted.ca.pem' -t "$DOCKERHUB_ACCOUNT/finalnetcoreapi:v1" .
 if [ $? -ne 0 ]; then
   echo '*** API docker build problem encountered'
   exit 1
 fi
 
 #
-# Load it into kind's Docker registry
+# Push it to DockerHub
 #
-kind load docker-image finalnetcoreapi:v1 --name oauth
+docker image rm -f "$DOCKERHUB_ACCOUNT/finalnetcoreapi:v1" 2>/dev/null
+docker image push "$DOCKERHUB_ACCOUNT/finalnetcoreapi:v1"
 if [ $? -ne 0 ]; then
   echo '*** API docker deploy problem encountered'
   exit 1
