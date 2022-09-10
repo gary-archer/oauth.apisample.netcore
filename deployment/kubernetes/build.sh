@@ -11,7 +11,17 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cd ../..
 
 #
-# Get the platform
+# Check preconditions
+#
+if [ "$CLUSTER_TYPE" != 'local' ]; then
+  if [ "$DOCKERHUB_ACCOUNT" == '' ]; then
+    echo '*** The DOCKERHUB_ACCOUNT environment variable has not been configured'
+    exit 1
+  fi
+fi
+
+#
+# Get the local computer platform
 #
 case "$(uname -s)" in
 
@@ -59,10 +69,19 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Load it into kind's Docker registry
+# Push the API docker image
 #
-kind load docker-image finalnetcoreapi:v1 --name oauth
+if [ "$CLUSTER_TYPE" == 'local' ]; then
+  
+  kind load docker-image finalnetcoreapi:v1 --name oauth
+
+else
+  
+  docker image rm -f "$DOCKERHUB_ACCOUNT/finalnetcoreapi:v1" 2>/dev/null
+  docker image push "$DOCKERHUB_ACCOUNT/finalnetcoreapi:v1"
+
+fi
 if [ $? -ne 0 ]; then
-  echo '*** API docker deploy problem encountered'
+  echo '*** API docker push problem encountered'
   exit 1
 fi
