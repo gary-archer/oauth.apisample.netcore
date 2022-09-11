@@ -2,11 +2,10 @@
 # https://hub.docker.com/_/microsoft-dotnet-aspnet
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 
-# Run a script from a runtime argument to do initialization of trusted certificates when required
+# Configure trusted root certificate authorities
 ARG TRUSTED_CA_CERTS
 COPY $TRUSTED_CA_CERTS /usr/local/share/certificates/trusted.ca.crt
-COPY deployment/shared/docker-init.sh /tmp/
-RUN chmod +x /tmp/docker-init.sh && /tmp/docker-init.sh
+RUN update-ca-certificates
 
 # Copy libraries and other files into our docker image
 WORKDIR /usr/api
