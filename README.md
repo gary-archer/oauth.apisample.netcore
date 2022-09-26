@@ -84,6 +84,13 @@ Then run integration tests and a load test:
 
 ## End-to-End Testing
 
+First ensure that these tools are installed:
+
+- [Node.js](https://nodejs.org/en/download/)
+- A Docker Engine such as [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- [openssl](https://www.openssl.org/)
+- [envsubst](https://github.com/a8m/envsubst)
+
 ### Run an SPA Client
 
 Re-run the API with `start.sh`, then run the SPA with the following commands.\
