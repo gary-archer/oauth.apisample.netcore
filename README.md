@@ -82,46 +82,6 @@ Then run integration tests and a load test:
 ./load_test.sh
 ```
 
-## End-to-End Testing
-
-First ensure that these tools are installed:
-
-- [Node.js](https://nodejs.org/en/download/)
-- A Docker Engine such as [Docker Desktop](https://www.docker.com/products/docker-desktop)
-- [openssl](https://www.openssl.org/)
-- [envsubst](https://github.com/a8m/envsubst)
-
-### Run an SPA Client
-
-Re-run the API with `start.sh`, then run the SPA with the following commands.\
-Login to the SPA at https://web.authsamples-dev.com/spa as `guestuser@mycompany.com / GuestPassword1`:
-
-```bash
-cd ..
-git clone https://github.com/gary-archer/oauth.websample.final
-cd oauth.websample.final
-./build.sh LOCALAPI && ./run.sh LOCALAPI
-```
-
-### Query API Logs
-
-Deploy the Elastic Stack with the following commands.\
-Login to Kibana at https://logs.authsamples-dev.com:5601 as `elastic / Password1`:
-
-```bash
-cd ..
-git clone https://github.com/gary-archer/logaggregation.elasticsearch
-cd logaggregation.elasticsearch
-./deployment/docker-local/deploy.sh
-```
-
-### Free Docker Resources
-
-```bash
-../oauth.websample.final/teardown.sh LOCALAPI
-../logaggregation.elasticsearch/deployment/docker-local/teardown.sh
-```
-
 ## Further Details
 
 * See the [Overview Page](https://authguidance.com/2018/01/05/net-core-code-sample-overview) for instructions on how to run the API
