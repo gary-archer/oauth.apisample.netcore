@@ -1,7 +1,6 @@
 # General files not checked in
 bin
 obj
-logs
 .DS_Store
 resources
 certs

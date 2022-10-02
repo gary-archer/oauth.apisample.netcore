@@ -25,6 +25,17 @@ if [ $? -ne 0 ]; then
 fi
 
 #
+# Ensure that log folders exist
+#
+if [ ! -d '../oauth.logs' ]; then
+  mkdir '../oauth.logs'
+fi
+if [ -d '../oauth.logs/api' ]; then
+  rm -rf '../oauth.logs/api'
+fi
+mkdir '../oauth.logs/api'
+
+#
 # Then start listening
 # On Linux ensure that you have first granted Node.js permissions to listen on port 446:
 # - sudo setcap 'cap_net_bind_service=+ep' ./bin/Debug/netcoreapp6/sampleapi

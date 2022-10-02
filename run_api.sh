@@ -17,6 +17,17 @@ if [ $? -ne 0 ]; then
 fi
 
 #
+# Ensure that log folders exist
+#
+if [ ! -d '../oauth.logs' ]; then
+  mkdir '../oauth.logs'
+fi
+if [ -d '../oauth.logs/api' ]; then
+  rm -rf '../oauth.logs/api'
+fi
+mkdir '../oauth.logs/api'
+
+#
 # Run the API in this terminal
 #
 dotnet run
