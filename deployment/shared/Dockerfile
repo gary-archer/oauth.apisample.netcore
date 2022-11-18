@@ -1,6 +1,6 @@
 # Use the .Net Core Debian linux docker image
 # https://hub.docker.com/_/microsoft-dotnet-aspnet
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
+FROM mcr.microsoft.com/dotnet/aspnet:7.0
 
 # Configure trusted root certificate authorities
 ARG TRUSTED_CA_CERTS
@@ -9,7 +9,7 @@ RUN update-ca-certificates
 
 # Copy libraries and other files into our docker image
 WORKDIR /usr/api
-COPY bin/Release/netcoreapp6/linux-x64/publish/*  /usr/api/
+COPY bin/Release/netcoreapp7/linux-x64/publish/*  /usr/api/
 COPY data/*                                       /usr/api/data/
 
 # Run the app as a low privilege user

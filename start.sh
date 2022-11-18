@@ -37,7 +37,7 @@ fi
 #
 # Then start listening
 # On Linux ensure that you have first granted Node.js permissions to listen on port 446:
-# - sudo setcap 'cap_net_bind_service=+ep' ./bin/Debug/netcoreapp6/sampleapi
+# - sudo setcap 'cap_net_bind_service=+ep' ./bin/Debug/netcoreapp7/sampleapi
 #
 dotnet run
 if [ $? -ne 0 ]; then
