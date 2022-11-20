@@ -1,4 +1,4 @@
-namespace Test2
+namespace SampleApi.Test
 {
     using System;
     using System.Collections.Generic;
@@ -6,10 +6,6 @@ namespace Test2
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
     using SampleApi.Test.Utils;
-    using WireMock.RequestBuilders;
-    using WireMock.ResponseBuilders;
-    using WireMock.Server;
-    using WireMock.Settings;
     using Xunit;
 
     /*
@@ -17,8 +13,8 @@ namespace Test2
      */
     public class LoadTest : IDisposable
     {
-        private readonly WireMockServer wiremockServer;
         private readonly TokenIssuer tokenIssuer;
+        private readonly WiremockAdmin wiremockAdmin;
         private readonly ApiClient apiClient;
         private readonly string sessionId;
         private readonly string guestUserId;
@@ -30,34 +26,18 @@ namespace Test2
          */
         public LoadTest()
         {
-            // Start the Wiremock server
-            var settings = new WireMockServerSettings
-            {
-                Port = 447,
-                UseSSL = true,
-                CertificateSettings = new WireMockCertificateSettings
-                {
-                    X509CertificateFilePath = "../../../../certs/authsamples-dev.ssl.p12",
-                    X509CertificatePassword = "Password1",
-                },
-            };
-            this.wiremockServer = WireMockServer.Start(settings);
-
             // Create the token issuer for these tests and issue some mock token signing keys
+            this.wiremockAdmin = new WiremockAdmin(false);
             this.tokenIssuer = new TokenIssuer();
             var keyset = this.tokenIssuer.GetTokenSigningPublicKeys();
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/.well-known/jwks.json").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(keyset));
+            this.wiremockAdmin.RegisterJsonWebWeys(keyset).Wait();
 
             // The API will call the Authorization Server to get user info for the token, so register a mock response
             dynamic data = new JObject();
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            this.wiremockAdmin.RegisterUserInfo(data.ToString()).Wait();
 
             // Create the API client
             var apiBaseUrl = "https://api.authsamples-dev.com:446";
@@ -75,7 +55,9 @@ namespace Test2
          */
         public void Dispose()
         {
-            this.wiremockServer.Stop();
+            this.tokenIssuer.Dispose();
+            this.wiremockAdmin.UnregisterJsonWebWeys().Wait();
+            this.wiremockAdmin.UnregisterUserInfo().Wait();
         }
 
         /*

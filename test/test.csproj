@@ -33,9 +33,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-
-    <!-- Wiremock is used to mock the Authorization Server -->
-    <PackageReference Include="WireMock.Net" Version="1.4.41" />
   </ItemGroup>
 
 </Project>

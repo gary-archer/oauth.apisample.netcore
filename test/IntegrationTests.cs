@@ -1,14 +1,10 @@
-namespace SampleApi.Test
+namespace SampleApi.LoadTest
 {
     using System;
     using System.Net;
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
     using SampleApi.Test.Utils;
-    using WireMock.RequestBuilders;
-    using WireMock.ResponseBuilders;
-    using WireMock.Server;
-    using WireMock.Settings;
     using Xunit;
 
     /*
@@ -22,7 +18,7 @@ namespace SampleApi.Test
 
         // A class to issue our own JWTs for testing
         private readonly TokenIssuer tokenIssuer;
-        private readonly WireMockServer wiremockServer;
+        private readonly WiremockAdmin wiremockAdmin;
 
         // API client details
         private readonly ApiClient apiClient;
@@ -32,25 +28,12 @@ namespace SampleApi.Test
          */
         public IntegrationTests()
         {
-            // Start the Wiremock server
-            var settings = new WireMockServerSettings
-            {
-                Port = 447,
-                UseSSL = true,
-                CertificateSettings = new WireMockCertificateSettings
-                {
-                    X509CertificateFilePath = "../../../../certs/authsamples-dev.ssl.p12",
-                    X509CertificatePassword = "Password1",
-                },
-            };
-            this.wiremockServer = WireMockServer.Start(settings);
+            this.wiremockAdmin = new WiremockAdmin(false);
 
             // Create the token issuer for these tests and issue some mock token signing keys
             this.tokenIssuer = new TokenIssuer();
             var keyset = this.tokenIssuer.GetTokenSigningPublicKeys();
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/.well-known/jwks.json").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(keyset));
+            this.wiremockAdmin.RegisterJsonWebWeys(keyset).Wait();
 
             // Create the API client
             var apiBaseUrl = "https://api.authsamples-dev.com:446";
@@ -64,7 +47,8 @@ namespace SampleApi.Test
         public void Dispose()
         {
             this.tokenIssuer.Dispose();
-            this.wiremockServer.Stop();
+            this.wiremockAdmin.UnregisterJsonWebWeys().Wait();
+            this.wiremockAdmin.UnregisterUserInfo().Wait();
         }
 
         /*
@@ -82,9 +66,7 @@ namespace SampleApi.Test
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.wiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -112,9 +94,7 @@ namespace SampleApi.Test
             data.given_name = "Admin";
             data.family_name = "User";
             data.email = "guestadmin@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.wiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -142,9 +122,7 @@ namespace SampleApi.Test
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.wiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -171,9 +149,7 @@ namespace SampleApi.Test
             data.given_name = "Admin";
             data.family_name = "User";
             data.email = "guestadmin@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.wiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -221,9 +197,7 @@ namespace SampleApi.Test
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.wiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -251,9 +225,7 @@ namespace SampleApi.Test
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.wiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -281,9 +253,7 @@ namespace SampleApi.Test
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.wiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
