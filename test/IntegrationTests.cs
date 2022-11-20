@@ -24,7 +24,7 @@ namespace SampleApi.LoadTest
         private readonly ApiClient apiClient;
 
         /*
-         * Initialize mock token issuing and wiremock
+         * Initialize mock token issuing and wiremock before a test runs
          */
         public IntegrationTests()
         {
@@ -42,7 +42,7 @@ namespace SampleApi.LoadTest
         }
 
         /*
-         * Clean up resources after all tests have completed
+         * Clean up resources when a test has completed
          */
         public void Dispose()
         {

@@ -3,12 +3,14 @@ namespace SampleApi.Test.Utils
     using System;
     using System.Net.Http;
     using System.Net.Http.Headers;
+    using System.Text;
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
     using SampleApi.Plumbing.Utilities;
 
     /*
-     * Manage updates to Wiremock
+     * Manage updates to Wiremock via the Admin API
+     * https://github.com/WireMock-Net/WireMock.Net/wiki/Admin-API-Reference
      */
     public class WiremockAdmin
     {
@@ -31,18 +33,22 @@ namespace SampleApi.Test.Utils
         public async Task RegisterJsonWebWeys(string keysJson)
         {
             dynamic data = new JObject();
-            data.id = this.jsonWebKeysId;
-            data.priority = 1;
+            data.Guid = this.jsonWebKeysId;
+            data.Priority = 1;
 
             dynamic request = new JObject();
-            request.method = "GET";
-            request.url = "/.well-known/jwks.json";
-            data.request = request;
+            request.Path = "/.well-known/jwks.json";
+
+            dynamic methods = new JArray();
+            methods.Add("get");
+            request.Methods = methods;
+
+            data.Request = request;
 
             dynamic response = new JObject();
-            response.status = 200;
-            response.body = keysJson;
-            data.response = response;
+            response.StatusCode = 200;
+            response.Body = keysJson;
+            data.Response = response;
 
             await this.Register(data.ToString());
         }
@@ -61,18 +67,22 @@ namespace SampleApi.Test.Utils
         public async Task RegisterUserInfo(string userJson)
         {
             dynamic data = new JObject();
-            data.id = this.userInfoId;
-            data.priority = 1;
+            data.Guid = this.userInfoId;
+            data.Priority = 1;
 
             dynamic request = new JObject();
-            request.method = "POST";
-            request.url = "/oauth2/userInfo";
-            data.request = request;
+            request.Path = "/oauth2/userInfo";
+
+            dynamic methods = new JArray();
+            methods.Add("post");
+            request.Methods = methods;
+
+            data.Request = request;
 
             dynamic response = new JObject();
-            response.status = 200;
-            response.body = userJson;
-            data.response = response;
+            response.StatusCode = 200;
+            response.Body = userJson;
+            data.Response = response;
 
             await this.Register(data.ToString());
         }
@@ -94,8 +104,15 @@ namespace SampleApi.Test.Utils
             {
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 var request = new HttpRequestMessage(HttpMethod.Post, this.baseUrl);
-                request.Content = new StringContent(stubbedResponse);
-                await client.SendAsync(request);
+                request.Content = new StringContent(stubbedResponse, Encoding.UTF8, "application/json");
+
+                var response = await client.SendAsync(request);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var status = (int)response.StatusCode;
+                    var text = await response.Content.ReadAsStringAsync();
+                    throw new InvalidOperationException($"Register call failed: {status}");
+                }
             }
         }
 
