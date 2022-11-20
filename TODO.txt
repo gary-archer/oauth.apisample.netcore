@@ -1,0 +1,7 @@
+1. Code updates in tests, to use the admin API, in line with Java and Node
+   Merge, then update blog
+
+2. Install Java 17 for Linux
+   Test on Windows and macOS later
+   Get Node and Java tests working
+
