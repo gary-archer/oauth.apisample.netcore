@@ -17,7 +17,7 @@ class Program
             },
             StartAdminInterface = true,
             AllowPartialMapping = true,
-            //Logger = new WireMockConsoleLogger()
+            /* Logger = new WireMockConsoleLogger() */
         };
 
         StandAloneApp.Start(settings);
