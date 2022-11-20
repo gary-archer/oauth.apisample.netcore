@@ -74,7 +74,7 @@ namespace SampleApi.Test.Utils
             response.body = userJson;
             data.response = response;
 
-            await this.Register(data);
+            await this.Register(data.ToString());
         }
 
         /*
