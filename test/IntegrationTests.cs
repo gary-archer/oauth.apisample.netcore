@@ -1,70 +1,38 @@
-namespace SampleApi.Test
+namespace SampleApi.IntegrationTests
 {
     using System;
     using System.Net;
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
     using SampleApi.Test.Utils;
-    using WireMock.RequestBuilders;
-    using WireMock.ResponseBuilders;
-    using WireMock.Server;
-    using WireMock.Settings;
     using Xunit;
 
     /*
      * Test the API in isolation, without any dependencies on the Authorization Server
      */
-    public class IntegrationTests : IDisposable
+    public class IntegrationTests : IClassFixture<IntegrationTestState>, IDisposable
     {
+        // State shared across the suite of tests
+        private readonly IntegrationTestState state;
+
         // The real subject claim values for my two online test users
         private readonly string guestUserId = "a6b404b1-98af-41a2-8e7f-e4061dc0bf86";
         private readonly string guestAdminId = "77a97e5b-b748-45e5-bb6f-658e85b2df91";
 
-        // A class to issue our own JWTs for testing
-        private readonly TokenIssuer tokenIssuer;
-        private readonly WireMockServer wiremockServer;
-
-        // API client details
-        private readonly ApiClient apiClient;
-
         /*
-         * Initialize mock token issuing and wiremock
+         * Initialize mock token issuing and wiremock before a test runs
          */
-        public IntegrationTests()
+        public IntegrationTests(IntegrationTestState state)
         {
-            // Start the Wiremock server
-            var settings = new WireMockServerSettings
-            {
-                Port = 447,
-                UseSSL = true,
-                CertificateSettings = new WireMockCertificateSettings
-                {
-                    X509CertificateFilePath = "../../../../certs/authsamples-dev.ssl.p12",
-                    X509CertificatePassword = "Password1",
-                },
-            };
-            this.wiremockServer = WireMockServer.Start(settings);
-
-            // Create the token issuer for these tests and issue some mock token signing keys
-            this.tokenIssuer = new TokenIssuer();
-            var keyset = this.tokenIssuer.GetTokenSigningPublicKeys();
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/.well-known/jwks.json").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(keyset));
-
-            // Create the API client
-            var apiBaseUrl = "https://api.authsamples-dev.com:446";
-            var sessionId = Guid.NewGuid().ToString();
-            this.apiClient = new ApiClient(apiBaseUrl, "IntegrationTests", sessionId);
+            this.state = state;
         }
 
         /*
-         * Clean up resources after all tests have completed
+         * Dispose per test state
          */
         public void Dispose()
         {
-            this.tokenIssuer.Dispose();
-            this.wiremockServer.Stop();
+            this.state.WiremockAdmin.UnregisterUserInfo().Wait();
         }
 
         /*
@@ -75,20 +43,18 @@ namespace SampleApi.Test
         public async Task GetUserClaims_ReturnsSingleRegion_ForStandardUser()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.tokenIssuer.IssueAccessToken(this.guestUserId);
+            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestUserId);
 
             // The API will call the Authorization Server to get user info for the token, so register a mock response
             dynamic data = new JObject();
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
-            var response = await this.apiClient.GetUserInfoClaims(options);
+            var response = await this.state.ApiClient.GetUserInfoClaims(options);
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
@@ -105,20 +71,18 @@ namespace SampleApi.Test
         public async Task GetUserClaims_ReturnsAllRegions_ForAdminUser()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.tokenIssuer.IssueAccessToken(this.guestAdminId);
+            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestAdminId);
 
             // The API will call the Authorization Server to get user info for the token, so register a mock response
             dynamic data = new JObject();
             data.given_name = "Admin";
             data.family_name = "User";
             data.email = "guestadmin@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
-            var response = await this.apiClient.GetUserInfoClaims(options);
+            var response = await this.state.ApiClient.GetUserInfoClaims(options);
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
@@ -135,20 +99,18 @@ namespace SampleApi.Test
         public async Task GetCompanies_ReturnsTwoItems_ForStandardUser()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.tokenIssuer.IssueAccessToken(this.guestUserId);
+            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestUserId);
 
             // The API will call the Authorization Server to get user info for the token, so register a mock response
             dynamic data = new JObject();
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
-            var response = await this.apiClient.GetCompanies(options);
+            var response = await this.state.ApiClient.GetCompanies(options);
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
@@ -164,20 +126,18 @@ namespace SampleApi.Test
         public async Task GetCompanies_ReturnsAllItems_ForAdminUser()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.tokenIssuer.IssueAccessToken(this.guestAdminId);
+            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestAdminId);
 
             // The API will call the Authorization Server to get user info for the token, so register a mock response
             dynamic data = new JObject();
             data.given_name = "Admin";
             data.family_name = "User";
             data.email = "guestadmin@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
-            var response = await this.apiClient.GetCompanies(options);
+            var response = await this.state.ApiClient.GetCompanies(options);
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
@@ -193,11 +153,11 @@ namespace SampleApi.Test
         public async Task GetCompanies_Returns401_ForMaliciousJwt()
         {
             // Get a malicious access token for the end user of this test
-            var accessToken = this.tokenIssuer.IssueMaliciousAccessToken(this.guestUserId);
+            var accessToken = this.state.TokenIssuer.IssueMaliciousAccessToken(this.guestUserId);
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
-            var response = await this.apiClient.GetCompanies(options);
+            var response = await this.state.ApiClient.GetCompanies(options);
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.Unauthorized, "Unexpected HTTP status code");
@@ -214,20 +174,18 @@ namespace SampleApi.Test
         public async Task GetTransactions_ReturnsAllowedItems_ForCompaniesMatchingTheRegionClaim()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.tokenIssuer.IssueAccessToken(this.guestUserId);
+            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestUserId);
 
             // The API will call the Authorization Server to get user info for the token, so register a mock response
             dynamic data = new JObject();
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
-            var response = await this.apiClient.GetCompanyTransactions(options, 2);
+            var response = await this.state.ApiClient.GetCompanyTransactions(options, 2);
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
@@ -244,20 +202,18 @@ namespace SampleApi.Test
         public async Task GetTransactions_ReturnsNotFoundForUser_ForCompaniesNotMatchingTheRegionClaim()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.tokenIssuer.IssueAccessToken(this.guestUserId);
+            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestUserId);
 
             // The API will call the Authorization Server to get user info for the token, so register a mock response
             dynamic data = new JObject();
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
-            var response = await this.apiClient.GetCompanyTransactions(options, 3);
+            var response = await this.state.ApiClient.GetCompanyTransactions(options, 3);
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.NotFound, "Unexpected HTTP status code");
@@ -274,21 +230,19 @@ namespace SampleApi.Test
         public async Task FailedApiCall_ReturnsSupportable500Error_ForErrorRehearsalRequest()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.tokenIssuer.IssueAccessToken(this.guestUserId);
+            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestUserId);
 
             // The API will call the Authorization Server to get user info for the token, so register a mock response
             dynamic data = new JObject();
             data.given_name = "Guest";
             data.family_name = "User";
             data.email = "guestuser@mycompany.com";
-            this.wiremockServer
-                .Given(Request.Create().WithPath("/oauth2/userInfo").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody(data.ToString()));
+            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
             options.RehearseException = true;
-            var response = await this.apiClient.GetCompanyTransactions(options, 3);
+            var response = await this.state.ApiClient.GetCompanyTransactions(options, 3);
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.InternalServerError, "Unexpected HTTP status code");
