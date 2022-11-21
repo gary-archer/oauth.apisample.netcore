@@ -66,7 +66,6 @@ namespace SampleApi.Test.Utils
             using (var client = new HttpClient(this.httpProxy.GetHandler()))
             {
                 // Create the request
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 var request = new HttpRequestMessage(options.HttpMethod, url);
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", options.AccessToken);
 

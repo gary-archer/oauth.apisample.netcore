@@ -8,13 +8,15 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cd wiremock
 
 #
-# Build the standalone Wiremock
+# Build the standalone Wiremock if it has not been built yet
 #
-dotnet build
-if [ $? -ne 0 ]; then
-  echo 'Problem encountered building Wiremock'
-  read -n 1
-  exit
+if [ ! -f ./bin/Debug/net7.0/wiremock ]; then
+  dotnet build
+  if [ $? -ne 0 ]; then
+    echo 'Problem encountered building Wiremock'
+    read -n 1
+    exit
+  fi
 fi
 
 #

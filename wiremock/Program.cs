@@ -1,7 +1,7 @@
 ﻿using System;
 using WireMock.Net.StandAlone;
 using WireMock.Settings;
-using WireMock.Logging;
+/*using WireMock.Logging;*/
 
 class Program
 {
@@ -16,8 +16,8 @@ class Program
                 X509CertificatePassword = "Password1"
             },
             StartAdminInterface = true,
-            AllowPartialMapping = true,
-            /* Logger = new WireMockConsoleLogger() */
+            AllowPartialMapping = true
+            /*Logger = new WireMockConsoleLogger()*/
         };
 
         StandAloneApp.Start(settings);

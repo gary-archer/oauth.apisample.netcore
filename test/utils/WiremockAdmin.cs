@@ -28,8 +28,8 @@ namespace SampleApi.Test.Utils
         }
 
         /*
-        * Register our test JWKS values at the start of the test suite
-        */
+         * Register our test JWKS values at the start of the test suite
+         */
         public async Task RegisterJsonWebWeys(string keysJson)
         {
             dynamic data = new JObject();
@@ -54,27 +54,27 @@ namespace SampleApi.Test.Utils
         }
 
         /*
-        * Unregister our test JWKS values at the end of the test suite
-        */
+         * Unregister our test JWKS values at the end of the test suite
+         */
         public async Task UnregisterJsonWebWeys()
         {
             await this.Unregister(this.jsonWebKeysId);
         }
 
         /*
-        * Register a user at the start of a test
-        */
+         * Register a user at the start of a test
+         */
         public async Task RegisterUserInfo(string userJson)
         {
             dynamic data = new JObject();
             data.Guid = this.userInfoId;
-            data.Priority = 1;
+            data.Priority = 2;
 
             dynamic request = new JObject();
             request.Path = "/oauth2/userInfo";
 
             dynamic methods = new JArray();
-            methods.Add("post");
+            methods.Add("get");
             request.Methods = methods;
 
             data.Request = request;
@@ -88,16 +88,16 @@ namespace SampleApi.Test.Utils
         }
 
         /*
-        * Unregister a user at the end of a test
-        */
+         * Unregister a user at the end of a test
+         */
         public async Task UnregisterUserInfo()
         {
             await this.Unregister(this.userInfoId);
         }
 
         /*
-        * Add a stubbed response to Wiremock via its Admin API
-        */
+         * Add a stubbed response to Wiremock via its Admin API
+         */
         private async Task Register(string stubbedResponse)
         {
             using (var client = new HttpClient(this.httpProxy.GetHandler()))
@@ -117,8 +117,8 @@ namespace SampleApi.Test.Utils
         }
 
         /*
-        * Delete a stubbed response from Wiremock via its Admin API
-        */
+         * Delete a stubbed response from Wiremock via its Admin API
+         */
         private async Task Unregister(string id)
         {
             using (var client = new HttpClient(this.httpProxy.GetHandler()))
