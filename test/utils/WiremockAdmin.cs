@@ -68,7 +68,7 @@ namespace SampleApi.Test.Utils
         {
             dynamic data = new JObject();
             data.Guid = this.userInfoId;
-            data.Priority = 2;
+            data.Priority = 1;
 
             dynamic request = new JObject();
             request.Path = "/oauth2/userInfo";
