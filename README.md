@@ -45,12 +45,6 @@ Ensure that .NET 7+ is installed, then run the API with this command:
 ./start.sh
 ```
 
-Then call an endpoint over port 446:
-
-```bash
-curl -k https://api.authsamples-dev.com:446/api/companies
-```
-
 ### Configure DNS and SSL
 
 Configure DNS by adding these domains to your hosts file:
