@@ -40,8 +40,7 @@
         {
             // Configure .Net Core authentication to run on all paths except particular exceptions
             app.UseWhen(
-                ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) &&
-                       !ctx.Request.Path.StartsWithSegments(new PathString("/api/customclaims")),
+                ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")),
                 api => api.UseAuthentication());
 
             // Configure .Net Core middleware classes to run on all API paths
