@@ -6,6 +6,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json;
     using SampleApi.Host.Claims;
+    using SampleApi.Plumbing.Errors;
 
     /*
      * A controller called during token issuing to ask the API for custom claim values
@@ -27,10 +28,20 @@
          */
         [AllowAnonymous]
         [HttpPost]
-        public async Task<ContentResult> GetCustomClaims()
+        public async Task<ContentResult> GetCustomClaims([FromBody] IdentityClaims identityClaims)
         {
-            var subject = "test";
-            var email = "user";
+            if (string.IsNullOrWhiteSpace(identityClaims.Subject))
+            {
+                throw ErrorUtils.FromMissingClaim("subject");
+            }
+
+            if (string.IsNullOrWhiteSpace(identityClaims.Email))
+            {
+                throw ErrorUtils.FromMissingClaim("email");
+            }
+
+            var subject = identityClaims.Subject;
+            var email = identityClaims.Email;
             var customClaims = await this.customClaimsProvider.IssueAsync(subject, email);
 
             var userId = customClaims.First(c => c.Type == CustomClaimNames.UserId).Value;
@@ -44,7 +55,6 @@
                 user_regions = userRegions.Split(' '),
             };
 
-            System.Console.WriteLine(JsonConvert.SerializeObject(data));
             return this.Content(JsonConvert.SerializeObject(data), "application/json");
         }
     }
