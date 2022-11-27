@@ -38,15 +38,11 @@
          */
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Configure .Net Core authentication to run on all paths except particular exceptions
-            app.UseWhen(
-                ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")),
-                api => api.UseAuthentication());
+            // Configure .Net Core authentication to run on all API paths
+            app.UseAuthentication();
 
             // Configure .Net Core middleware classes to run on all API paths
-            app.UseWhen(
-                ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")),
-                api => this.ConfigureApiMiddleware(api));
+            this.ConfigureApiMiddleware(app);
 
             // Use controller attributes for API request routing
             app.UseRouting();
