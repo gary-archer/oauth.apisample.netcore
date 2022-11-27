@@ -9,7 +9,7 @@ namespace SampleApi.Plumbing.Middleware
     using SampleApi.Plumbing.Utilities;
 
     /*
-     * The unhandled exception handler, primarily called when an ASP.Net request fails
+     * The unhandled exception handler, primarily called when an HTTP request fails
      */
     public sealed class UnhandledExceptionMiddleware
     {
