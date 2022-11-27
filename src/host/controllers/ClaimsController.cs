@@ -2,6 +2,7 @@
 {
     using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json;
     using SampleApi.Host.Claims;
@@ -21,13 +22,16 @@
         }
 
         /*
-         * This is called during token issuance by the Authorization Server when using the StandardAuthorizer
-         * The custom claims are then included in the access token
+         * This is called during token issuance when the Authorization Server supports it
+         * The Authorization Server will then include claims returned in the JWT access token
          */
-        [HttpGet("{subject}")]
-        public async Task<ContentResult> GetCustomClaims(string subject)
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<ContentResult> GetCustomClaims()
         {
-            var customClaims = await this.customClaimsProvider.IssueAsync(subject);
+            var subject = "test";
+            var email = "user";
+            var customClaims = await this.customClaimsProvider.IssueAsync(subject, email);
 
             var userId = customClaims.First(c => c.Type == CustomClaimNames.UserId).Value;
             var userRole = customClaims.First(c => c.Type == CustomClaimNames.UserRole).Value;
@@ -40,6 +44,7 @@
                 user_regions = userRegions.Split(' '),
             };
 
+            System.Console.WriteLine(JsonConvert.SerializeObject(data));
             return this.Content(JsonConvert.SerializeObject(data), "application/json");
         }
     }

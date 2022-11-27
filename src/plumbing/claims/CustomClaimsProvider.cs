@@ -13,7 +13,7 @@
          * This can be overridden by derived classes and is used at the time of token issuance
          */
         #pragma warning disable 1998
-        public virtual async Task<IEnumerable<Claim>> IssueAsync(string subject)
+        public virtual async Task<IEnumerable<Claim>> IssueAsync(string subject, string email)
         {
             return new List<Claim>();
         }
