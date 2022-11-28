@@ -165,11 +165,13 @@
         /*
          * Handle unexpected data errors if an expected claim was not found in an OAuth message
          */
-        public static ServerError FromMissingClaim(string claimName)
+        public static ClientError FromMissingClaim(string claimName)
         {
-            var error = ErrorFactory.CreateServerError("claims_failure", "Authorization data not found");
-            error.SetDetails($"An empty value was found for the expected claim '{claimName}'");
-            return error;
+            return ErrorFactory.CreateClientErrorWithContext(
+                System.Net.HttpStatusCode.BadRequest,
+                ErrorCodes.ClaimsFailure,
+                "Authorization data not found",
+                $"Missing claim in input: {claimName}");
         }
 
         /*

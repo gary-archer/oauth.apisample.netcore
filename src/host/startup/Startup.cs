@@ -1,11 +1,9 @@
 ﻿namespace SampleApi.Host.Startup
 {
-    using System;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc.Authorization;
     using Microsoft.Extensions.DependencyInjection;
     using SampleApi.Host.Claims;
@@ -38,16 +36,11 @@
          */
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Configure .Net Core authentication to run on all paths except particular exceptions
-            app.UseWhen(
-                ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")) &&
-                       !ctx.Request.Path.StartsWithSegments(new PathString("/api/customclaims")),
-                api => api.UseAuthentication());
+            // Configure .HET authentication
+            app.UseAuthentication();
 
-            // Configure .Net Core middleware classes to run on all API paths
-            app.UseWhen(
-                ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")),
-                api => this.ConfigureApiMiddleware(api));
+            // Configure .NET middleware classes
+            this.ConfigureApiMiddleware(app);
 
             // Use controller attributes for API request routing
             app.UseRouting();
@@ -81,7 +74,7 @@
         }
 
         /*
-         * customize OAuth handling to use a library, and set up a global authorization filter
+         * Customize OAuth handling to use a library, and set up a global authorization filter
          */
         private void ConfigureOAuth(IServiceCollection services)
         {
@@ -115,6 +108,7 @@
          */
         private void ConfigureApiDependencies(IServiceCollection services)
         {
+            services.AddScoped<SampleCustomClaimsProvider>();
             services.AddTransient<JsonReader>();
             services.AddTransient<CompanyRepository>();
             services.AddTransient<CompanyService>();

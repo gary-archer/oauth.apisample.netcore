@@ -6,6 +6,7 @@ namespace SampleApi.Plumbing.Security
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authentication;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
     using SampleApi.Plumbing.Errors;
     using SampleApi.Plumbing.Logging;
@@ -37,6 +38,12 @@ namespace SampleApi.Plumbing.Security
         {
             try
             {
+                // Do not apply authentication to anonymous routes
+                if (this.Context.Request.Path.Equals(new PathString("/api/customclaims")))
+                {
+                    return AuthenticateResult.NoResult();
+                }
+
                 var logEntry = (LogEntry)this.Context.RequestServices.GetService(typeof(ILogEntry));
                 logEntry.Start(this.Request);
 
@@ -47,7 +54,7 @@ namespace SampleApi.Plumbing.Security
                 // Add identity details to logs
                 logEntry.SetIdentity(claimsPrincipal);
 
-                // Set up .Net security
+                // Set up .NET security
                 var ticket = new AuthenticationTicket(claimsPrincipal, new AuthenticationProperties(), this.Scheme.Name);
                 return AuthenticateResult.Success(ticket);
             }

@@ -79,7 +79,7 @@ namespace SampleApi.Plumbing.Logging
          */
         private void ConfigureProductionLogging(ILoggingBuilder builder, JObject loggingConfiguration)
         {
-            // Tell .Net Core to use log4net
+            // Tell .NET to use log4net
             var options = new Log4NetProviderOptions
             {
                 ExternalConfigurationSetup = true,
@@ -114,7 +114,7 @@ namespace SampleApi.Plumbing.Logging
         }
 
         /*
-         * Use Microsoft .Net Core logging only for developer trace logging, which only ever runs on a developer PC
+         * Use Microsoft .NET logging only for developer trace logging, which only ever runs on a developer PC
          * This logging is off by default
          */
         private void ConfigureDevelopmentTraceLogging(ILoggingBuilder builder, JObject loggingConfiguration)
