@@ -16,6 +16,11 @@ if [ $? -ne 0 ]; then
 fi
 
 #
+# Ensure that the development configuration is used
+#
+cp deployment/environments/dev/api.config.json ./api.config.json
+
+#
 # Build the app
 #
 dotnet build

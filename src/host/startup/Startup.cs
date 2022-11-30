@@ -61,6 +61,7 @@
             this.ConfigureOAuth(services);
 
             // Register the API's dependencies
+            services.AddControllers();
             this.ConfigureBaseDependencies(services);
             this.ConfigureApiDependencies(services);
         }
@@ -90,8 +91,6 @@
             {
                 options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
             });
-
-            services.AddControllers();
         }
 
         /*
