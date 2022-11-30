@@ -37,18 +37,19 @@ namespace SampleApi.Plumbing.Security
          */
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
+            // Do not apply authentication to anonymous routes
+            var endpoint = this.Context.GetEndpoint();
+            if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
+            {
+                return AuthenticateResult.NoResult();
+            }
+
+            // Start logging the request, which will be output in the LoggerMiddleware if the authorizer succeeds
+            var logEntry = (LogEntry)this.Context.RequestServices.GetService(typeof(ILogEntry));
+            logEntry.Start(this.Request);
+
             try
             {
-                // Do not apply authentication to anonymous routes
-                var endpoint = this.Context.GetEndpoint();
-                if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
-                {
-                    return AuthenticateResult.NoResult();
-                }
-
-                var logEntry = (LogEntry)this.Context.RequestServices.GetService(typeof(ILogEntry));
-                logEntry.Start(this.Request);
-
                 // Do the authorization work and get a claims principal
                 IAuthorizer authorizer = (IAuthorizer)this.Context.RequestServices.GetService(typeof(IAuthorizer));
                 var claimsPrincipal = await authorizer.ExecuteAsync(this.Request);
@@ -66,6 +67,10 @@ namespace SampleApi.Plumbing.Security
                 var handler = new UnhandledExceptionMiddleware();
                 handler.HandleException(clientError, this.Context);
 
+                // Finish logging
+                logEntry.End(this.Context.Request, this.Context.Response);
+                logEntry.Write();
+
                 // Store fields for the challenge method which will fire later
                 this.Request.HttpContext.Items.TryAdd(StatusCodeKey, clientError.StatusCode);
                 this.Request.HttpContext.Items.TryAdd(ClientErrorKey, clientError);
@@ -76,6 +81,10 @@ namespace SampleApi.Plumbing.Security
                 // Handle 500 errors due to failed processing
                 var handler = new UnhandledExceptionMiddleware();
                 var clientError = handler.HandleException(exception, this.Context);
+
+                // Finish logging
+                logEntry.End(this.Context.Request, this.Context.Response);
+                logEntry.Write();
 
                 // Store results for the below challenge method, which will fire later
                 this.Request.HttpContext.Items.TryAdd(StatusCodeKey, clientError.StatusCode);
