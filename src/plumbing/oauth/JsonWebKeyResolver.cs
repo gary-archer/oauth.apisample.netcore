@@ -73,7 +73,7 @@ namespace SampleApi.Plumbing.OAuth
         private async Task<string> DownloadKeys()
         {
             try
-                {
+            {
                 using (var client = new HttpClient(this.httpProxy.GetHandler()))
                 {
                     // Send the request
@@ -95,6 +95,7 @@ namespace SampleApi.Plumbing.OAuth
             catch (Exception ex)
             {
                 // Report connectivity errors
+                System.Console.WriteLine("*** DOWNLOAD KEYS ERROR");
                 throw ErrorUtils.FromTokenSigningKeysDownloadError(ex, this.configuration.JwksEndpoint);
             }
         }

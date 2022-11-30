@@ -4,7 +4,6 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Mvc.Authorization;
     using Microsoft.Extensions.DependencyInjection;
     using SampleApi.Host.Claims;
     using SampleApi.Host.Configuration;
@@ -15,7 +14,8 @@
     using SampleApi.Plumbing.Security;
 
     /*
-     * The application startup class
+     * The application startup class configures authentication and authorization
+     * https://github.com/mihirdilip/aspnetcore-allowanonymous-test/blob/main/Startup.cs
      */
     public class Startup
     {
@@ -36,14 +36,16 @@
          */
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Configure .HET authentication
-            app.UseAuthentication();
+            app.UseRouting();
 
-            // Configure .NET middleware classes
+            // Indicate that .NET security will be used
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            // Configure other middleware classes
             this.ConfigureApiMiddleware(app);
 
             // Use controller attributes for API request routing
-            app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -59,6 +61,7 @@
             this.ConfigureOAuth(services);
 
             // Register the API's dependencies
+            services.AddControllers();
             this.ConfigureBaseDependencies(services);
             this.ConfigureApiDependencies(services);
         }
@@ -74,18 +77,19 @@
         }
 
         /*
-         * Customize OAuth handling to use a library, and set up a global authorization filter
+         * Say how authentication and authorization will be done
          */
         private void ConfigureOAuth(IServiceCollection services)
         {
+            // Do custom JWT authentication, to create a useful claims principal and to control OAuth error handling
             string scheme = "Bearer";
             services.AddAuthentication(scheme)
                     .AddScheme<AuthenticationSchemeOptions, CustomAuthenticationHandler>(scheme, null);
 
-            services.AddMvc(options =>
+            // Unless AllowAnonymous is used, require successful authentication before running controller actions
+            services.AddAuthorization(options =>
             {
-                options.Filters.Add(new AuthorizeFilter(
-                    new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+                options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
             });
         }
 

@@ -73,16 +73,16 @@
          */
         public void Register()
         {
+            // Register dependencies for logging and error handling
+            this.RegisterBaseDependencies();
+
+            // Register the Microsoft thread safe memory cache
+            this.services.AddDistributedMemoryCache();
+
+            // Get the container, then register dependencies for OAuth processing and claims handling
             using (var container = this.services.BuildServiceProvider())
             {
-                // Register dependencies for logging and error handling
-                this.RegisterBaseDependencies();
-
-                // Register the Microsoft thread safe memory cache
-                this.services.AddDistributedMemoryCache();
                 var cache = container.GetService<IDistributedCache>();
-
-                // Register dependencies for OAuth processing and claims handling
                 this.RegisterOAuthDependencies(cache);
                 this.RegisterClaimsDependencies(cache, container);
             }
