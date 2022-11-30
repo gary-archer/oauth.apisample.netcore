@@ -6,6 +6,7 @@ namespace SampleApi.Plumbing.Security
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authentication;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
     using SampleApi.Plumbing.Errors;
@@ -39,7 +40,8 @@ namespace SampleApi.Plumbing.Security
             try
             {
                 // Do not apply authentication to anonymous routes
-                if (this.Context.Request.Path.Equals(new PathString("/api/customclaims")))
+                var endpoint = this.Context.GetEndpoint();
+                if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
                 {
                     return AuthenticateResult.NoResult();
                 }
