@@ -81,7 +81,7 @@
          */
         private void ConfigureOAuth(IServiceCollection services)
         {
-            // Do custom JWT authentication to control setting up the claims principal
+            // Do custom JWT authentication, to create a useful claims principal and to control OAuth error handling
             string scheme = "Bearer";
             services.AddAuthentication(scheme)
                     .AddScheme<AuthenticationSchemeOptions, CustomAuthenticationHandler>(scheme, null);
