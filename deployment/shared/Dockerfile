@@ -9,8 +9,8 @@ RUN update-ca-certificates
 
 # Copy libraries and other files into our docker image
 WORKDIR /usr/api
-COPY bin/Release/netcoreapp7/linux-x64/publish/*  /usr/api/
-COPY data/*                                       /usr/api/data/
+COPY bin/Release/net7.0/linux-x64/publish/*  /usr/api/
+COPY data/*                                  /usr/api/data/
 
 # Run the app as a low privilege user
 RUN adduser --disabled-password --home /home/apiuser --gecos '' apiuser
