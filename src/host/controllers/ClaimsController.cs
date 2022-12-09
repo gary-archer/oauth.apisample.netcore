@@ -6,7 +6,9 @@
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json;
     using SampleApi.Logic.Claims;
+    using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
+    using SampleApi.Plumbing.OAuth;
 
     /*
      * A controller called during token issuing to ask the API for custom claim values
@@ -15,10 +17,14 @@
     [Route("api/customclaims")]
     public class ClaimsController : Controller
     {
+        private readonly OAuthConfiguration configuration;
         private readonly SampleCustomClaimsProvider customClaimsProvider;
 
-        public ClaimsController(SampleCustomClaimsProvider customClaimsProvider)
+        public ClaimsController(
+            OAuthConfiguration configuration,
+            SampleCustomClaimsProvider customClaimsProvider)
         {
+            this.configuration = configuration;
             this.customClaimsProvider = customClaimsProvider as SampleCustomClaimsProvider;
         }
 
@@ -30,6 +36,13 @@
         [HttpPost]
         public async Task<ContentResult> GetCustomClaims([FromBody] IdentityClaims identityClaims)
         {
+            // The endpoint is only enabled when this claims strategy is used
+            if (this.configuration.ClaimsStrategy != "jwt")
+            {
+                ScopeVerifier.Deny();
+            }
+
+            // Sanity checks on required input
             if (string.IsNullOrWhiteSpace(identityClaims.Subject))
             {
                 throw ErrorUtils.FromMissingClaim("subject");
@@ -40,10 +53,12 @@
                 throw ErrorUtils.FromMissingClaim("email");
             }
 
+            // Send identity claims and receive domain specific claims
             var subject = identityClaims.Subject;
             var email = identityClaims.Email;
             var customClaims = await this.customClaimsProvider.IssueAsync(subject, email);
 
+            // Extract and return values
             var userId = customClaims.First(c => c.Type == CustomClaimNames.UserId).Value;
             var userRole = customClaims.First(c => c.Type == CustomClaimNames.UserRole).Value;
             var userRegions = customClaims.First(c => c.Type == CustomClaimNames.UserRegions).Value;
