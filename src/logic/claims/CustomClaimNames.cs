@@ -1,4 +1,4 @@
-namespace SampleApi.Host.Claims
+namespace SampleApi.Logic.Claims
 {
     /*
      * Claim names from the Authorization Server

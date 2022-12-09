@@ -1,11 +1,11 @@
-namespace SampleApi.Plumbing.Claims
+namespace SampleApi.Plumbing.OAuth.ClaimsCaching
 {
     using System.Collections.Generic;
     using System.Security.Claims;
     using Newtonsoft.Json.Linq;
 
     /*
-     * A simple utility class to read claims into objects
+     * A simple utility class to read and write claims
      */
     public static class ClaimsSerializer
     {

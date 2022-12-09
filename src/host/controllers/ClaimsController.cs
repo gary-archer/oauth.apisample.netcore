@@ -5,7 +5,7 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json;
-    using SampleApi.Host.Claims;
+    using SampleApi.Logic.Claims;
     using SampleApi.Plumbing.Errors;
 
     /*

@@ -19,17 +19,17 @@ namespace SampleApi.Plumbing.Claims
         {
             var claimsSet = JObject.Parse(json);
             var claims = new List<Claim>();
-            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Issuer));
+            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Issuer));
 
             if (!string.IsNullOrWhiteSpace(configuration.Audience))
             {
-                claims.Add(ReadClaim(claimsSet, StandardClaimNames.Audience));
+                claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Audience));
             }
 
-            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Subject));
-            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Scope));
-            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Exp));
-            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Exp));
+            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Subject));
+            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Scope));
+            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Exp));
+            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Exp));
             return claims;
         }
 
@@ -40,9 +40,9 @@ namespace SampleApi.Plumbing.Claims
         {
             var claimsSet = JObject.Parse(json);
             var claims = new List<Claim>();
-            claims.Add(ReadClaim(claimsSet, StandardClaimNames.GivenName));
-            claims.Add(ReadClaim(claimsSet, StandardClaimNames.FamilyName));
-            claims.Add(ReadClaim(claimsSet, StandardClaimNames.Email));
+            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.GivenName));
+            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.FamilyName));
+            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Email));
             return claims;
         }
 

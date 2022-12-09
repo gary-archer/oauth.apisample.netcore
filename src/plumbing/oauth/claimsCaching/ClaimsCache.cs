@@ -1,4 +1,4 @@
-namespace SampleApi.Plumbing.Claims
+namespace SampleApi.Plumbing.OAuth.ClaimsCaching
 {
     using System;
     using System.Collections.Generic;

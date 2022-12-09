@@ -1,13 +1,13 @@
 namespace SampleApi.Host.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using SampleApi.Host.Claims;
+    using SampleApi.Logic.Claims;
     using SampleApi.Logic.Entities;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.OAuth;
 
     /*
-     * A simple API controller to return user info
+     * A simple API controller to serve user info
      */
     [Route("api/userinfo")]
     public class UserInfoController : Controller

@@ -1,38 +1,25 @@
 namespace SampleApi.Plumbing.OAuth
 {
     using System;
-    using System.Collections.Generic;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
     using System.Security.Claims;
     using System.Threading.Tasks;
     using Jose;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
-    using SampleApi.Plumbing.Logging;
-    using SampleApi.Plumbing.Utilities;
 
     /*
-     * The class from which OAuth calls are initiated
+     * A class to verify the JWT access token, to authenticate the request
      */
     public sealed class OAuthAuthenticator
     {
         private readonly OAuthConfiguration configuration;
         private readonly JsonWebKeyResolver jsonWebKeyResolver;
-        private readonly HttpProxy httpProxy;
-        private readonly LogEntry logEntry;
 
-        public OAuthAuthenticator(
-            OAuthConfiguration configuration,
-            JsonWebKeyResolver jsonWebKeyResolver,
-            HttpProxy httpProxy,
-            ILogEntry logEntry)
+        public OAuthAuthenticator(OAuthConfiguration configuration, JsonWebKeyResolver jsonWebKeyResolver)
         {
             this.configuration = configuration;
             this.jsonWebKeyResolver = jsonWebKeyResolver;
-            this.httpProxy = httpProxy;
-            this.logEntry = (LogEntry)logEntry;
         }
 
         /*
@@ -77,44 +64,6 @@ namespace SampleApi.Plumbing.OAuth
             catch (Exception ex)
             {
                 throw ErrorUtils.FromTokenValidationError(ex);
-            }
-        }
-
-        /*
-         * Perform OAuth user info lookup
-         */
-        public async Task<IEnumerable<Claim>> GetUserInfoAsync(string accessToken)
-        {
-            using (this.logEntry.CreatePerformanceBreakdown("userInfoLookup"))
-            {
-                try
-                {
-                    using (var client = new HttpClient(this.httpProxy.GetHandler()))
-                    {
-                        // Send the request
-                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                        var request = new HttpRequestMessage(HttpMethod.Get, this.configuration.UserInfoEndpoint);
-                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                        var response = await client.SendAsync(request);
-
-                        // Report errors with a response
-                        if (!response.IsSuccessStatusCode)
-                        {
-                            var status = (int)response.StatusCode;
-                            var text = await response.Content.ReadAsStringAsync();
-                            throw ErrorUtils.FromUserInfoError(status, text, this.configuration.UserInfoEndpoint);
-                        }
-
-                        // Convert from JSON data to an array of claims
-                        var json = await response.Content.ReadAsStringAsync();
-                        return ClaimsReader.UserInfoClaims(json);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Report connectity errors
-                    throw ErrorUtils.FromUserInfoError(ex, this.configuration.UserInfoEndpoint);
-                }
             }
         }
 

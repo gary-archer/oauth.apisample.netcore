@@ -39,44 +39,44 @@ namespace SampleApi.Plumbing.Claims
          */
         public static string GetIssuer(this ClaimsPrincipal principal)
         {
-            return ClaimsReader.ReadClaim(principal, StandardClaimNames.Issuer).Value;
+            return ClaimsReader.ReadClaim(principal, OAuthClaimNames.Issuer).Value;
         }
 
         public static string GetAudience(this ClaimsPrincipal principal)
         {
-            return ClaimsReader.ReadClaim(principal, StandardClaimNames.Audience).Value;
+            return ClaimsReader.ReadClaim(principal, OAuthClaimNames.Audience).Value;
         }
 
         public static string GetSubject(this ClaimsPrincipal principal)
         {
-            return ClaimsReader.ReadClaim(principal, StandardClaimNames.Subject).Value;
+            return ClaimsReader.ReadClaim(principal, OAuthClaimNames.Subject).Value;
         }
 
         public static string[] GetScopes(this ClaimsPrincipal principal)
         {
-            var scopeValue = ClaimsReader.ReadClaim(principal, StandardClaimNames.Scope).Value;
+            var scopeValue = ClaimsReader.ReadClaim(principal, OAuthClaimNames.Scope).Value;
             return scopeValue.Split(' ');
         }
 
         public static int GetExpiry(this ClaimsPrincipal principal)
         {
-            var expValue = ClaimsReader.ReadClaim(principal, StandardClaimNames.Exp).Value;
+            var expValue = ClaimsReader.ReadClaim(principal, OAuthClaimNames.Exp).Value;
             return Convert.ToInt32(expValue, CultureInfo.InvariantCulture);
         }
 
         public static string GetGivenName(this ClaimsPrincipal principal)
         {
-            return ClaimsReader.ReadClaim(principal, StandardClaimNames.GivenName).Value;
+            return ClaimsReader.ReadClaim(principal, OAuthClaimNames.GivenName).Value;
         }
 
         public static string GetFamilyName(this ClaimsPrincipal principal)
         {
-            return ClaimsReader.ReadClaim(principal, StandardClaimNames.FamilyName).Value;
+            return ClaimsReader.ReadClaim(principal, OAuthClaimNames.FamilyName).Value;
         }
 
         public static string GetEmail(this ClaimsPrincipal principal)
         {
-            return ClaimsReader.ReadClaim(principal, StandardClaimNames.Email).Value;
+            return ClaimsReader.ReadClaim(principal, OAuthClaimNames.Email).Value;
         }
     }
 }

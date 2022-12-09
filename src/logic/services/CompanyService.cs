@@ -5,7 +5,7 @@ namespace SampleApi.Logic.Repositories
     using System.Net;
     using System.Security.Claims;
     using System.Threading.Tasks;
-    using SampleApi.Host.Claims;
+    using SampleApi.Logic.Claims;
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Errors;
     using SampleApi.Plumbing.Errors;

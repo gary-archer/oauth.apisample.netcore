@@ -7,6 +7,7 @@
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Logging;
     using SampleApi.Plumbing.OAuth;
+    using SampleApi.Plumbing.OAuth.ClaimsCaching;
     using SampleApi.Plumbing.Security;
     using SampleApi.Plumbing.Utilities;
 
@@ -113,8 +114,8 @@
         {
             this.services.AddSingleton(this.oauthConfiguration);
 
-            // Register the authorizer as a per request dependency
-            if (this.oauthConfiguration.Provider == "cognito")
+            this.services.AddScoped<OAuthAuthenticator>();
+            if (this.oauthConfiguration.ClaimsStrategy == "apiLookup")
             {
                 this.services.AddScoped<IAuthorizer, ClaimsCachingAuthorizer>();
             }
@@ -123,10 +124,7 @@
                 this.services.AddScoped<IAuthorizer, StandardAuthorizer>();
             }
 
-            // The authenticator is a per request dependency
-            this.services.AddScoped<OAuthAuthenticator>();
-
-            // The JWT handling uses a singleton thread safe cache
+            // JWKS keys are stored in a thread safe cache
             var jwksCache = new JwksCache(cache);
             this.services.AddSingleton(new JsonWebKeyResolver(this.oauthConfiguration, jwksCache, this.httpProxy));
         }
@@ -136,12 +134,14 @@
          */
         private void RegisterClaimsDependencies(IDistributedCache cache, ServiceProvider container)
         {
-            // Register the singleton cache if using claims caching
-            if (this.oauthConfiguration.Provider == "cognito")
+            // Register extra objects if using claims caching
+            if (this.oauthConfiguration.ClaimsStrategy == "apiLookup")
             {
+                this.services.AddScoped<UserInfoClient>();
+
                 var claimsCache = new ClaimsCache(
                     cache,
-                    this.oauthConfiguration.ClaimsCacheTimeToLiveMinutes,
+                    this.oauthConfiguration.ClaimsCache.TimeToLiveMinutes,
                     container);
                 this.services.AddSingleton(claimsCache);
             }

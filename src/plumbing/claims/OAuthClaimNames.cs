@@ -3,7 +3,7 @@ namespace SampleApi.Plumbing.Claims
     /*
      * Claim names from the Authorization Server
      */
-    public static class StandardClaimNames
+    public static class OAuthClaimNames
     {
         public static readonly string Issuer = "iss";
         public static readonly string Audience = "aud";

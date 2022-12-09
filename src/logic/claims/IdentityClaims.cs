@@ -1,7 +1,7 @@
-namespace SampleApi.Host.Claims
+namespace SampleApi.Logic.Claims
 {
     /*
-     * User attributes stored in the authorization server
+     * User attributes sent by the authorization server to the API's claims controller
      */
     public sealed class IdentityClaims
     {

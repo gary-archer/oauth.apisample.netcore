@@ -1,4 +1,4 @@
-namespace SampleApi.Host.Claims
+namespace SampleApi.Logic.Claims
 {
     using System.Security.Claims;
     using SampleApi.Plumbing.Claims;

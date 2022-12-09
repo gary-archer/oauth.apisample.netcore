@@ -1,4 +1,4 @@
-namespace SampleApi.Host.Claims
+namespace SampleApi.Logic.Claims
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -27,7 +27,7 @@ namespace SampleApi.Host.Claims
         #pragma warning disable 1998
         public override async Task<IEnumerable<Claim>> GetAsync(string accessToken, ClaimsPrincipal basePrincipal, IEnumerable<Claim> userInfo)
         {
-            var email = userInfo.First(c => c.Type == StandardClaimNames.Email)?.Value;
+            var email = userInfo.First(c => c.Type == OAuthClaimNames.Email)?.Value;
             return this.GetCustomClaims(basePrincipal.GetSubject(), email);
         }
         #pragma warning restore 1998

@@ -5,8 +5,8 @@
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.DependencyInjection;
-    using SampleApi.Host.Claims;
     using SampleApi.Host.Configuration;
+    using SampleApi.Logic.Claims;
     using SampleApi.Logic.Repositories;
     using SampleApi.Logic.Utilities;
     using SampleApi.Plumbing.Logging;
@@ -108,11 +108,11 @@
         }
 
         /*
-         * These could be request scoped, but I prefer transient for non HTTP related classes
+         * Use transient scopes for non HTTP related classes
          */
         private void ConfigureApiDependencies(IServiceCollection services)
         {
-            services.AddScoped<SampleCustomClaimsProvider>();
+            services.AddTransient<SampleCustomClaimsProvider>();
             services.AddTransient<JsonReader>();
             services.AddTransient<CompanyRepository>();
             services.AddTransient<CompanyService>();
