@@ -134,7 +134,7 @@
          */
         private void RegisterClaimsDependencies(IDistributedCache cache, ServiceProvider container)
         {
-            // Register an object to manage custom claims
+            // Register an object to provide custom claims
             this.services.AddSingleton(this.customClaimsProvider);
 
             // Make the claims principal injectable

@@ -19,7 +19,7 @@ namespace SampleApi.Plumbing.OAuth.ClaimsCaching
     {
         private readonly OAuthConfiguration configuration;
         private readonly HttpProxy httpProxy;
-        private readonly LogEntry logEntry;
+        private readonly ILogEntry logEntry;
 
         public UserInfoClient(
             OAuthConfiguration configuration,
