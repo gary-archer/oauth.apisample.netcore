@@ -11,19 +11,17 @@
     "production": {
       "level": "Info",
       "performanceThresholdMilliseconds": 500,
-      "appenders": [
-        {
-          "type": "console",
-          "prettyPrint": true
-        },
-        {
-          "type": "file",
-          "filePrefix": "api",
-          "dirName": "../../../../oauth.logs/api/",
-          "maxSize": "10MB",
-          "maxFiles": "100"
-        }
-      ]
+      "appenders": [{
+        "type": "console",
+        "prettyPrint": true
+      },
+      {
+        "type": "file",
+        "filePrefix": "api",
+        "dirName": "../../../../oauth.logs/api/",
+        "maxSize": "10MB",
+        "maxFiles": "100"
+      }]
     },
     "development": {
       "level": "Info",
