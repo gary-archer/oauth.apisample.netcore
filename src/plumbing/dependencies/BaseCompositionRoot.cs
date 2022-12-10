@@ -134,6 +134,12 @@
          */
         private void RegisterClaimsDependencies(IDistributedCache cache, ServiceProvider container)
         {
+            // Register an object to manage custom claims
+            this.services.AddSingleton(this.customClaimsProvider);
+
+            // Make the claims principal injectable
+            this.services.AddScoped(ctx => ctx.GetService<IHttpContextAccessor>().HttpContext.User);
+
             // Register extra objects if using claims caching
             if (this.oauthConfiguration.ClaimsStrategy == "apiLookup")
             {
@@ -145,12 +151,6 @@
                     container);
                 this.services.AddSingleton(claimsCache);
             }
-
-            // Register an object to manage custom claims
-            this.services.AddSingleton(this.customClaimsProvider);
-
-            // Make the claims principal injectable
-            this.services.AddScoped(ctx => ctx.GetService<IHttpContextAccessor>().HttpContext.User);
         }
     }
 }
