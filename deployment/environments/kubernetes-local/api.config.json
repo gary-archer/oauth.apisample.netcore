@@ -1,0 +1,38 @@
+{
+  "api": {
+    "port": 8101,
+    "sslCertificateFileName": "./certs/keystore.p12",
+    "sslCertificatePassword": "Password1",
+    "useProxy": false,
+    "proxyUrl": ""
+  },
+  "logging": {
+    "apiName": "SampleApi",
+    "production": {
+      "level": "Info",
+      "performanceThresholdMilliseconds": 500,
+      "appenders": [{
+        "type": "console",
+        "prettyPrint": false
+      }]
+    },
+    "development": {
+      "level": "Info",
+      "appenders": [{
+        "type": "console"
+      }],
+      "overrideLevels": {
+        "Microsoft": "Warning",
+        "Microsoft.AspNetCore.Server.Kestrel": "Error",
+        "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
+        "SampleApi.Plumbing.Security.CustomAuthenticationHandler": "Error"
+      }
+    }
+  },
+  "oauth": {
+    "issuer":         "https://login.mycluster.com/oauth/v2/oauth-anonymous",
+    "audience":       "api.mycompany.com",
+    "jwksEndpoint":   "https://curity-idsvr-runtime-svc.curity.svc:8443/oauth/v2/oauth-anonymous/jwks",
+    "claimsStrategy": "jwt"
+  }
+}
