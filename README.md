@@ -91,4 +91,4 @@ Then run integration tests and a load test:
 * The Kestrel web server is used to host the API over SSL
 * AWS Cognito is used as the default Authorization Server
 * The [jose-jwt Library](https://github.com/dvsekhvalnov/jose-jwt) is used to manage in memory validation of JWTs
-* The API is designed for [cloud native deployment](https://github.com/gary-archer/oauth.cloudnative.local) to Kubernetes
+* The project includes API deployment resources for Docker and Kubernetes
