@@ -95,7 +95,6 @@ namespace SampleApi.Plumbing.OAuth
             catch (Exception ex)
             {
                 // Report connectivity errors
-                System.Console.WriteLine("*** DOWNLOAD KEYS ERROR");
                 throw ErrorUtils.FromTokenSigningKeysDownloadError(ex, this.configuration.JwksEndpoint);
             }
         }
