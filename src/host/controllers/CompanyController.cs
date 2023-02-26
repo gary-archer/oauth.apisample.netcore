@@ -15,7 +15,7 @@
     /*
      * A controller for our company resources
      */
-    [Route("api/companies")]
+    [Route("investments/companies")]
     public class CompanyController : Controller
     {
         private readonly CompanyService service;

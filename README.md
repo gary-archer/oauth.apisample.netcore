@@ -6,6 +6,7 @@
 
 The final OAuth secured .NET API code sample, referenced in my blog at https://authguidance.com:
 
+- The API has a basic business theme of `investments`, but simply returns hard coded data
 - The API takes finer control over OAuth domain specific claims and uses a certified JOSE library
 - The API uses JSON request logging and Elasticsearch log aggregation, for measurability
 
@@ -56,7 +57,7 @@ Configure DNS by adding these domains to your hosts file:
 Then call an endpoint over port 446:
 
 ```bash
-curl -k https://api.authsamples-dev.com:446/api/companies
+curl -k https://api.authsamples-dev.com:446/investments/companies
 ```
 
 Configure [.NET SSL trust](https://authguidance.com/2017/11/11/developer-ssl-setup/#os-ssl-trust) for the root CA at `./certs/authsamples-dev.ca.pem`.
