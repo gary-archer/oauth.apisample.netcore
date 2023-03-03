@@ -51,13 +51,13 @@ Ensure that .NET 7+ is installed, then run the API with this command:
 Configure DNS by adding these domains to your hosts file:
 
 ```text
-127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
+127.0.0.1 localhost apilocal.authsamples-dev.com login.authsamples-dev.com
 ```
 
 Then call an endpoint over port 446:
 
 ```bash
-curl -k https://api.authsamples-dev.com:446/investments/companies
+curl -k https://apilocal.authsamples-dev.com:446/investments/companies
 ```
 
 Configure [.NET SSL trust](https://authguidance.com/2017/11/11/developer-ssl-setup/#os-ssl-trust) for the root CA at `./certs/authsamples-dev.ca.pem`.

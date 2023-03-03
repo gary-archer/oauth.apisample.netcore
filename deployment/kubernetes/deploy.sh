@@ -27,7 +27,7 @@ else
   fi
 
   ENVIRONMENT_FOLDER='kubernetes-aws';
-  export API_DOMAIN_NAME='api.authsamples-k8s.com'
+  export API_DOMAIN_NAME='apilocal.authsamples-k8s.com'
   export API_DOCKER_IMAGE="$DOCKERHUB_ACCOUNT/finalnetcoreapi:1.0"
 fi
 

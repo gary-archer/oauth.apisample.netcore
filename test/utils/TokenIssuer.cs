@@ -65,7 +65,7 @@ namespace SampleApi.Test.Utils
                 { "aud", "api.mycompany.com" },
                 { "iat", iat.ToUnixTimeSeconds() },
                 { "exp", exp.ToUnixTimeSeconds() },
-                { "scope", "openid profile email https://api.authsamples.com/investments" },
+                { "scope", "openid profile email investments" },
             };
 
             return Jose.JWT.Encode(payload, this.tokenSigningPrivateKey, JwsAlgorithm.RS256, headers);
@@ -98,7 +98,7 @@ namespace SampleApi.Test.Utils
                     { "aud", "api.mycompany.com" },
                     { "iat", iat.ToUnixTimeSeconds() },
                     { "exp", exp.ToUnixTimeSeconds() },
-                    { "scope", "openid profile email https://api.authsamples.com/investments" },
+                    { "scope", "openid profile email investments" },
                 };
 
                 return Jose.JWT.Encode(payload, maliciousPrivateKey, JwsAlgorithm.RS256, headers);
