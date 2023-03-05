@@ -14,7 +14,7 @@
      * A controller called during token issuing to ask the API for custom claim values
      * This requires a capability for the Authorization Server to reach out to the API
      */
-    [Route("api/customclaims")]
+    [Route("investments/customclaims")]
     public class ClaimsController : Controller
     {
         private readonly OAuthConfiguration configuration;

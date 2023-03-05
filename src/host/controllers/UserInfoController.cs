@@ -9,7 +9,7 @@ namespace SampleApi.Host.Controllers
     /*
      * A simple API controller to serve user info
      */
-    [Route("api/userinfo")]
+    [Route("investments/userinfo")]
     public class UserInfoController : Controller
     {
         /*

@@ -15,7 +15,7 @@
     /*
      * A controller for our company resources
      */
-    [Route("api/companies")]
+    [Route("investments/companies")]
     public class CompanyController : Controller
     {
         private readonly CompanyService service;
@@ -32,7 +32,7 @@
         public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
             // First check we have access to this level of data
-            ScopeVerifier.Enforce(this.User.GetScopes(), "transactions_read");
+            ScopeVerifier.Enforce(this.User.GetScopes(), "investments");
 
             // Then return the list of companies
             return await this.service.GetCompanyListAsync();
@@ -45,7 +45,7 @@
         public async Task<CompanyTransactions> GetCompanyTransactionsAsync(string id)
         {
             // First check we have access to this level of data
-            ScopeVerifier.Enforce(this.User.GetScopes(), "transactions_read");
+            ScopeVerifier.Enforce(this.User.GetScopes(), "investments");
 
             // Return a 400 if the id is not a number
             int idValue;

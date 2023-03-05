@@ -27,7 +27,7 @@ namespace SampleApi.Test.Utils
         public async Task<ApiResponse> GetUserInfoClaims(ApiRequestOptions options)
         {
             options.HttpMethod = HttpMethod.Get;
-            options.ApiPath = "/api/userinfo";
+            options.ApiPath = "/investments/userinfo";
 
             var metrics = new ApiResponseMetrics("getUserInfoClaims");
             return await this.CallApi(options, metrics);
@@ -36,7 +36,7 @@ namespace SampleApi.Test.Utils
         public async Task<ApiResponse> GetCompanies(ApiRequestOptions options)
         {
             options.HttpMethod = HttpMethod.Get;
-            options.ApiPath = "/api/companies";
+            options.ApiPath = "/investments/companies";
 
             var metrics = new ApiResponseMetrics("getCompanies");
             return await this.CallApi(options, metrics);
@@ -45,7 +45,7 @@ namespace SampleApi.Test.Utils
         public async Task<ApiResponse> GetCompanyTransactions(ApiRequestOptions options, int companyId)
         {
             options.HttpMethod = HttpMethod.Get;
-            options.ApiPath = $"/api/companies/{companyId}/transactions";
+            options.ApiPath = $"/investments/companies/{companyId}/transactions";
 
             var metrics = new ApiResponseMetrics("getCompanyTransactions");
             return await this.CallApi(options, metrics);
