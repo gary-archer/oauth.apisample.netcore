@@ -40,7 +40,7 @@ fi
 #
 # Produce the final YAML using the envsubst tool
 #
-envsubst < ./kubernetes/api-template.yaml > ../shared/api.yaml
+envsubst < ./api-template.yaml > ./api.yaml
 if [ $? -ne 0 ]; then
   echo '*** Problem encountered running envsubst to produce the final Kubernetes api.yaml file'
   exit 1
