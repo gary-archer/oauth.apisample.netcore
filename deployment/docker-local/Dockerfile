@@ -3,8 +3,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 
 # Configure trusted root certificate authorities
-ARG TRUSTED_CA_CERTS
-COPY $TRUSTED_CA_CERTS /usr/local/share/certificates/trusted.ca.crt
+COPY certs/authsamples-dev.ca.pem /usr/local/share/certificates/trusted.ca.crt
 RUN update-ca-certificates
 
 # Copy libraries and other files into our docker image
@@ -13,6 +12,7 @@ COPY bin/Release/net7.0/linux-x64/publish/*  /usr/api/
 COPY data/*                                  /usr/api/data/
 
 # Run the app as a low privilege user
-RUN adduser --disabled-password --home /home/apiuser --gecos '' apiuser
-USER apiuser
+RUN groupadd --gid 10000 apiuser \
+  && useradd --uid 10001 --gid apiuser --shell /bin/bash --create-home apiuser
+USER 10001
 CMD ["dotnet", "sampleapi.dll"]

@@ -3,4 +3,3 @@ obj
 .DS_Store
 resources
 certs
-trusted.ca.pem
