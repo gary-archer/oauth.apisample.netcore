@@ -8,20 +8,22 @@
 # Ensure that we are in the root folder
 #
 cd "$(dirname "${BASH_SOURCE[0]}")"
-cd ../..
 
 #
-# Support different docker repositories
+# Use a timestamp based tag and support both KIND and DockerHub repositories
 #
+TAG=$(date +%Y%m%d%H%M%S)
+echo $TAG > ./dockertag.txt
 if [ "$DOCKER_REPOSITORY" == "" ]; then
-  DOCKER_IMAGE='finalnetcoreapi:1.0.0'
+  DOCKER_IMAGE="finalnetcoreapi:$TAG"
 else
-  DOCKER_IMAGE="$DOCKER_REPOSITORY/finalnetcoreapi:1.0.0"
+  DOCKER_IMAGE="$DOCKER_REPOSITORY/finalnetcoreapi:$TAG"
 fi
 
 #
 # Build the .NET API
 #
+cd ../..
 dotnet publish sampleapi.csproj -c Release -r linux-x64 --no-self-contained
 if [ $? -ne 0 ]; then
   echo '*** .NET API build problem encountered'

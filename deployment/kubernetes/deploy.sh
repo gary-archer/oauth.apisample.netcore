@@ -19,12 +19,13 @@ if [ "$ENVIRONMENT_FOLDER" == "" ]; then
 fi
 
 #
-# Support different docker repositories
+# Use a timestamp based tag and support both KIND and DockerHub repositories
 #
+TAG=$(cat ./dockertag.txt)
 if [ "$DOCKER_REPOSITORY" == "" ]; then
-  export DOCKER_IMAGE='finalnetcoreapi:1.0.0'
+  export DOCKER_IMAGE="finalnetcoreapi:$TAG"
 else
-  export DOCKER_IMAGE="$DOCKER_REPOSITORY/finalnetcoreapi:1.0.0"
+  export DOCKER_IMAGE="$DOCKER_REPOSITORY/finalnetcoreapi:$TAG"
 fi
 
 #
