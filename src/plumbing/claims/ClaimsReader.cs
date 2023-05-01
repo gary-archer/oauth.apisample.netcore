@@ -24,7 +24,7 @@ namespace SampleApi.Plumbing.Claims
             if (!string.IsNullOrWhiteSpace(configuration.Audience))
             {
                 System.Console.WriteLine("*** START");
-                var audiences = claimsSet.GetValue(configuration.Audience);
+                var audiences = claimsSet.GetValue(OAuthClaimNames.Audience);
                 if (audiences is JArray)
                 {
                     System.Console.WriteLine("*** IS ARRAY");
@@ -42,7 +42,6 @@ namespace SampleApi.Plumbing.Claims
 
             claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Subject));
             claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Scope));
-            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Exp));
             claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Exp));
             return claims;
         }
