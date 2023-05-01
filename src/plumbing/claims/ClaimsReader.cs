@@ -23,7 +23,21 @@ namespace SampleApi.Plumbing.Claims
 
             if (!string.IsNullOrWhiteSpace(configuration.Audience))
             {
-                claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Audience));
+                System.Console.WriteLine("*** START");
+                var audiences = claimsSet.GetValue(configuration.Audience);
+                if (audiences is JArray)
+                {
+                    System.Console.WriteLine("*** IS ARRAY");
+                    foreach (var audience in audiences)
+                    {
+                        System.Console.WriteLine("*** ADDING " + audience.ToString());
+                        claims.Add(new Claim(OAuthClaimNames.Audience, audience.ToString()));
+                    }
+                }
+                else
+                {
+                    claims.Add(new Claim(OAuthClaimNames.Audience, audiences.ToString()));
+                }
             }
 
             claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Subject));
