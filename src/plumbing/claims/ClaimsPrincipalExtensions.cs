@@ -42,9 +42,9 @@ namespace SampleApi.Plumbing.Claims
             return ClaimsReader.ReadClaim(principal, OAuthClaimNames.Issuer).Value;
         }
 
-        public static string GetAudience(this ClaimsPrincipal principal)
+        public static IEnumerable<string> GetAudiences(this ClaimsPrincipal principal)
         {
-            return ClaimsReader.ReadClaim(principal, OAuthClaimNames.Audience).Value;
+            return principal.FindAll(c => c.Type == OAuthClaimNames.Audience).Select(c => c.Value);
         }
 
         public static string GetSubject(this ClaimsPrincipal principal)

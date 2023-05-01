@@ -1,6 +1,7 @@
 namespace SampleApi.Plumbing.OAuth
 {
     using System;
+    using System.Linq;
     using System.Security.Claims;
     using System.Threading.Tasks;
     using Jose;
@@ -100,9 +101,13 @@ namespace SampleApi.Plumbing.OAuth
                 throw ErrorFactory.CreateClient401Error("The issuer claim had an unexpected value");
             }
 
-            if (!string.IsNullOrWhiteSpace(this.configuration.Audience) && principal.GetAudience() != this.configuration.Audience)
+            if (!string.IsNullOrWhiteSpace(this.configuration.Audience))
             {
-                throw ErrorFactory.CreateClient401Error("The audience claim had an unexpected value");
+                var audiences = principal.GetAudiences();
+                if (!audiences.Contains(this.configuration.Audience))
+                {
+                    throw ErrorFactory.CreateClient401Error("The audience claim had an unexpected value");
+                }
             }
 
             if (principal.GetExpiry() < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
