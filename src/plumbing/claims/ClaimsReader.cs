@@ -13,7 +13,7 @@ namespace SampleApi.Plumbing.Claims
     public static class ClaimsReader
     {
         /*
-         * Read the claims from an access token
+         * Read the base claims from an access token
          */
         public static IEnumerable<Claim> AccessTokenClaims(string json, OAuthConfiguration configuration)
         {
@@ -23,14 +23,11 @@ namespace SampleApi.Plumbing.Claims
 
             if (!string.IsNullOrWhiteSpace(configuration.Audience))
             {
-                System.Console.WriteLine("*** START");
                 var audiences = claimsSet.GetValue(OAuthClaimNames.Audience);
                 if (audiences is JArray)
                 {
-                    System.Console.WriteLine("*** IS ARRAY");
                     foreach (var audience in audiences)
                     {
-                        System.Console.WriteLine("*** ADDING " + audience.ToString());
                         claims.Add(new Claim(OAuthClaimNames.Audience, audience.ToString()));
                     }
                 }
