@@ -1,5 +1,6 @@
 namespace SampleApi.Plumbing.OAuth
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Net;
     using SampleApi.Plumbing.Errors;
@@ -12,7 +13,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Deny access unless a required scope is present
          */
-        public static void Enforce(string[] scopes, string requiredScope)
+        public static void Enforce(IEnumerable<string> scopes, string requiredScope)
         {
             var found = scopes.FirstOrDefault(s => s.Contains(requiredScope));
             if (found == null)

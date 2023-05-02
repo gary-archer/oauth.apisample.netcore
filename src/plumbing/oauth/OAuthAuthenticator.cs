@@ -2,9 +2,10 @@ namespace SampleApi.Plumbing.OAuth
 {
     using System;
     using System.Linq;
-    using System.Security.Claims;
     using System.Threading.Tasks;
     using Jose;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Serialization;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
@@ -32,7 +33,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Validate the access token using the jose-jwt library
          */
-        public async Task<ClaimsPrincipal> ValidateTokenAsync(string accessToken)
+        public async Task<ClaimsModel> ValidateTokenAsync(string accessToken)
         {
             using (this.logEntry.CreatePerformanceBreakdown("userInfoLookup"))
             {
@@ -59,16 +60,21 @@ namespace SampleApi.Plumbing.OAuth
                     }
 
                     // Do the cryptographic validation of the JWT signature using the JWK public key
-                    var json = JWT.Decode(accessToken, jwk);
+                    var claimsJson = JWT.Decode(accessToken, jwk);
 
-                    // Read claims and create the Microsoft objects so that .NET logic can use the standard mechanisms
-                    var claims = ClaimsReader.AccessTokenClaims(json, this.configuration);
-                    var identity = new ClaimsIdentity(claims, "Bearer");
-                    var principal = new ClaimsPrincipal(identity);
+                    // Deserialize to an object
+                    var settings = new JsonSerializerSettings
+                    {
+                        ContractResolver = new DefaultContractResolver
+                        {
+                            NamingStrategy = new SnakeCaseNamingStrategy(),
+                        },
+                    };
+                    var claims = JsonConvert.DeserializeObject<ClaimsModel>(claimsJson, settings);
 
                     // Make extra validation checks that jose4j does not support, then return the principal
-                    this.ValidateProtocolClaims(principal);
-                    return principal;
+                    this.ValidateProtocolClaims(claims);
+                    return claims;
                 }
                 catch (Exception ex)
                 {
@@ -94,23 +100,23 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * jose-jwt does not support checking standard claims for issuer, audience and expiry, so make those checks here instead
          */
-        private void ValidateProtocolClaims(ClaimsPrincipal principal)
+        private void ValidateProtocolClaims(ClaimsModel claimsModel)
         {
-            if (principal.GetIssuer() != this.configuration.Issuer)
+            if (claimsModel.Iss != this.configuration.Issuer)
             {
                 throw ErrorFactory.CreateClient401Error("The issuer claim had an unexpected value");
             }
 
             if (!string.IsNullOrWhiteSpace(this.configuration.Audience))
             {
-                var audiences = principal.GetAudiences();
+                var audiences = claimsModel.GetAudiences();
                 if (!audiences.Contains(this.configuration.Audience))
                 {
                     throw ErrorFactory.CreateClient401Error("The audience claim had an unexpected value");
                 }
             }
 
-            if (principal.GetExpiry() < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            if (claimsModel.Exp < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
             {
                 throw ErrorFactory.CreateClient401Error("The access token is expired");
             }

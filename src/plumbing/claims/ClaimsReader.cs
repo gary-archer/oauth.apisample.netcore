@@ -1,10 +1,8 @@
 namespace SampleApi.Plumbing.Claims
 {
     using System.Collections.Generic;
-    using System.Linq;
     using System.Security.Claims;
     using Newtonsoft.Json.Linq;
-    using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
 
     /*
@@ -13,33 +11,20 @@ namespace SampleApi.Plumbing.Claims
     public static class ClaimsReader
     {
         /*
-         * Read the base claims from an access token
+         * Read base claims from the access token
          */
-        public static IEnumerable<Claim> AccessTokenClaims(string json, OAuthConfiguration configuration)
+        public static IEnumerable<Claim> BaseClaims(ClaimsModel model)
         {
-            var claimsSet = JObject.Parse(json);
             var claims = new List<Claim>();
-            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Issuer));
+            claims.Add(CheckClaim(OAuthClaimNames.Subject, model.Sub));
 
-            if (!string.IsNullOrWhiteSpace(configuration.Audience))
+            var scopes = model.Scope.Split(" ");
+            foreach (var scope in scopes)
             {
-                var audiences = claimsSet.GetValue(OAuthClaimNames.Audience);
-                if (audiences is JArray)
-                {
-                    foreach (var audience in audiences)
-                    {
-                        claims.Add(new Claim(OAuthClaimNames.Audience, audience.ToString()));
-                    }
-                }
-                else
-                {
-                    claims.Add(new Claim(OAuthClaimNames.Audience, audiences.ToString()));
-                }
+                claims.Add(CheckClaim(OAuthClaimNames.Scope, scope));
             }
 
-            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Subject));
-            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Scope));
-            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Exp));
+            claims.Add(CheckClaim(OAuthClaimNames.Exp, model.Exp.ToString()));
             return claims;
         }
 
@@ -50,30 +35,41 @@ namespace SampleApi.Plumbing.Claims
         {
             var claimsSet = JObject.Parse(json);
             var claims = new List<Claim>();
-            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.GivenName));
-            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.FamilyName));
-            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Email));
+            claims.Add(CheckClaim(claimsSet, OAuthClaimNames.GivenName));
+            claims.Add(CheckClaim(claimsSet, OAuthClaimNames.FamilyName));
+            claims.Add(CheckClaim(claimsSet, OAuthClaimNames.Email));
             return claims;
         }
 
         /*
-         * Read a claim from a ClaimsPrincipal and report missing claims clearly
+         * Read user info claims from the access token
          */
-        public static Claim ReadClaim(ClaimsPrincipal principal, string name)
+        public static IEnumerable<Claim> UserInfoClaims(ClaimsModel model)
         {
-            var found = principal.Claims.FirstOrDefault(c => c.Type == name);
-            if (found == null)
+            var claims = new List<Claim>();
+            claims.Add(CheckClaim(OAuthClaimNames.GivenName, model.GivenName));
+            claims.Add(CheckClaim(OAuthClaimNames.FamilyName, model.FamilyName));
+            claims.Add(CheckClaim(OAuthClaimNames.Email, model.Email));
+            return claims;
+        }
+
+        /*
+         * Return a claim object, checking that it exists first
+         */
+        private static Claim CheckClaim(string name, string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
             {
                 throw ErrorUtils.FromMissingClaim(name);
             }
 
-            return found;
+            return new Claim(name, value.ToString());
         }
 
         /*
          * Read a claim from JSON and report missing claims clearly
          */
-        private static Claim ReadClaim(JObject claimsSet, string name)
+        private static Claim CheckClaim(JObject claimsSet, string name)
         {
             var value = claimsSet.GetValue(name);
             if (value == null)

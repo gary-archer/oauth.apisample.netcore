@@ -1,8 +1,10 @@
 namespace SampleApi.Plumbing.OAuth
 {
+    using System.Collections.Generic;
     using System.Security.Claims;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
+    using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
     using SampleApi.Plumbing.Security;
 
@@ -13,10 +15,12 @@ namespace SampleApi.Plumbing.OAuth
     public sealed class StandardAuthorizer : IAuthorizer
     {
         private readonly OAuthAuthenticator authenticator;
+        private readonly CustomClaimsProvider claimsProvider;
 
-        public StandardAuthorizer(OAuthAuthenticator authenticator)
+        public StandardAuthorizer(OAuthAuthenticator authenticator, CustomClaimsProvider claimsProvider)
         {
             this.authenticator = authenticator;
+            this.claimsProvider = claimsProvider;
         }
 
         /*
@@ -32,8 +36,21 @@ namespace SampleApi.Plumbing.OAuth
             }
 
             // On every API request we validate the JWT, in a zero trust manner, and read all claims from it
-            var claims = await this.authenticator.ValidateTokenAsync(accessToken);
-            return claims;
+            var claimsModel = await this.authenticator.ValidateTokenAsync(accessToken);
+
+            // Read claims to check that expected values exist
+            var baseClaims = ClaimsReader.BaseClaims(claimsModel);
+            var userInfoClaims = ClaimsReader.UserInfoClaims(claimsModel);
+            var customClaims = this.claimsProvider.GetFromPayload(claimsModel);
+
+            var allClaims = new List<Claim>();
+            allClaims.AddRange(baseClaims);
+            allClaims.AddRange(userInfoClaims);
+            allClaims.AddRange(customClaims);
+
+            // Create a claims principal so that Microsoft authorization works
+            var identity = new ClaimsIdentity(allClaims, "Bearer");
+            return new ClaimsPrincipal(identity);
         }
     }
 }

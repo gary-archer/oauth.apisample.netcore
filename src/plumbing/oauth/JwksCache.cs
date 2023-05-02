@@ -1,4 +1,4 @@
-namespace SampleApi.Plumbing.Claims
+namespace SampleApi.Plumbing.OAuth
 {
     using System;
     using System.Text;

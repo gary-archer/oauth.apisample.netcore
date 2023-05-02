@@ -47,29 +47,30 @@ namespace SampleApi.Plumbing.OAuth.ClaimsCaching
             }
 
             // On every API request we validate the JWT, in a zero trust manner
-            var basePrincipal = await this.authenticator.ValidateTokenAsync(accessToken);
+            var claimsModel = await this.authenticator.ValidateTokenAsync(accessToken);
+            var baseClaims = ClaimsReader.BaseClaims(claimsModel);
 
             // If cached results already exist for this token then return them immediately
             var accessTokenHash = this.Sha256(accessToken);
             var cachedExtraClaims = await this.cache.GetExtraUserClaimsAsync(accessTokenHash);
             if (cachedExtraClaims.Count() > 0)
             {
-                // Extend the claims principal with the additional claims
-                return basePrincipal.ExtendClaims(cachedExtraClaims);
+                // Return the final claims principal
+                return this.CreatePrincipal(baseClaims, cachedExtraClaims);
             }
 
             // In Cognito we cannot issue custom claims so the API looks them up when the access token is first received
-            var userInfo = await this.userInfoClient.GetUserInfoAsync(accessToken);
-            var customClaims = await this.customClaimsProvider.GetAsync(accessToken, basePrincipal, userInfo);
+            var userInfoClaims = await this.userInfoClient.GetUserInfoAsync(accessToken);
+            var customClaims = await this.customClaimsProvider.GetFromLookupAsync(accessToken, baseClaims, userInfoClaims);
 
             // Cache the claims against the token hash until the token's expiry time
             var extraClaims = new List<Claim>();
-            extraClaims.AddRange(userInfo);
+            extraClaims.AddRange(userInfoClaims);
             extraClaims.AddRange(customClaims);
-            await this.cache.SetExtraUserClaimsAsync(accessTokenHash, extraClaims, basePrincipal.GetExpiry());
+            await this.cache.SetExtraUserClaimsAsync(accessTokenHash, extraClaims, claimsModel.Exp);
 
-            // Extend the claims principal with the additional claims
-            return basePrincipal.ExtendClaims(extraClaims);
+            // Return the final claims principal
+            return this.CreatePrincipal(baseClaims, extraClaims);
         }
 
         /*
@@ -83,6 +84,19 @@ namespace SampleApi.Plumbing.OAuth.ClaimsCaching
                 var hash = sha.ComputeHash(bytes);
                 return Convert.ToBase64String(hash);
             }
+        }
+
+        /*
+         * Create a claims principal from the token and custom claims
+         */
+        private ClaimsPrincipal CreatePrincipal(IEnumerable<Claim> baseClaims, IEnumerable<Claim> extraClaims)
+        {
+            var allClaims = new List<Claim>();
+            allClaims.AddRange(baseClaims);
+            allClaims.AddRange(extraClaims);
+
+            var identity = new ClaimsIdentity(allClaims, "Bearer");
+            return new ClaimsPrincipal(identity);
         }
     }
 }
