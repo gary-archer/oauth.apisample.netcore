@@ -49,6 +49,7 @@ namespace SampleApi.Logic.Claims
         /*
          * Receive user attributes from identity data, and return user attributes from business data
          */
+        #pragma warning disable 1998
         private IEnumerable<Claim> Get(string subject, string email)
         {
             var claims = new List<Claim>();
@@ -76,5 +77,6 @@ namespace SampleApi.Logic.Claims
 
             return claims;
         }
+        #pragma warning restore 1998
     }
 }
