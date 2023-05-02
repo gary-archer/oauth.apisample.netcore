@@ -67,7 +67,7 @@
         }
 
         /*
-         * Set up the API with cross cutting concerns
+         * Set up the API with cross cutting concerns, including JSON settings
          */
         private void ConfigureApiMiddleware(IApplicationBuilder api)
         {

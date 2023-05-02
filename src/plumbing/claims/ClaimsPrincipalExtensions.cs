@@ -37,16 +37,6 @@ namespace SampleApi.Plumbing.Claims
         /*
          * Convenience accessors
          */
-        public static string GetIssuer(this ClaimsPrincipal principal)
-        {
-            return ClaimsReader.ReadClaim(principal, OAuthClaimNames.Issuer).Value;
-        }
-
-        public static IEnumerable<string> GetAudiences(this ClaimsPrincipal principal)
-        {
-            return principal.FindAll(c => c.Type == OAuthClaimNames.Audience).Select(c => c.Value);
-        }
-
         public static string GetSubject(this ClaimsPrincipal principal)
         {
             return ClaimsReader.ReadClaim(principal, OAuthClaimNames.Subject).Value;
