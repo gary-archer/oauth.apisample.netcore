@@ -63,7 +63,7 @@ namespace SampleApi.Plumbing.Claims
                 throw ErrorUtils.FromMissingClaim(name);
             }
 
-            return new Claim(name, value.ToString());
+            return new Claim(name, value);
         }
 
         /*
