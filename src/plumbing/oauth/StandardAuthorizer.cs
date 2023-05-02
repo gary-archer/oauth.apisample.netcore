@@ -32,8 +32,7 @@ namespace SampleApi.Plumbing.OAuth
             }
 
             // On every API request we validate the JWT, in a zero trust manner, and read all claims from it
-            var claims = await this.authenticator.ValidateTokenAsync(accessToken);
-            return claims;
+            return await this.authenticator.ValidateTokenAsync(accessToken);
         }
     }
 }

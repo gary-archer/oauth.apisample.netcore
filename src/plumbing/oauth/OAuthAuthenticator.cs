@@ -62,7 +62,7 @@ namespace SampleApi.Plumbing.OAuth
                     var json = JWT.Decode(accessToken, jwk);
 
                     // Read claims and create the Microsoft objects so that .NET logic can use the standard mechanisms
-                    var claims = ClaimsReader.AccessTokenClaims(json, this.configuration);
+                    var claims = ClaimsReader.BaseClaims(json, this.configuration);
                     var identity = new ClaimsIdentity(claims, "Bearer");
                     var principal = new ClaimsPrincipal(identity);
 

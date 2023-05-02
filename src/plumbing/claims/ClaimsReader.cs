@@ -13,14 +13,14 @@ namespace SampleApi.Plumbing.Claims
     public static class ClaimsReader
     {
         /*
-         * Read the base claims from an access token
+         * Read the base claims from the access token
          */
-        public static IEnumerable<Claim> AccessTokenClaims(string json, OAuthConfiguration configuration)
+        public static IEnumerable<Claim> BaseClaims(string json, OAuthConfiguration configuration)
         {
             var claimsSet = JObject.Parse(json);
             var claims = new List<Claim>();
-            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Issuer));
 
+            claims.Add(ReadClaim(claimsSet, OAuthClaimNames.Issuer));
             if (!string.IsNullOrWhiteSpace(configuration.Audience))
             {
                 var audiences = claimsSet.GetValue(OAuthClaimNames.Audience);
