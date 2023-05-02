@@ -5,68 +5,53 @@ namespace SampleApi.Plumbing.Claims
     using System.Globalization;
     using System.Linq;
     using System.Security.Claims;
+    using SampleApi.Plumbing.Errors;
 
     /*
-     * Extensions to claims principal behaviour
+     * Convenience extensions to return values once there is a claims principal
      */
     public static class ClaimsPrincipalExtensions
     {
-        /*
-         * Extend the claims in the JWT with those retrived from other sources
-         */
-        public static ClaimsPrincipal ExtendClaims(this ClaimsPrincipal principal, IEnumerable<Claim> extraClaims)
-        {
-            // Include both token claims and those retrieved from external sources
-            var claims = new List<Claim>();
-            claims.AddRange(principal.Claims);
-            claims.AddRange(extraClaims);
-
-            // All claims are available to use for authorization
-            var identity = new ClaimsIdentity(claims, principal.Identity.AuthenticationType);
-            return new ClaimsPrincipal(identity);
-        }
-
-        /*
-         * Return custom claims, which do not have an issuer
-         */
-        public static IEnumerable<Claim> GetCustomClaims(this ClaimsPrincipal principal)
-        {
-            return principal.Claims.Where(c => string.IsNullOrWhiteSpace(c.Issuer));
-        }
-
-        /*
-         * Convenience accessors
-         */
         public static string GetSubject(this ClaimsPrincipal principal)
         {
-            return ClaimsReader.ReadClaim(principal, OAuthClaimNames.Subject).Value;
+            return principal.ReadStringClaim(OAuthClaimNames.Subject).Value;
         }
 
-        public static string[] GetScopes(this ClaimsPrincipal principal)
+        public static IEnumerable<string> GetScopes(this ClaimsPrincipal principal)
         {
-            var scopeValue = ClaimsReader.ReadClaim(principal, OAuthClaimNames.Scope).Value;
-            return scopeValue.Split(' ');
+            return principal.Claims.Where(c => c.Type == OAuthClaimNames.Scope).Select(s => s.Value);
         }
 
         public static int GetExpiry(this ClaimsPrincipal principal)
         {
-            var expValue = ClaimsReader.ReadClaim(principal, OAuthClaimNames.Exp).Value;
+            var expValue = principal.ReadStringClaim(OAuthClaimNames.Exp).Value;
             return Convert.ToInt32(expValue, CultureInfo.InvariantCulture);
         }
 
         public static string GetGivenName(this ClaimsPrincipal principal)
         {
-            return ClaimsReader.ReadClaim(principal, OAuthClaimNames.GivenName).Value;
+            return principal.ReadStringClaim(OAuthClaimNames.GivenName).Value;
         }
 
         public static string GetFamilyName(this ClaimsPrincipal principal)
         {
-            return ClaimsReader.ReadClaim(principal, OAuthClaimNames.FamilyName).Value;
+            return principal.ReadStringClaim(OAuthClaimNames.FamilyName).Value;
         }
 
         public static string GetEmail(this ClaimsPrincipal principal)
         {
-            return ClaimsReader.ReadClaim(principal, OAuthClaimNames.Email).Value;
+            return principal.ReadStringClaim(OAuthClaimNames.Email).Value;
+        }
+
+        public static Claim ReadStringClaim(this ClaimsPrincipal principal, string name)
+        {
+            var found = principal.Claims.FirstOrDefault(c => c.Type == name);
+            if (found == null)
+            {
+                throw ErrorUtils.FromMissingClaim(name);
+            }
+
+            return found;
         }
     }
 }

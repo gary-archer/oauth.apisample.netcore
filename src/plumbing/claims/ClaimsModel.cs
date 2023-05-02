@@ -16,7 +16,7 @@ namespace SampleApi.Plumbing.Claims
 
         public string Scope { get; set; }
 
-        public long Exp { get; set; }
+        public int Exp { get; set; }
 
         public string Sub { get; set; }
 

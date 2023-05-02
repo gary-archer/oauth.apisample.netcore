@@ -2,7 +2,6 @@ namespace SampleApi.Plumbing.OAuth
 {
     using System;
     using System.Linq;
-    using System.Security.Claims;
     using System.Threading.Tasks;
     using Jose;
     using Newtonsoft.Json;
@@ -34,7 +33,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Validate the access token using the jose-jwt library
          */
-        public async Task<ClaimsPrincipal> ValidateTokenAsync(string accessToken)
+        public async Task<ClaimsModel> ValidateTokenAsync(string accessToken)
         {
             using (this.logEntry.CreatePerformanceBreakdown("userInfoLookup"))
             {
@@ -71,16 +70,11 @@ namespace SampleApi.Plumbing.OAuth
                             NamingStrategy = new SnakeCaseNamingStrategy(),
                         },
                     };
-                    var claimsModel = JsonConvert.DeserializeObject<ClaimsModel>(claimsJson, settings);
-
-                    // Read claims and create the Microsoft objects so that .NET logic can use the standard mechanisms
-                    var claims = ClaimsReader.BaseClaims(claimsJson, this.configuration);
-                    var identity = new ClaimsIdentity(claims, "Bearer");
-                    var principal = new ClaimsPrincipal(identity);
+                    var claims = JsonConvert.DeserializeObject<ClaimsModel>(claimsJson, settings);
 
                     // Make extra validation checks that jose4j does not support, then return the principal
-                    this.ValidateProtocolClaims(claimsModel);
-                    return principal;
+                    this.ValidateProtocolClaims(claims);
+                    return claims;
                 }
                 catch (Exception ex)
                 {

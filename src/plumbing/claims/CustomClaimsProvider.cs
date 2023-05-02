@@ -10,8 +10,7 @@
     public class CustomClaimsProvider
     {
         /*
-         * This can be overridden when an API wants to provide a domain specific claims endpoint
-         * The authorization server then calls the API at the time of token issuance
+         * When using the StandardAuthorizer this is called at the time of token issuance
          */
         #pragma warning disable 1998
         public virtual async Task<IEnumerable<Claim>> IssueAsync(string subject, string email)
@@ -21,11 +20,23 @@
         #pragma warning restore 1998
 
         /*
-         * This can be overridden by an API that looks up extra claims from a cache
-         * This is used when the authorization server does not support issuing domain specific claims
+         * When using the StandardAuthorizer, this is called to read claims from the access token
          */
         #pragma warning disable 1998
-        public virtual async Task<IEnumerable<Claim>> GetAsync(string accessToken, ClaimsPrincipal principal, IEnumerable<Claim> userInfo)
+        public virtual IEnumerable<Claim> GetFromPayload(ClaimsModel claimsModel)
+        {
+            return new List<Claim>();
+        }
+        #pragma warning restore 1998
+
+        /*
+         * When using the ClaimsCachingAuthorizer, this is called to get extra claims when the token is first received
+         */
+        #pragma warning disable 1998
+        public virtual async Task<IEnumerable<Claim>> GetFromLookupAsync(
+            string accessToken,
+            IEnumerable<Claim> baseClaims,
+            IEnumerable<Claim> userInfoClaims)
         {
             return new List<Claim>();
         }

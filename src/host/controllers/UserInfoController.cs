@@ -1,5 +1,6 @@
 namespace SampleApi.Host.Controllers
 {
+    using System.Linq;
     using Microsoft.AspNetCore.Mvc;
     using SampleApi.Logic.Claims;
     using SampleApi.Logic.Entities;
@@ -21,8 +22,11 @@ namespace SampleApi.Host.Controllers
             // First check we have access to this level of data
             ScopeVerifier.Enforce(this.User.GetScopes(), "profile");
 
-            // Next return the user info
-            return new ClientUserInfo(this.User.GetGivenName(), this.User.GetFamilyName(), this.User.GetUserRegions());
+            // Next return the user info, including the custom regions field
+            return new ClientUserInfo(
+                this.User.GetGivenName(),
+                this.User.GetFamilyName(),
+                this.User.GetUserRegions().ToArray());
         }
     }
 }

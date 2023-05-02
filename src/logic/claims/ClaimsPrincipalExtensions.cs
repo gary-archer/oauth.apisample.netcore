@@ -1,5 +1,7 @@
 namespace SampleApi.Logic.Claims
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Security.Claims;
     using SampleApi.Plumbing.Claims;
 
@@ -8,23 +10,19 @@ namespace SampleApi.Logic.Claims
      */
     public static class ClaimsPrincipalExtensions
     {
-        /*
-         * Convenience accessors
-         */
         public static string GetUserId(this ClaimsPrincipal principal)
         {
-            return ClaimsReader.ReadClaim(principal, CustomClaimNames.UserId).Value;
+            return principal.ReadStringClaim(CustomClaimNames.UserId).Value;
         }
 
         public static string GetUserRole(this ClaimsPrincipal principal)
         {
-            return ClaimsReader.ReadClaim(principal, CustomClaimNames.UserRole).Value;
+            return principal.ReadStringClaim(CustomClaimNames.UserRole).Value;
         }
 
-        public static string[] GetUserRegions(this ClaimsPrincipal principal)
+        public static IEnumerable<string> GetUserRegions(this ClaimsPrincipal principal)
         {
-            var regionsValue = ClaimsReader.ReadClaim(principal, CustomClaimNames.UserRegions).Value;
-            return regionsValue.Split(' ');
+            return principal.Claims.Where(c => c.Type == CustomClaimNames.UserRegions).Select(s => s.Value);
         }
     }
 }
