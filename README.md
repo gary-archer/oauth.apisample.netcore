@@ -2,8 +2,6 @@
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/18e0bf7a5ae8420d989d62b287245f0a)](https://www.codacy.com/gh/gary-archer/oauth.apisample.netcore/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=gary-archer/oauth.apisample.netcore&amp;utm_campaign=Badge_Grade)
 
-[![Known Vulnerabilities](https://snyk.io/test/github/gary-archer/oauth.apisample.netcore/badge.svg?targetFile=sampleapi.csproj)](https://snyk.io/test/github/gary-archer/oauth.apisample.netcore?targetFile=sampleapi.csproj)
-
 ## Behaviour
 
 The final OAuth secured .NET API code sample, referenced in my blog at https://authguidance.com:
