@@ -24,8 +24,6 @@ namespace SampleApi.Host.Controllers
 
             // Next return the user info, including the custom regions field
             return new ClientUserInfo(
-                this.User.GetGivenName(),
-                this.User.GetFamilyName(),
                 this.User.GetUserRole(),
                 this.User.GetUserRegions().ToArray());
         }
