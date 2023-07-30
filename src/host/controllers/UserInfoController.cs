@@ -26,6 +26,7 @@ namespace SampleApi.Host.Controllers
             return new ClientUserInfo(
                 this.User.GetGivenName(),
                 this.User.GetFamilyName(),
+                this.User.GetUserRole(),
                 this.User.GetUserRegions().ToArray());
         }
     }

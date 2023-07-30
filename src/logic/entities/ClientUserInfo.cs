@@ -5,7 +5,7 @@ namespace SampleApi.Logic.Entities
      */
     public class ClientUserInfo
     {
-        public ClientUserInfo(string givenName, string familyName, string[] regions)
+        public ClientUserInfo(string givenName, string familyName, string role, string[] regions)
         {
             this.GivenName = givenName;
             this.FamilyName = familyName;
@@ -15,6 +15,8 @@ namespace SampleApi.Logic.Entities
         public string GivenName { get; }
 
         public string FamilyName { get; }
+
+        public string Role { get; }
 
         public string[] Regions { get; }
     }
