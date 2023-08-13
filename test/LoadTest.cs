@@ -16,7 +16,6 @@ namespace SampleApi.Test
         private readonly MockAuthorizationServer mockAuthorizationServer;
         private readonly ApiClient apiClient;
         private readonly string sessionId;
-        private readonly string guestUserId;
         private int totalCount;
         private int errorCount;
 
@@ -35,7 +34,6 @@ namespace SampleApi.Test
             this.apiClient = new ApiClient(apiBaseUrl, "LoadTest", this.sessionId);
 
             // Initialise other fields
-            this.guestUserId = "a6b404b1-98af-41a2-8e7f-e4061dc0bf86";
             this.totalCount = 0;
             this.errorCount = 0;
         }
@@ -93,10 +91,13 @@ namespace SampleApi.Test
          */
         private IList<string> GetAccessTokens()
         {
+            var jwtOptions = new MockTokenOptions();
+            jwtOptions.UseStandardUser();
+
             var tokens = new List<string>();
             for (int index = 0; index < 5; index++)
             {
-                tokens.Add(this.mockAuthorizationServer.IssueAccessToken(this.guestUserId));
+                tokens.Add(this.mockAuthorizationServer.IssueAccessToken(jwtOptions));
             }
 
             return tokens;

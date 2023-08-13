@@ -15,10 +15,6 @@ namespace SampleApi.IntegrationTests
         // State shared across the suite of tests
         private readonly IntegrationTestState state;
 
-        // The real subject claim values for my two online test users
-        private readonly string guestUserId = "a6b404b1-98af-41a2-8e7f-e4061dc0bf86";
-        private readonly string guestAdminId = "77a97e5b-b748-45e5-bb6f-658e85b2df91";
-
         /*
          * Initialize mock token issuing and wiremock before a test runs
          */
@@ -77,7 +73,9 @@ namespace SampleApi.IntegrationTests
         public async Task GetCompanies_ReturnsTwoItems_ForStandardUser()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.state.MockAuthorizationServer.IssueAccessToken(this.guestUserId);
+            var jwtOptions = new MockTokenOptions();
+            jwtOptions.UseStandardUser();
+            var accessToken = this.state.MockAuthorizationServer.IssueAccessToken(jwtOptions);
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);

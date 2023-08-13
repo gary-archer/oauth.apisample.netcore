@@ -49,7 +49,6 @@ namespace SampleApi.Test.Utils
         {
             var keyset = this.GetTokenSigningPublicKeys();
             this.RegisterJsonWebWeys(keyset).Wait();
-
         }
 
         public void Stop()
@@ -69,11 +68,10 @@ namespace SampleApi.Test.Utils
         /*
          * Issue an access token with the supplied subject claim
          */
-        public string IssueAccessToken(string subject, Jwk jwk = null)
+        public string IssueAccessToken(MockTokenOptions options, Jwk jwk = null)
         {
             var now = DateTimeOffset.Now;
-            var iat = now.AddMinutes(-30);
-            var exp = now.AddMinutes(30);
+            var exp = now.AddMinutes(options.ExpiryMinutes);
 
             var headers = new Dictionary<string, object>()
             {
@@ -82,15 +80,15 @@ namespace SampleApi.Test.Utils
 
             var payload = new Dictionary<string, object>()
             {
-                { "sub", subject },
-                { "iss", "https://login.authsamples-dev.com" },
-                { "aud", "api.mycompany.com" },
-                { "iat", iat.ToUnixTimeSeconds() },
+                { "iss", options.Issuer },
+                { "aud", options.Audience },
+                { "scope", options.Scope },
+                { "sub", options.Subject },
+                { "manager_id", options.ManagerId },
                 { "exp", exp.ToUnixTimeSeconds() },
-                { "scope", "openid profile investments" },
             };
 
-            return Jose.JWT.Encode(payload, this.tokenSigningPrivateKey, JwsAlgorithm.RS256, headers);
+            return JWT.Encode(payload, this.tokenSigningPrivateKey, JwsAlgorithm.RS256, headers);
         }
 
         /*
