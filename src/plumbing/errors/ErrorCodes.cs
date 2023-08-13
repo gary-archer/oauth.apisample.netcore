@@ -7,7 +7,7 @@
     {
         public static readonly string ServerError = "server_error";
 
-        public static readonly string UnauthorizedRequest = "unauthorized";
+        public static readonly string InvalidToken = "invalid_token";
 
         public static readonly string ClaimsFailure = "claims_failure";
 

@@ -16,10 +16,8 @@ namespace SampleApi.Test.Utils
      */
     public class MockAuthorizationServer : IDisposable
     {
-        private readonly string baseUrl;
-        private readonly string jsonWebKeysId;
+        private readonly string adminBaseUrl;
         private readonly HttpProxy httpProxy;
-        private readonly string algorithm;
         private readonly RSA rsa;
         private readonly Jwk tokenSigningPrivateKey;
         private readonly Jwk tokenSigningPublicKey;
@@ -27,21 +25,19 @@ namespace SampleApi.Test.Utils
 
         public MockAuthorizationServer(bool useProxy = false)
         {
-            this.baseUrl = "https://login.authsamples-dev.com:3447/__admin/mappings";
-            this.jsonWebKeysId = Guid.NewGuid().ToString();
+            this.adminBaseUrl = "https://login.authsamples-dev.com:3447/__admin/mappings";
             this.httpProxy = new HttpProxy(useProxy, "http://127.0.0.1:8888");
 
-            this.algorithm = "RS256";
+            var algorithm = "RS256";
+            this.rsa = RSA.Create(2048);
             this.keyId = Guid.NewGuid().ToString();
 
-            this.rsa = RSA.Create(2048);
-
             this.tokenSigningPrivateKey = new Jwk(this.rsa, true);
-            this.tokenSigningPrivateKey.Alg = this.algorithm;
+            this.tokenSigningPrivateKey.Alg = algorithm;
             this.tokenSigningPrivateKey.KeyId = this.keyId;
 
             this.tokenSigningPublicKey = new Jwk(this.rsa, false);
-            this.tokenSigningPublicKey.Alg = this.algorithm;
+            this.tokenSigningPublicKey.Alg = algorithm;
             this.tokenSigningPublicKey.KeyId = this.keyId;
         }
 
@@ -105,7 +101,7 @@ namespace SampleApi.Test.Utils
         private async Task RegisterJsonWebWeys(string keysJson)
         {
             dynamic data = new JObject();
-            data.Guid = this.jsonWebKeysId;
+            data.Guid = this.keyId;
             data.Priority = 1;
 
             dynamic request = new JObject();
@@ -130,7 +126,7 @@ namespace SampleApi.Test.Utils
          */
         private async Task UnregisterJsonWebWeys()
         {
-            await this.Unregister(this.jsonWebKeysId);
+            await this.Unregister(this.keyId);
         }
 
         /*
@@ -141,7 +137,7 @@ namespace SampleApi.Test.Utils
             using (var client = new HttpClient(this.httpProxy.GetHandler()))
             {
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                var request = new HttpRequestMessage(HttpMethod.Post, this.baseUrl);
+                var request = new HttpRequestMessage(HttpMethod.Post, this.adminBaseUrl);
                 request.Content = new StringContent(stubbedResponse, Encoding.UTF8, "application/json");
 
                 var response = await client.SendAsync(request);
@@ -161,7 +157,7 @@ namespace SampleApi.Test.Utils
         {
             using (var client = new HttpClient(this.httpProxy.GetHandler()))
             {
-                var request = new HttpRequestMessage(HttpMethod.Delete, $"{this.baseUrl}/{id}");
+                var request = new HttpRequestMessage(HttpMethod.Delete, $"{this.adminBaseUrl}/{id}");
                 await client.SendAsync(request);
             }
         }

@@ -24,6 +24,24 @@ namespace SampleApi.IntegrationTests
         }
 
         /*
+         * Test that a request without an access token is rejected
+         */
+        [Fact]
+        [Trait("Category", "Integration")]
+        public async Task CallApi_Returns401_ForMissingJwt()
+        {
+            // Call the API and ensure a 401 response
+            var options = new ApiRequestOptions(string.Empty);
+            var response = await this.state.ApiClient.GetCompanies(options);
+
+            // Assert expected results
+            Assert.True(response.StatusCode == HttpStatusCode.Unauthorized, "Unexpected HTTP status code");
+            var error = JObject.Parse(response.Body);
+            var code = error.Value<string>("code");
+            Assert.True(code == "invalid_token", "Unexpected error code");
+        }
+
+        /*
          * Test getting claims
          */
         /*[Fact]

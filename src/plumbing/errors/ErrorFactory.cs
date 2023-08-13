@@ -54,7 +54,7 @@
         {
             var error = new ClientErrorImpl(
                     HttpStatusCode.Unauthorized,
-                    ErrorCodes.UnauthorizedRequest,
+                    ErrorCodes.InvalidToken,
                     "Missing, invalid or expired access token");
             error.SetLogContext(reason);
             return error;
