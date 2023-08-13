@@ -20,14 +20,13 @@ namespace SampleApi.Plumbing.Claims
 
         public ClaimsCache(
             IDistributedCache cache,
+            ExtraClaimsProvider extraClaimsProvider,
             int timeToLiveMinutes,
             ServiceProvider container)
         {
             this.cache = cache;
+            this.extraClaimsProvider = extraClaimsProvider;
             this.timeToLiveMinutes = timeToLiveMinutes;
-
-            // Get a development trace logger for this class
-            this.extraClaimsProvider = container.GetService<ExtraClaimsProvider>();
             this.traceLogger = container.GetService<ILoggerFactory>().CreateLogger<ClaimsCache>();
         }
 

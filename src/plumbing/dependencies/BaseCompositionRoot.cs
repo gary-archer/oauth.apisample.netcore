@@ -133,12 +133,14 @@
             // Create the singleton cache
             var claimsCache = new ClaimsCache(
                 cache,
+                this.extraClaimsProvider,
                 this.oauthConfiguration.ClaimsCacheTimeToLiveMinutes,
                 container);
             this.services.AddSingleton(claimsCache);
 
             // Make the claims principal injectable
-            this.services.AddScoped(ctx => ctx.GetService<IHttpContextAccessor>().HttpContext.User);
+            this.services.AddScoped(ctx =>
+                ctx.GetService<IHttpContextAccessor>().HttpContext.User as CustomClaimsPrincipal);
         }
     }
 }
