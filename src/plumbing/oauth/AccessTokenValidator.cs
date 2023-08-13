@@ -14,13 +14,13 @@ namespace SampleApi.Plumbing.OAuth
     /*
      * A class to verify the JWT access token, to authenticate the request
      */
-    public sealed class OAuthAuthenticator
+    public sealed class AccessTokenValidator
     {
         private readonly OAuthConfiguration configuration;
         private readonly JsonWebKeyResolver jsonWebKeyResolver;
         private readonly ILogEntry logEntry;
 
-        public OAuthAuthenticator(
+        public AccessTokenValidator(
             OAuthConfiguration configuration,
             JsonWebKeyResolver jsonWebKeyResolver,
             ILogEntry logEntry)

@@ -10,24 +10,23 @@ namespace SampleApi.Plumbing.OAuth.ClaimsCaching
     using Microsoft.AspNetCore.Http;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
-    using SampleApi.Plumbing.Security;
 
     /*
      * An authorizer that manages claims in an extensible manner, with the ability to use claims from the API's own data
      */
-    public sealed class ClaimsCachingAuthorizer : IAuthorizer
+    public sealed class OAuthAuthorizer
     {
         private readonly ClaimsCache cache;
-        private readonly OAuthAuthenticator authenticator;
+        private readonly AccessTokenValidator accessTokenValidator;
         private readonly CustomClaimsProvider customClaimsProvider;
 
-        public ClaimsCachingAuthorizer(
+        public OAuthAuthorizer(
             ClaimsCache cache,
-            OAuthAuthenticator authenticator,
+            AccessTokenValidator accessTokenValidator,
             CustomClaimsProvider customClaimsProvider)
         {
             this.cache = cache;
-            this.authenticator = authenticator;
+            this.accessTokenValidator = accessTokenValidator;
             this.customClaimsProvider = customClaimsProvider;
         }
 
@@ -44,7 +43,7 @@ namespace SampleApi.Plumbing.OAuth.ClaimsCaching
             }
 
             // On every API request we validate the JWT, in a zero trust manner
-            var claimsModel = await this.authenticator.ValidateTokenAsync(accessToken);
+            var claimsModel = await this.accessTokenValidator.ValidateTokenAsync(accessToken);
             var baseClaims = ClaimsReader.BaseClaims(claimsModel);
 
             // If cached results already exist for this token then return them immediately

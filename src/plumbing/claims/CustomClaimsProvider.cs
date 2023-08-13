@@ -20,7 +20,7 @@
         #pragma warning restore 1998
 
         /*
-         * When using the ClaimsCachingAuthorizer, this is called to get extra claims when the token is first received
+         * This is called to get extra claims when the token is first received
          */
         #pragma warning disable 1998
         public virtual async Task<IEnumerable<Claim>> GetFromLookupAsync(

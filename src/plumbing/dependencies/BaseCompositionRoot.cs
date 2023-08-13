@@ -8,7 +8,6 @@
     using SampleApi.Plumbing.Logging;
     using SampleApi.Plumbing.OAuth;
     using SampleApi.Plumbing.OAuth.ClaimsCaching;
-    using SampleApi.Plumbing.Security;
     using SampleApi.Plumbing.Utilities;
 
     /*
@@ -113,16 +112,8 @@
         private void RegisterOAuthDependencies(IDistributedCache cache)
         {
             this.services.AddSingleton(this.oauthConfiguration);
-
-            this.services.AddScoped<OAuthAuthenticator>();
-            if (this.oauthConfiguration.ClaimsStrategy == "apiLookup")
-            {
-                this.services.AddScoped<IAuthorizer, ClaimsCachingAuthorizer>();
-            }
-            else
-            {
-                this.services.AddScoped<IAuthorizer, StandardAuthorizer>();
-            }
+            this.services.AddScoped<OAuthAuthorizer>();
+            this.services.AddScoped<AccessTokenValidator>();
 
             // JWKS keys are stored in a thread safe cache
             var jwksCache = new JwksCache(cache);

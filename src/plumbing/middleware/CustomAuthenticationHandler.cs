@@ -12,6 +12,7 @@ namespace SampleApi.Plumbing.Security
     using SampleApi.Plumbing.Errors;
     using SampleApi.Plumbing.Logging;
     using SampleApi.Plumbing.Middleware;
+    using SampleApi.Plumbing.OAuth.ClaimsCaching;
     using SampleApi.Plumbing.Utilities;
 
     /*
@@ -51,7 +52,7 @@ namespace SampleApi.Plumbing.Security
             try
             {
                 // Do the authorization work and get a claims principal
-                IAuthorizer authorizer = (IAuthorizer)this.Context.RequestServices.GetService(typeof(IAuthorizer));
+                var authorizer = (OAuthAuthorizer)this.Context.RequestServices.GetService(typeof(OAuthAuthorizer));
                 var claimsPrincipal = await authorizer.ExecuteAsync(this.Request);
 
                 // Add identity details to logs
