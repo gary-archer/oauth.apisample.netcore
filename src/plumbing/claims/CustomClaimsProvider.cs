@@ -35,8 +35,7 @@
         #pragma warning disable 1998
         public virtual async Task<IEnumerable<Claim>> GetFromLookupAsync(
             string accessToken,
-            IEnumerable<Claim> baseClaims,
-            IEnumerable<Claim> userInfoClaims)
+            IEnumerable<Claim> baseClaims)
         {
             return new List<Claim>();
         }

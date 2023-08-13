@@ -19,18 +19,15 @@ namespace SampleApi.Plumbing.OAuth.ClaimsCaching
     {
         private readonly ClaimsCache cache;
         private readonly OAuthAuthenticator authenticator;
-        private readonly UserInfoClient userInfoClient;
         private readonly CustomClaimsProvider customClaimsProvider;
 
         public ClaimsCachingAuthorizer(
             ClaimsCache cache,
             OAuthAuthenticator authenticator,
-            UserInfoClient userInfoClient,
             CustomClaimsProvider customClaimsProvider)
         {
             this.cache = cache;
             this.authenticator = authenticator;
-            this.userInfoClient = userInfoClient;
             this.customClaimsProvider = customClaimsProvider;
         }
 
@@ -60,12 +57,10 @@ namespace SampleApi.Plumbing.OAuth.ClaimsCaching
             }
 
             // In Cognito we cannot issue custom claims so the API looks them up when the access token is first received
-            var userInfoClaims = await this.userInfoClient.GetUserInfoAsync(accessToken);
-            var customClaims = await this.customClaimsProvider.GetFromLookupAsync(accessToken, baseClaims, userInfoClaims);
+            var customClaims = await this.customClaimsProvider.GetFromLookupAsync(accessToken, baseClaims);
 
             // Cache the claims against the token hash until the token's expiry time
             var extraClaims = new List<Claim>();
-            extraClaims.AddRange(userInfoClaims);
             extraClaims.AddRange(customClaims);
             await this.cache.SetExtraUserClaimsAsync(accessTokenHash, extraClaims, claimsModel.Exp);
 

@@ -37,12 +37,10 @@ namespace SampleApi.Logic.Claims
         #pragma warning disable 1998
         public override async Task<IEnumerable<Claim>> GetFromLookupAsync(
             string accessToken,
-            IEnumerable<Claim> baseClaims,
-            IEnumerable<Claim> userInfoClaims)
+            IEnumerable<Claim> baseClaims)
         {
             var subject = baseClaims.FirstOrDefault(c => c.Type == OAuthClaimNames.Subject)?.Value;
-            var email = userInfoClaims.FirstOrDefault(c => c.Type == OAuthClaimNames.Email)?.Value;
-            return this.Get(subject, email);
+            return this.Get(subject, string.Empty);
         }
         #pragma warning restore 1998
 

@@ -143,8 +143,6 @@
             // Register extra objects if using claims caching
             if (this.oauthConfiguration.ClaimsStrategy == "apiLookup")
             {
-                this.services.AddScoped<UserInfoClient>();
-
                 var claimsCache = new ClaimsCache(
                     cache,
                     this.oauthConfiguration.ClaimsCache.TimeToLiveMinutes,
