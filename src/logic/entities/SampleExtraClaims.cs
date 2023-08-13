@@ -65,21 +65,25 @@ namespace SampleApi.Logic.Claims
         }
 
         /*
-         * Return all claims as a list, to be added to the ClaimsPrincipal
-         * This ensures that .NET authorization attributes work as expected
+         * Add claims to the identity in order for .NET authorization to work as expected
          */
-        public override IEnumerable<Claim> ToList()
+        public override void AddClaims(ClaimsIdentity identity)
         {
-            var claims = new List<Claim>();
-            claims.Add(new Claim(CustomClaimNames.ManagerId, this.ManagerId));
-            claims.Add(new Claim(CustomClaimNames.Role, this.Role));
+            identity.AddClaim(new Claim(CustomClaimNames.ManagerId, this.ManagerId));
+            identity.AddClaim(new Claim(CustomClaimNames.Role, this.Role));
 
             foreach (var region in this.Regions)
             {
-                claims.Add(new Claim(CustomClaimNames.Regions, region));
+                identity.AddClaim(new Claim(CustomClaimNames.Regions, region));
             }
+        }
 
-            return claims;
+        /*
+         * This claim could be used with .NET attribute based authorization
+         */
+        public override string GetRoleClaimType()
+        {
+            return CustomClaimNames.Role;
         }
     }
 }

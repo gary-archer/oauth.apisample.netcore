@@ -1,6 +1,5 @@
 namespace SampleApi.Plumbing.Claims
 {
-    using System.Collections.Generic;
     using System.Security.Claims;
 
     /*
@@ -24,10 +23,10 @@ namespace SampleApi.Plumbing.Claims
          */
         private static ClaimsIdentity GetClaimsIdentity(JwtClaims jwtClaims, ExtraClaims extraClaims)
         {
-            var claims = new List<Claim>();
-            claims.AddRange(jwtClaims.ToList());
-            claims.AddRange(extraClaims.ToList());
-            return new ClaimsIdentity(claims, "Bearer");
+            var identity = new ClaimsIdentity("Bearer", jwtClaims.GetNameClaimType(), extraClaims.GetRoleClaimType());
+            jwtClaims.AddClaims(identity);
+            extraClaims.AddClaims(identity);
+            return identity;
         }
     }
 }

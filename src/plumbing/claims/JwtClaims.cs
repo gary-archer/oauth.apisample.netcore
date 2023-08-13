@@ -22,23 +22,29 @@ namespace SampleApi.Plumbing.Claims
         public int Exp { get; set; }
 
         /*
-         * Return all claims as a list
+         * Set the name claim type to the subject claim
          */
-        public IEnumerable<Claim> ToList()
+        public string GetNameClaimType()
         {
-            var claims = new List<Claim>();
-            claims.Add(new Claim(OAuthClaimNames.Issuer, this.Iss));
+            return OAuthClaimNames.Subject;
+        }
+
+        /*
+         * Add claims to the identity in order for .NET authorization to work as expected
+         */
+        public void AddClaims(ClaimsIdentity identity)
+        {
+            identity.AddClaim(new Claim(OAuthClaimNames.Issuer, this.Iss));
 
             var audiences = this.GetAudiences();
             foreach (var audience in audiences)
             {
-                claims.Add(new Claim(OAuthClaimNames.Audience, audience));
+                identity.AddClaim(new Claim(OAuthClaimNames.Audience, audience));
             }
 
-            claims.Add(new Claim(OAuthClaimNames.Scope, this.Scope));
-            claims.Add(new Claim(OAuthClaimNames.Subject, this.Sub));
-            claims.Add(new Claim(OAuthClaimNames.Exp, Convert.ToString(this.Exp, CultureInfo.InvariantCulture)));
-            return claims;
+            identity.AddClaim(new Claim(OAuthClaimNames.Scope, this.Scope));
+            identity.AddClaim(new Claim(OAuthClaimNames.Subject, this.Sub));
+            identity.AddClaim(new Claim(OAuthClaimNames.Exp, Convert.ToString(this.Exp, CultureInfo.InvariantCulture)));
         }
 
         /*

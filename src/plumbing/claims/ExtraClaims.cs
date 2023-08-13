@@ -26,11 +26,18 @@ namespace SampleApi.Plumbing.Claims
         }
 
         /*
-         * Return all claims as a list
+         * Add claims to the identity in order for .NET authorization to work as expected
          */
-        public virtual IEnumerable<Claim> ToList()
+        public virtual void AddClaims(ClaimsIdentity identity)
         {
-            return new List<Claim>();
+        }
+
+        /*
+         * A derived class can set the role claim type
+         */
+        public virtual string GetRoleClaimType()
+        {
+            return null;
         }
     }
 }
