@@ -29,31 +29,6 @@ namespace SampleApi.Plumbing.Claims
         }
 
         /*
-         * Return user info claims from a JSON object received in an HTTP response
-         */
-        public static IEnumerable<Claim> UserInfoClaims(string json)
-        {
-            var claimsSet = JObject.Parse(json);
-            var claims = new List<Claim>();
-            claims.Add(CheckClaim(claimsSet, OAuthClaimNames.GivenName));
-            claims.Add(CheckClaim(claimsSet, OAuthClaimNames.FamilyName));
-            claims.Add(CheckClaim(claimsSet, OAuthClaimNames.Email));
-            return claims;
-        }
-
-        /*
-         * Read user info claims from the access token
-         */
-        public static IEnumerable<Claim> UserInfoClaims(ClaimsModel model)
-        {
-            var claims = new List<Claim>();
-            claims.Add(CheckClaim(OAuthClaimNames.GivenName, model.GivenName));
-            claims.Add(CheckClaim(OAuthClaimNames.FamilyName, model.FamilyName));
-            claims.Add(CheckClaim(OAuthClaimNames.Email, model.Email));
-            return claims;
-        }
-
-        /*
          * Return a claim object, checking that it exists first
          */
         private static Claim CheckClaim(string name, string value)

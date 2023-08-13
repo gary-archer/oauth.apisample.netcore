@@ -9,9 +9,9 @@
     using SampleApi.Logic.Claims;
     using SampleApi.Logic.Repositories;
     using SampleApi.Logic.Utilities;
+    using SampleApi.Plumbing.Dependencies;
     using SampleApi.Plumbing.Logging;
     using SampleApi.Plumbing.Middleware;
-    using SampleApi.Plumbing.Security;
 
     /*
      * The application startup class configures authentication and authorization

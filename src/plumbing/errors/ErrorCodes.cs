@@ -15,10 +15,6 @@
 
         public static readonly string InsufficientScope = "insufficient_scope";
 
-        public static readonly string UserInfoFailure = "userinfo_failure";
-
-        public static readonly string UserInfoTokenExpired = "invalid_token";
-
         public static readonly string ExceptionSimulation = "exception_simulation";
     }
 }

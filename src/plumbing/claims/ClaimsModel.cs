@@ -19,13 +19,6 @@ namespace SampleApi.Plumbing.Claims
 
         public string Sub { get; set; }
 
-        // User info claims
-        public string GivenName { get; set; }
-
-        public string FamilyName { get; set; }
-
-        public string Email { get; set; }
-
         // Custom claims
         public string UserId { get; set; }
 

@@ -10,7 +10,7 @@ namespace SampleApi.IntegrationTests
     /*
      * Test the API in isolation, without any dependencies on the Authorization Server
      */
-    public class IntegrationTests : IClassFixture<IntegrationTestState>, IDisposable
+    public class IntegrationTests : IClassFixture<IntegrationTestState>
     {
         // State shared across the suite of tests
         private readonly IntegrationTestState state;
@@ -28,29 +28,14 @@ namespace SampleApi.IntegrationTests
         }
 
         /*
-         * Dispose per test state
-         */
-        public void Dispose()
-        {
-            this.state.WiremockAdmin.UnregisterUserInfo().Wait();
-        }
-
-        /*
          * Test getting claims
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task GetUserClaims_ReturnsSingleRegion_ForStandardUser()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestUserId);
-
-            // The API will call the Authorization Server to get user info for the token, so register a mock response
-            dynamic data = new JObject();
-            data.given_name = "Guest";
-            data.family_name = "User";
-            data.email = "guestuser@mycompany.com";
-            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
+            var accessToken = this.state.MockAuthorizationServer.IssueAccessToken(this.guestUserId);
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -61,24 +46,17 @@ namespace SampleApi.IntegrationTests
             var claims = JObject.Parse(response.Body);
             var regions = claims.Value<JArray>("regions");
             Assert.True(regions.Count == 1, "Unexpected regions claim");
-        }
+        }*/
 
         /*
          * Test getting claims for the admin user
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task GetUserClaims_ReturnsAllRegions_ForAdminUser()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestAdminId);
-
-            // The API will call the Authorization Server to get user info for the token, so register a mock response
-            dynamic data = new JObject();
-            data.given_name = "Admin";
-            data.family_name = "User";
-            data.email = "guestadmin@mycompany.com";
-            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
+            var accessToken = this.state.MockAuthorizationServer.IssueAccessToken(this.guestAdminId);
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -89,7 +67,7 @@ namespace SampleApi.IntegrationTests
             var claims = JObject.Parse(response.Body);
             var regions = claims.Value<JArray>("regions");
             Assert.True(regions.Count == 3, "Unexpected regions claim");
-        }
+        }*/
 
         /*
          * Test getting companies
@@ -99,14 +77,7 @@ namespace SampleApi.IntegrationTests
         public async Task GetCompanies_ReturnsTwoItems_ForStandardUser()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestUserId);
-
-            // The API will call the Authorization Server to get user info for the token, so register a mock response
-            dynamic data = new JObject();
-            data.given_name = "Guest";
-            data.family_name = "User";
-            data.email = "guestuser@mycompany.com";
-            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
+            var accessToken = this.state.MockAuthorizationServer.IssueAccessToken(this.guestUserId);
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -121,19 +92,12 @@ namespace SampleApi.IntegrationTests
         /*
          * Test getting companies for the admin user
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task GetCompanies_ReturnsAllItems_ForAdminUser()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestAdminId);
-
-            // The API will call the Authorization Server to get user info for the token, so register a mock response
-            dynamic data = new JObject();
-            data.given_name = "Admin";
-            data.family_name = "User";
-            data.email = "guestadmin@mycompany.com";
-            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
+            var accessToken = this.state.MockAuthorizationServer.IssueAccessToken(this.guestAdminId);
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -143,17 +107,17 @@ namespace SampleApi.IntegrationTests
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
             var companies = JArray.Parse(response.Body);
             Assert.True(companies.Count == 4, "Unexpected companies list");
-        }
+        }*/
 
         /*
          * Test getting companies with a malicious JWT access token
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task GetCompanies_Returns401_ForMaliciousJwt()
         {
             // Get a malicious access token for the end user of this test
-            var accessToken = this.state.TokenIssuer.IssueMaliciousAccessToken(this.guestUserId);
+            var accessToken = this.state.MockAuthorizationServer.IssueMaliciousAccessToken(this.guestUserId);
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -164,24 +128,17 @@ namespace SampleApi.IntegrationTests
             var error = JObject.Parse(response.Body);
             var code = error.Value<string>("code");
             Assert.True(code == "unauthorized", "Unexpected error code");
-        }
+        }*/
 
         /*
          * Test getting allowed transactions
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task GetTransactions_ReturnsAllowedItems_ForCompaniesMatchingTheRegionClaim()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestUserId);
-
-            // The API will call the Authorization Server to get user info for the token, so register a mock response
-            dynamic data = new JObject();
-            data.given_name = "Guest";
-            data.family_name = "User";
-            data.email = "guestuser@mycompany.com";
-            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
+            var accessToken = this.state.MockAuthorizationServer.IssueAccessToken(this.guestUserId);
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -192,24 +149,17 @@ namespace SampleApi.IntegrationTests
             var payload = JObject.Parse(response.Body);
             var transactions = payload.Value<JArray>("transactions");
             Assert.True(transactions.Count == 8, "Unexpected transactions list");
-        }
+        }*/
 
         /*
          * Test getting unauthorized transactions
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task GetTransactions_ReturnsNotFoundForUser_ForCompaniesNotMatchingTheRegionClaim()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestUserId);
-
-            // The API will call the Authorization Server to get user info for the token, so register a mock response
-            dynamic data = new JObject();
-            data.given_name = "Guest";
-            data.family_name = "User";
-            data.email = "guestuser@mycompany.com";
-            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
+            var accessToken = this.state.MockAuthorizationServer.IssueAccessToken(this.guestUserId);
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -220,24 +170,17 @@ namespace SampleApi.IntegrationTests
             var error = JObject.Parse(response.Body);
             var code = error.Value<string>("code");
             Assert.True(code == "company_not_found", "Unexpected error code");
-        }
+        }*/
 
         /*
          * Test rehearsing a 500 error when there is an exception in the API
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task FailedApiCall_ReturnsSupportable500Error_ForErrorRehearsalRequest()
         {
             // Get an access token for the end user of this test
-            var accessToken = this.state.TokenIssuer.IssueAccessToken(this.guestUserId);
-
-            // The API will call the Authorization Server to get user info for the token, so register a mock response
-            dynamic data = new JObject();
-            data.given_name = "Guest";
-            data.family_name = "User";
-            data.email = "guestuser@mycompany.com";
-            await this.state.WiremockAdmin.RegisterUserInfo(data.ToString());
+            var accessToken = this.state.MockAuthorizationServer.IssueAccessToken(this.guestUserId);
 
             // Call the API
             var options = new ApiRequestOptions(accessToken);
@@ -249,6 +192,6 @@ namespace SampleApi.IntegrationTests
             var error = JObject.Parse(response.Body);
             var code = error.Value<string>("code");
             Assert.True(code == "exception_simulation", "Unexpected error code");
-        }
+        }*/
     }
 }

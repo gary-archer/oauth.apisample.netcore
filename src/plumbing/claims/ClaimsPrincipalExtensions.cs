@@ -28,21 +28,6 @@ namespace SampleApi.Plumbing.Claims
             return Convert.ToInt32(expValue, CultureInfo.InvariantCulture);
         }
 
-        public static string GetGivenName(this ClaimsPrincipal principal)
-        {
-            return principal.ReadStringClaim(OAuthClaimNames.GivenName).Value;
-        }
-
-        public static string GetFamilyName(this ClaimsPrincipal principal)
-        {
-            return principal.ReadStringClaim(OAuthClaimNames.FamilyName).Value;
-        }
-
-        public static string GetEmail(this ClaimsPrincipal principal)
-        {
-            return principal.ReadStringClaim(OAuthClaimNames.Email).Value;
-        }
-
         public static Claim ReadStringClaim(this ClaimsPrincipal principal, string name)
         {
             var found = principal.Claims.FirstOrDefault(c => c.Type == name);

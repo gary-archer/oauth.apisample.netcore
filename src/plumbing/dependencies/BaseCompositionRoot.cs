@@ -1,4 +1,4 @@
-﻿namespace SampleApi.Host.Startup
+﻿namespace SampleApi.Plumbing.Dependencies
 {
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Distributed;
@@ -7,7 +7,6 @@
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Logging;
     using SampleApi.Plumbing.OAuth;
-    using SampleApi.Plumbing.OAuth.ClaimsCaching;
     using SampleApi.Plumbing.Utilities;
 
     /*
@@ -107,39 +106,39 @@
         }
 
         /*
-         * Register OAuth dependencies
+         * Register dependencies used for OAuth processing
          */
         private void RegisterOAuthDependencies(IDistributedCache cache)
         {
+            // Register the configuration
             this.services.AddSingleton(this.oauthConfiguration);
-            this.services.AddScoped<OAuthAuthorizer>();
-            this.services.AddScoped<AccessTokenValidator>();
 
-            // JWKS keys are stored in a thread safe cache
+            // Create the main objects for validating tokens and creating the claims principal
+            this.services.AddScoped<AccessTokenValidator>();
+            this.services.AddScoped<OAuthAuthorizer>();
+
+            // Register a singleton to store JWKS keys in a thread safe cache
             var jwksCache = new JwksCache(cache);
             this.services.AddSingleton(new JsonWebKeyResolver(this.oauthConfiguration, jwksCache, this.httpProxy));
         }
 
         /*
-         * Register Claims related dependencies
+         * Register claims related dependencies
          */
         private void RegisterClaimsDependencies(IDistributedCache cache, ServiceProvider container)
         {
             // Register an object to provide custom claims
             this.services.AddSingleton(this.customClaimsProvider);
 
+            // Create the singleton cache
+            var claimsCache = new ClaimsCache(
+                cache,
+                this.oauthConfiguration.ClaimsCacheTimeToLiveMinutes,
+                container);
+            this.services.AddSingleton(claimsCache);
+
             // Make the claims principal injectable
             this.services.AddScoped(ctx => ctx.GetService<IHttpContextAccessor>().HttpContext.User);
-
-            // Register extra objects if using claims caching
-            if (this.oauthConfiguration.ClaimsStrategy == "apiLookup")
-            {
-                var claimsCache = new ClaimsCache(
-                    cache,
-                    this.oauthConfiguration.ClaimsCacheTimeToLiveMinutes,
-                    container);
-                this.services.AddSingleton(claimsCache);
-            }
         }
     }
 }

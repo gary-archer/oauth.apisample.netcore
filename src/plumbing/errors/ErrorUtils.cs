@@ -1,7 +1,6 @@
 ﻿namespace SampleApi.Plumbing.Errors
 {
     using System;
-    using System.Collections.Generic;
 
     /*
      * A class to manage error translation
@@ -93,73 +92,6 @@
             // Record the details behind the verification error
             var context = $"JWT verification failed: {ex.Message}";
             throw ErrorFactory.CreateClient401Error(context);
-        }
-
-        /*
-         * Report user info failures clearly
-         */
-        public static Exception FromUserInfoError(int status, string responseData, string url)
-        {
-            // Add base details
-            var parts = new List<string>();
-            parts.Add("User info lookup failed");
-            parts.Add($"Status: {status}");
-
-            // Read the standard OAuth error fields
-            var json = ErrorResponseReader.ReadJson(responseData);
-            if (json != null)
-            {
-                var code = json.GetValue("error");
-                if (code != null)
-                {
-                    parts.Add($"Code: {code}");
-                }
-
-                var description = json.GetValue("error_description");
-                if (description != null)
-                {
-                    parts.Add($"Description: {description}");
-                }
-            }
-
-            // Finalize details
-            parts.Add($"URL: {url}");
-            var details = string.Join(", ", parts);
-
-            // If there is a race condition and the access token is expired return a 401
-            if (status == 401)
-            {
-                return ErrorFactory.CreateClient401Error(details);
-            }
-
-            // Otherwise return a 500
-            var error = ErrorFactory.CreateServerError(
-                ErrorCodes.UserInfoFailure,
-                "User info lookup failed");
-            error.SetDetails(details);
-            return error;
-        }
-
-        /*
-         * Report connectivity exceptions trying to downloading user info
-         */
-        public static Exception FromUserInfoError(Exception ex, string url)
-        {
-            // Avoid reprocessing
-            var serverError = TryConvertToServerError(ex);
-            if (serverError != null)
-            {
-                return serverError;
-            }
-
-            var clientError = TryConvertToClientError(ex);
-            if (clientError != null)
-            {
-                return clientError;
-            }
-
-            // Create the error
-            return CreateServerError(ex, ErrorCodes.UserInfoFailure,  "User info lookup failed");
         }
 
         /*

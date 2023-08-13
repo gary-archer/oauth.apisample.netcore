@@ -1,4 +1,4 @@
-namespace SampleApi.Plumbing.Security
+namespace SampleApi.Plumbing.Middleware
 {
     using System;
     using System.Collections.Generic;
@@ -9,10 +9,11 @@ namespace SampleApi.Plumbing.Security
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
+    using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
     using SampleApi.Plumbing.Logging;
     using SampleApi.Plumbing.Middleware;
-    using SampleApi.Plumbing.OAuth.ClaimsCaching;
+    using SampleApi.Plumbing.OAuth;
     using SampleApi.Plumbing.Utilities;
 
     /*

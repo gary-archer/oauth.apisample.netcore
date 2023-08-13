@@ -29,19 +29,16 @@
         "Microsoft": "Warning",
         "Microsoft.AspNetCore.Server.Kestrel": "Error",
         "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
-        "SampleApi.Plumbing.Security.CustomAuthenticationHandler": "Error",
-        "SampleApi.Plumbing.OAuth.ClaimsCaching.ClaimsCache": "Info"
+        "SampleApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",
+        "SampleApi.Plumbing.Claims.ClaimsCache": "Info"
       }
     }
   },
   "oauth": {
-    "issuer":       "testissuer.com",
-    "audience":     "api.mycompany.com",
-    "jwksEndpoint": "https://login.authsamples-dev.com:3447/.well-known/jwks.json",
-    "claimsStrategy": "apiLookup",
-    "claimsCache": {
-      "userInfoEndpoint":   "https://login.authsamples-dev.com:3447/oauth2/userInfo",
-      "timeToLiveMinutes":  15
-    }
+    "issuer":                       "https://login.authsamples-dev.com",
+    "audience":                     "api.mycompany.com",
+    "scope":                        "investments",
+    "jwksEndpoint":                 "https://login.authsamples-dev.com:3447/.well-known/jwks.json",
+    "claimsCacheTimeToLiveMinutes": 15
   }
 }

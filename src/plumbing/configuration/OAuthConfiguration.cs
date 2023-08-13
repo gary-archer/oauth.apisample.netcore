@@ -17,9 +17,6 @@ namespace SampleApi.Plumbing.Configuration
         // The endpoint from which to download the token signing public key
         public string JwksEndpoint { get; set; }
 
-        // The strategy for domain specific claims, either 'jwt' or 'apiLookup'
-        public string ClaimsStrategy { get; set; }
-
         // Optional claims caching configuration
         public int ClaimsCacheTimeToLiveMinutes { get; set; }
     }

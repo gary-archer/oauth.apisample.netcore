@@ -1,0 +1,171 @@
+namespace SampleApi.Test.Utils
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Security.Cryptography;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Jose;
+    using Newtonsoft.Json.Linq;
+    using SampleApi.Plumbing.Utilities;
+
+    /*
+     * A mock authorization server implemented with wiremock and a JOSE library
+     */
+    public class MockAuthorizationServer : IDisposable
+    {
+        private readonly string baseUrl;
+        private readonly string jsonWebKeysId;
+        private readonly HttpProxy httpProxy;
+        private readonly string algorithm;
+        private readonly RSA rsa;
+        private readonly Jwk tokenSigningPrivateKey;
+        private readonly Jwk tokenSigningPublicKey;
+        private readonly string keyId;
+
+        public MockAuthorizationServer(bool useProxy = false)
+        {
+            this.baseUrl = "https://login.authsamples-dev.com:3447/__admin/mappings";
+            this.jsonWebKeysId = Guid.NewGuid().ToString();
+            this.httpProxy = new HttpProxy(useProxy, "http://127.0.0.1:8888");
+
+            this.algorithm = "RS256";
+            this.keyId = Guid.NewGuid().ToString();
+
+            this.rsa = RSA.Create(2048);
+
+            this.tokenSigningPrivateKey = new Jwk(this.rsa, true);
+            this.tokenSigningPrivateKey.Alg = this.algorithm;
+            this.tokenSigningPrivateKey.KeyId = this.keyId;
+
+            this.tokenSigningPublicKey = new Jwk(this.rsa, false);
+            this.tokenSigningPublicKey.Alg = this.algorithm;
+            this.tokenSigningPublicKey.KeyId = this.keyId;
+        }
+
+        public void Start()
+        {
+            var keyset = this.GetTokenSigningPublicKeys();
+            this.RegisterJsonWebWeys(keyset).Wait();
+
+        }
+
+        public void Stop()
+        {
+            this.UnregisterJsonWebWeys().Wait();
+        }
+
+        /*
+         * Get the token signing public keys as a JSON Web Keyset
+         */
+        public string GetTokenSigningPublicKeys()
+        {
+            var keyset = new JwkSet(this.tokenSigningPublicKey);
+            return keyset.ToJson(JWT.DefaultSettings.JsonMapper);
+        }
+
+        /*
+         * Issue an access token with the supplied subject claim
+         */
+        public string IssueAccessToken(string subject, Jwk jwk = null)
+        {
+            var now = DateTimeOffset.Now;
+            var iat = now.AddMinutes(-30);
+            var exp = now.AddMinutes(30);
+
+            var headers = new Dictionary<string, object>()
+            {
+                { "kid", this.keyId },
+            };
+
+            var payload = new Dictionary<string, object>()
+            {
+                { "sub", subject },
+                { "iss", "https://login.authsamples-dev.com" },
+                { "aud", "api.mycompany.com" },
+                { "iat", iat.ToUnixTimeSeconds() },
+                { "exp", exp.ToUnixTimeSeconds() },
+                { "scope", "openid profile investments" },
+            };
+
+            return Jose.JWT.Encode(payload, this.tokenSigningPrivateKey, JwsAlgorithm.RS256, headers);
+        }
+
+        /*
+         * Dispose the internal key
+         */
+        public void Dispose()
+        {
+            this.rsa.Dispose();
+        }
+
+        /*
+         * Register our test JWKS values at the start of the test suite
+         */
+        private async Task RegisterJsonWebWeys(string keysJson)
+        {
+            dynamic data = new JObject();
+            data.Guid = this.jsonWebKeysId;
+            data.Priority = 1;
+
+            dynamic request = new JObject();
+            request.Path = "/.well-known/jwks.json";
+
+            dynamic methods = new JArray();
+            methods.Add("get");
+            request.Methods = methods;
+
+            data.Request = request;
+
+            dynamic response = new JObject();
+            response.StatusCode = 200;
+            response.Body = keysJson;
+            data.Response = response;
+
+            await this.Register(data.ToString());
+        }
+
+        /*
+         * Unregister our test JWKS values at the end of the test suite
+         */
+        private async Task UnregisterJsonWebWeys()
+        {
+            await this.Unregister(this.jsonWebKeysId);
+        }
+
+        /*
+         * Add a stubbed response to Wiremock via its Admin API
+         */
+        private async Task Register(string stubbedResponse)
+        {
+            using (var client = new HttpClient(this.httpProxy.GetHandler()))
+            {
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var request = new HttpRequestMessage(HttpMethod.Post, this.baseUrl);
+                request.Content = new StringContent(stubbedResponse, Encoding.UTF8, "application/json");
+
+                var response = await client.SendAsync(request);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var status = (int)response.StatusCode;
+                    var text = await response.Content.ReadAsStringAsync();
+                    throw new InvalidOperationException($"Register call failed: {status}");
+                }
+            }
+        }
+
+        /*
+         * Delete a stubbed response from Wiremock via its Admin API
+         */
+        private async Task Unregister(string id)
+        {
+            using (var client = new HttpClient(this.httpProxy.GetHandler()))
+            {
+                var request = new HttpRequestMessage(HttpMethod.Delete, $"{this.baseUrl}/{id}");
+                await client.SendAsync(request);
+            }
+        }
+    }
+}

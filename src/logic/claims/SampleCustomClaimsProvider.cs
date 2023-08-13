@@ -17,7 +17,7 @@ namespace SampleApi.Logic.Claims
         #pragma warning disable 1998
         public override IEnumerable<Claim> GetFromPayload(ClaimsModel claimsModel)
         {
-            return this.Get(claimsModel.Sub, claimsModel.Email);
+            return this.Get(claimsModel.Sub, string.Empty);
         }
         #pragma warning restore 1998
 

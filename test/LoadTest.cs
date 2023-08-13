@@ -13,8 +13,7 @@ namespace SampleApi.Test
      */
     public class LoadTest : IDisposable
     {
-        private readonly TokenIssuer tokenIssuer;
-        private readonly WiremockAdmin wiremockAdmin;
+        private readonly MockAuthorizationServer mockAuthorizationServer;
         private readonly ApiClient apiClient;
         private readonly string sessionId;
         private readonly string guestUserId;
@@ -26,18 +25,9 @@ namespace SampleApi.Test
          */
         public LoadTest()
         {
-            // Create the token issuer for these tests and issue some mock token signing keys
-            this.wiremockAdmin = new WiremockAdmin(false);
-            this.tokenIssuer = new TokenIssuer();
-            var keyset = this.tokenIssuer.GetTokenSigningPublicKeys();
-            this.wiremockAdmin.RegisterJsonWebWeys(keyset).Wait();
-
-            // The API will call the Authorization Server to get user info for the token, so register a mock response
-            dynamic data = new JObject();
-            data.given_name = "Guest";
-            data.family_name = "User";
-            data.email = "guestuser@mycompany.com";
-            this.wiremockAdmin.RegisterUserInfo(data.ToString()).Wait();
+            // Create the mock authorization server, which enables productive API tests
+            this.mockAuthorizationServer = new MockAuthorizationServer();
+            this.mockAuthorizationServer.Start();
 
             // Create the API client
             var apiBaseUrl = "https://apilocal.authsamples-dev.com:3446";
@@ -55,9 +45,8 @@ namespace SampleApi.Test
          */
         public void Dispose()
         {
-            this.tokenIssuer.Dispose();
-            this.wiremockAdmin.UnregisterJsonWebWeys().Wait();
-            this.wiremockAdmin.UnregisterUserInfo().Wait();
+            this.mockAuthorizationServer.Stop();
+            this.mockAuthorizationServer.Dispose();
         }
 
         /*
@@ -107,7 +96,7 @@ namespace SampleApi.Test
             var tokens = new List<string>();
             for (int index = 0; index < 5; index++)
             {
-                tokens.Add(this.tokenIssuer.IssueAccessToken(this.guestUserId));
+                tokens.Add(this.mockAuthorizationServer.IssueAccessToken(this.guestUserId));
             }
 
             return tokens;

@@ -35,7 +35,7 @@ namespace SampleApi.Plumbing.OAuth
          */
         public async Task<ClaimsModel> ValidateTokenAsync(string accessToken)
         {
-            using (this.logEntry.CreatePerformanceBreakdown("userInfoLookup"))
+            using (this.logEntry.CreatePerformanceBreakdown("tokenValidator"))
             {
                 try
                 {
