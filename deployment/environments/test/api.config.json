@@ -1,6 +1,6 @@
 {
   "api": {
-    "port": 3446,
+    "port": 446,
     "sslCertificateFileName": "../../../certs/authsamples-dev.ssl.p12",
     "sslCertificatePassword": "Password1",
     "useProxy": false,
@@ -38,7 +38,7 @@
     "issuer":                       "https://login.authsamples-dev.com",
     "audience":                     "api.mycompany.com",
     "scope":                        "investments",
-    "jwksEndpoint":                 "https://login.authsamples-dev.com:3447/.well-known/jwks.json",
+    "jwksEndpoint":                 "https://login.authsamples-dev.com:447/.well-known/jwks.json",
     "claimsCacheTimeToLiveMinutes": 15
   }
 }

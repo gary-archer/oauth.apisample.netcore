@@ -25,7 +25,7 @@ namespace SampleApi.Test.Utils
 
         public MockAuthorizationServer(bool useProxy = false)
         {
-            this.adminBaseUrl = "https://login.authsamples-dev.com:3447/__admin/mappings";
+            this.adminBaseUrl = "https://login.authsamples-dev.com:447/__admin/mappings";
             this.httpProxy = new HttpProxy(useProxy, "http://127.0.0.1:8888");
 
             var algorithm = "RS256";

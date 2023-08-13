@@ -21,7 +21,7 @@ fi
 
 #
 # Run Wiremock over HTTPS in this terminal
-# On Linux ensure that you have first granted wiremock permissions to listen on port 3447:
+# On Linux ensure that you have first granted wiremock permissions to listen on port 447:
 # - sudo setcap 'cap_net_bind_service=+ep' ./wiremock/bin/Debug/net7.0/wiremock
 #
 dotnet run

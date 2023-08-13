@@ -3,7 +3,6 @@ namespace SampleApi.Plumbing.Claims
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Runtime.InteropServices;
     using System.Security.Claims;
     using Newtonsoft.Json.Linq;
 
@@ -91,8 +90,7 @@ namespace SampleApi.Plumbing.Claims
          */
         public string GetOptionalStringClaim(string name)
         {
-            var claim = ClaimsReader.GetOptionalStringClaim(this.payload, name);
-            return claim == null ? null : claim.Value<string>();
+            return ClaimsReader.GetOptionalStringClaim(this.payload, name);
         }
 
         /*
@@ -102,18 +100,21 @@ namespace SampleApi.Plumbing.Claims
         {
             var results = new List<string>();
 
-            var aud = ClaimsReader.GetClaim(this.payload, OAuthClaimNames.Audience);
-            if (aud is JArray)
+            var aud = ClaimsReader.GetOptionalClaim(this.payload, OAuthClaimNames.Audience);
+            if (aud != null)
             {
-                var audiences = aud as JArray;
-                foreach (var audience in audiences)
+                if (aud is JArray)
                 {
-                    results.Add(audience.Value<string>());
+                    var audiences = aud as JArray;
+                    foreach (var audience in audiences)
+                    {
+                        results.Add(audience.Value<string>());
+                    }
                 }
-            }
-            else
-            {
-                results.Add(aud.Value<string>());
+                else
+                {
+                    results.Add(aud.Value<string>());
+                }
             }
 
             return results;

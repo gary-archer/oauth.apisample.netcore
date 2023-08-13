@@ -31,7 +31,7 @@
     "issuer":                       "https://login.authsamples-dev.com",
     "audience":                     "api.mycompany.com",
     "scope":                        "investments",
-    "jwksEndpoint":                 "https://login.authsamples-dev.com:3447/.well-known/jwks.json",
+    "jwksEndpoint":                 "https://login.authsamples-dev.com:447/.well-known/jwks.json",
     "claimsCacheTimeToLiveMinutes": 15
   }
 }

@@ -36,7 +36,7 @@ namespace SampleApi.IntegrationTests
         public async Task CallApi_Returns401_ForMissingJwt()
         {
             // Call the API and ensure a 401 response
-            var options = new ApiRequestOptions("2");
+            var options = new ApiRequestOptions(string.Empty);
             var response = await this.state.ApiClient.GetCompanies(options);
 
             // Assert expected results
