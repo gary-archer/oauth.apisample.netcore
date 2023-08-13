@@ -18,7 +18,7 @@ fi
 #
 # Ensure that the development configuration is used
 #
-#cp deployment/environments/dev/api.config.json ./api.config.json
+cp deployment/environments/dev/api.config.json ./api.config.json
 
 #
 # Build the app
@@ -41,7 +41,7 @@ fi
 
 #
 # Then start listening
-# On Linux ensure that you have first granted the API permissions to listen on port 446:
+# On Linux ensure that you have first granted the API permissions to listen on port 3446:
 # - sudo setcap 'cap_net_bind_service=+ep' ./bin/Debug/net7.0/sampleapi
 #
 dotnet run

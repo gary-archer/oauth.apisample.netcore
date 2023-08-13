@@ -9,7 +9,7 @@ class Program
     {
         var settings = new WireMockServerSettings
         {
-            Urls = new [] { "https://login.authsamples-dev.com:447" },
+            Urls = new [] { "https://login.authsamples-dev.com:3447" },
             CertificateSettings = new WireMockCertificateSettings
             {
                 X509CertificateFilePath = "../certs/authsamples-dev.ssl.p12",
@@ -21,7 +21,7 @@ class Program
         };
 
         StandAloneApp.Start(settings);
-        Console.WriteLine("Wiremock is listening on port 447 ...");
+        Console.WriteLine("Wiremock is listening on port 3447 ...");
         Console.ReadKey();
     }
 }

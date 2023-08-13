@@ -12,17 +12,7 @@ namespace SampleApi.Logic.Claims
     public class SampleCustomClaimsProvider : CustomClaimsProvider
     {
         /*
-         * When using the StandardAuthorizer this is called at the time of token issuance
-         */
-        #pragma warning disable 1998
-        public override async Task<IEnumerable<Claim>> IssueAsync(string subject, string email)
-        {
-            return this.Get(subject, email);
-        }
-        #pragma warning restore 1998
-
-        /*
-         * When using the StandardAuthorizer, this is called to read claims from the access token
+         * This is called to read claims from the access token
          */
         #pragma warning disable 1998
         public override IEnumerable<Claim> GetFromPayload(ClaimsModel claimsModel)

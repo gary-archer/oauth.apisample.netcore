@@ -40,7 +40,7 @@ namespace SampleApi.Test
             this.wiremockAdmin.RegisterUserInfo(data.ToString()).Wait();
 
             // Create the API client
-            var apiBaseUrl = "https://apilocal.authsamples-dev.com:446";
+            var apiBaseUrl = "https://apilocal.authsamples-dev.com:3446";
             this.sessionId = Guid.NewGuid().ToString();
             this.apiClient = new ApiClient(apiBaseUrl, "LoadTest", this.sessionId);
 

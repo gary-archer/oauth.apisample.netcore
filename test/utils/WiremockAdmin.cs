@@ -21,7 +21,7 @@ namespace SampleApi.Test.Utils
 
         public WiremockAdmin(bool useProxy)
         {
-            this.baseUrl = "https://login.authsamples-dev.com:447/__admin/mappings";
+            this.baseUrl = "https://login.authsamples-dev.com:3447/__admin/mappings";
             this.jsonWebKeysId = Guid.NewGuid().ToString();
             this.userInfoId = Guid.NewGuid().ToString();
             this.httpProxy = new HttpProxy(useProxy, "http://127.0.0.1:8888");

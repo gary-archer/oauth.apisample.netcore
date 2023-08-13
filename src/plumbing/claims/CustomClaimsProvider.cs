@@ -10,17 +10,7 @@
     public class CustomClaimsProvider
     {
         /*
-         * When using the StandardAuthorizer this is called at the time of token issuance
-         */
-        #pragma warning disable 1998
-        public virtual async Task<IEnumerable<Claim>> IssueAsync(string subject, string email)
-        {
-            return new List<Claim>();
-        }
-        #pragma warning restore 1998
-
-        /*
-         * When using the StandardAuthorizer, this is called to read claims from the access token
+         * This is called to read claims from the access token
          */
         #pragma warning disable 1998
         public virtual IEnumerable<Claim> GetFromPayload(ClaimsModel claimsModel)

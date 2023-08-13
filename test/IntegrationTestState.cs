@@ -21,7 +21,7 @@ namespace SampleApi.IntegrationTests
             this.WiremockAdmin.RegisterJsonWebWeys(keyset).Wait();
 
             // Create the API client
-            var apiBaseUrl = "https://apilocal.authsamples-dev.com:446";
+            var apiBaseUrl = "https://apilocal.authsamples-dev.com:3446";
             var sessionId = Guid.NewGuid().ToString();
             this.ApiClient = new ApiClient(apiBaseUrl, "IntegrationTests", sessionId);
         }

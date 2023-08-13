@@ -1,6 +1,6 @@
 {
   "api": {
-    "port": 3000,
+    "port": 3446,
     "sslCertificateFileName": "../../../certs/authsamples-dev.ssl.p12",
     "sslCertificatePassword": "Password1",
     "useProxy": false,
