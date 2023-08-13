@@ -92,9 +92,9 @@ namespace SampleApi.Plumbing.Logging
         /*
          * Add identity details for secured requests
          */
-        public void SetIdentity(ClaimsPrincipal claims)
+        public void SetIdentity(string subject)
         {
-            this.data.UserId = claims.GetSubject();
+            this.data.UserId = subject;
         }
 
         /*

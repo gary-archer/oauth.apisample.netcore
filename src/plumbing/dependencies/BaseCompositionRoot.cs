@@ -15,7 +15,7 @@
     public sealed class BaseCompositionRoot
     {
         private OAuthConfiguration oauthConfiguration;
-        private CustomClaimsProvider customClaimsProvider;
+        private ExtraClaimsProvider extraClaimsProvider;
         private LoggingConfiguration loggingConfiguration;
         private LoggerFactory loggerFactory;
         private HttpProxy httpProxy;
@@ -33,9 +33,9 @@
         /*
          * Receive an object to manage processing claims
          */
-        public BaseCompositionRoot WithCustomClaimsProvider(CustomClaimsProvider customClaimsProvider)
+        public BaseCompositionRoot WithExtraClaimsProvider(ExtraClaimsProvider extraClaimsProvider)
         {
-            this.customClaimsProvider = customClaimsProvider;
+            this.extraClaimsProvider = extraClaimsProvider;
             return this;
         }
 
@@ -127,18 +127,20 @@
          */
         private void RegisterClaimsDependencies(IDistributedCache cache, ServiceProvider container)
         {
-            // Register an object to provide custom claims
-            this.services.AddSingleton(this.customClaimsProvider);
+            // Register an object to provide extra claims
+            this.services.AddSingleton(this.extraClaimsProvider);
 
             // Create the singleton cache
             var claimsCache = new ClaimsCache(
                 cache,
+                this.extraClaimsProvider,
                 this.oauthConfiguration.ClaimsCacheTimeToLiveMinutes,
                 container);
             this.services.AddSingleton(claimsCache);
 
             // Make the claims principal injectable
-            this.services.AddScoped(ctx => ctx.GetService<IHttpContextAccessor>().HttpContext.User);
+            this.services.AddScoped(ctx =>
+                ctx.GetService<IHttpContextAccessor>().HttpContext.User as CustomClaimsPrincipal);
         }
     }
 }
