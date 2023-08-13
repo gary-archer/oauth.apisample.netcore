@@ -1,9 +1,9 @@
 namespace SampleApi.Logic.Claims
 {
     /*
-     * Claim names from the Authorization Server
+     * Extra claims that may be looked up in the API
      */
-    public static class CustomClaimNames
+    public static class ExtraClaimNames
     {
         public static readonly string ManagerId = "manager_id";
         public static readonly string Role = "role";

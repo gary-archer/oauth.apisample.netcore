@@ -7,16 +7,17 @@ namespace SampleApi.Host.Controllers
     using SampleApi.Plumbing.Claims;
 
     /*
-     * A simple API controller to serve user info
+     * Return user info from the business data to the client
+     * Clients call the authorization server's user info endpoint to get OAuth user attributes
      */
     [Route("investments/userinfo")]
     public class UserInfoController : Controller
     {
         /*
-         * Return user info to the UI
+         * Return attributes that are not stored in the authorization server that the UI needs
          */
         [HttpGet("")]
-        public ClientUserInfo GetUserClaims()
+        public ClientUserInfo GetUserInfo()
         {
             var claimsPrincipal = this.User as CustomClaimsPrincipal;
             var extraClaims = claimsPrincipal.ExtraClaims as SampleExtraClaims;

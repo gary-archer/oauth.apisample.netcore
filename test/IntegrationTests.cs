@@ -36,7 +36,7 @@ namespace SampleApi.IntegrationTests
         public async Task CallApi_Returns401_ForMissingJwt()
         {
             // Call the API and ensure a 401 response
-            var options = new ApiRequestOptions(string.Empty);
+            var options = new ApiRequestOptions("2");
             var response = await this.state.ApiClient.GetCompanies(options);
 
             // Assert expected results
@@ -229,7 +229,7 @@ namespace SampleApi.IntegrationTests
         [Fact]
         [TestOrder(9)]
         [Trait("Category", "Integration")]
-        public async Task GetUserClaims_ReturnsAllRegions_ForAdminUser()
+        public async Task GetUserInfo_ReturnsAllRegions_ForAdminUser()
         {
             // Get an access token for the end user of this test
             var jwtOptions = new MockTokenOptions();

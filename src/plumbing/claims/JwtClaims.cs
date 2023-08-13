@@ -3,6 +3,7 @@ namespace SampleApi.Plumbing.Claims
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Runtime.InteropServices;
     using System.Security.Claims;
     using Newtonsoft.Json.Linq;
 
@@ -11,22 +12,50 @@ namespace SampleApi.Plumbing.Claims
      */
     public class JwtClaims
     {
-        public string Iss { get; set; }
-
-        public object Aud { private get; set; }
-
-        public string Scope { get; set; }
-
-        public string Sub { get; set; }
-
-        public int Exp { get; set; }
+        private readonly JObject payload;
 
         /*
-         * Set the name claim type to the subject claim
+         * Wrap the raw payload
          */
-        public string GetNameClaimType()
+        public JwtClaims(string claimsJson)
         {
-            return OAuthClaimNames.Subject;
+            this.payload = JObject.Parse(claimsJson);
+        }
+
+        /*
+         * Return individual claim values
+         */
+        public string Iss
+        {
+            get
+            {
+                return ClaimsReader.GetStringClaim(this.payload, OAuthClaimNames.Issuer);
+            }
+        }
+
+        public string Scope
+        {
+            get
+            {
+                return ClaimsReader.GetStringClaim(this.payload, OAuthClaimNames.Scope);
+            }
+        }
+
+        public string Sub
+        {
+            get
+            {
+                return ClaimsReader.GetStringClaim(this.payload, OAuthClaimNames.Subject);
+            }
+        }
+
+        public int Exp
+        {
+            get
+            {
+                var exp = ClaimsReader.GetStringClaim(this.payload, OAuthClaimNames.Exp);
+                return Convert.ToInt32(exp, CultureInfo.InvariantCulture);
+            }
         }
 
         /*
@@ -44,15 +73,26 @@ namespace SampleApi.Plumbing.Claims
 
             identity.AddClaim(new Claim(OAuthClaimNames.Scope, this.Scope));
             identity.AddClaim(new Claim(OAuthClaimNames.Subject, this.Sub));
-            identity.AddClaim(new Claim(OAuthClaimNames.Exp, Convert.ToString(this.Exp, CultureInfo.InvariantCulture)));
+
+            var exp = ClaimsReader.GetStringClaim(this.payload, OAuthClaimNames.Exp);
+            identity.AddClaim(new Claim(OAuthClaimNames.Exp, exp));
+        }
+
+        /*
+         * Set the name claim type to the subject claim
+         */
+        public string GetNameClaimType()
+        {
+            return OAuthClaimNames.Subject;
         }
 
         /*
          * Look up an optional claim in the JWT
          */
-        public string GetOptionalClaim(string name)
+        public string GetOptionalStringClaim(string name)
         {
-            return null;
+            var claim = ClaimsReader.GetOptionalStringClaim(this.payload, name);
+            return claim == null ? null : claim.Value<string>();
         }
 
         /*
@@ -62,18 +102,18 @@ namespace SampleApi.Plumbing.Claims
         {
             var results = new List<string>();
 
-            if (this.Aud is string)
+            var aud = ClaimsReader.GetClaim(this.payload, OAuthClaimNames.Audience);
+            if (aud is JArray)
             {
-                results.Add(this.Aud as string);
-            }
-
-            if (this.Aud is JArray)
-            {
-                var audiences = this.Aud as JArray;
+                var audiences = aud as JArray;
                 foreach (var audience in audiences)
                 {
                     results.Add(audience.Value<string>());
                 }
+            }
+            else
+            {
+                results.Add(aud.Value<string>());
             }
 
             return results;

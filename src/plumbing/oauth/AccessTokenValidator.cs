@@ -69,15 +69,8 @@ namespace SampleApi.Plumbing.OAuth
                     throw ErrorUtils.FromTokenValidationError(ex);
                 }
 
-                // Deserialize to an object
-                var settings = new JsonSerializerSettings
-                {
-                    ContractResolver = new DefaultContractResolver
-                    {
-                        NamingStrategy = new SnakeCaseNamingStrategy(),
-                    },
-                };
-                var claims = JsonConvert.DeserializeObject<JwtClaims>(claimsJson, settings);
+                // Save to a claims object
+                var claims = new JwtClaims(claimsJson);
 
                 // Verify the protocol claims according to best practices
                 this.ValidateProtocolClaims(claims);

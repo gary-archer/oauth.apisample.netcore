@@ -1,43 +1,42 @@
 namespace SampleApi.Plumbing.Claims
 {
-    using System.Collections.Generic;
-    using System.Security.Claims;
+    using System.Runtime.CompilerServices;
+    using Newtonsoft.Json.Linq;
     using SampleApi.Plumbing.Errors;
 
     /*
-     * A simple utility class to read claims into objects
+     * A simple utility class to read claim values safely
      */
     public static class ClaimsReader
     {
         /*
-         * Read base claims from the access token
+         * Return a mandatory string claim
          */
-        public static IEnumerable<Claim> ReadJwtClaims(JwtClaims jwtClaims)
+        public static string GetStringClaim(JObject claims, string name)
         {
-            var claims = new List<Claim>();
-            claims.Add(GetClaim(OAuthClaimNames.Subject, jwtClaims.Sub));
-
-            var scopes = jwtClaims.Scope.Split(" ");
-            foreach (var scope in scopes)
-            {
-                claims.Add(GetClaim(OAuthClaimNames.Scope, scope));
-            }
-
-            claims.Add(GetClaim(OAuthClaimNames.Exp, jwtClaims.Exp.ToString()));
-            return claims;
+            return GetClaim(claims, name).Value<string>();
         }
 
         /*
-         * Return a claim object, checking that it exists first
+         * Return an optional string claim
          */
-        private static Claim GetClaim(string name, string value)
+        public static JToken GetOptionalStringClaim(JObject claims, string name)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            return claims.GetValue(name);
+        }
+
+        /*
+         * Get a claim of any type, checking that it exists first
+         */
+        public static JToken GetClaim(JObject claims, string name)
+        {
+            var claim = claims.GetValue(name);
+            if (claim == null)
             {
                 throw ErrorUtils.FromMissingClaim(name);
             }
 
-            return new Claim(name, value);
+            return claim.Value<string>();
         }
     }
 }

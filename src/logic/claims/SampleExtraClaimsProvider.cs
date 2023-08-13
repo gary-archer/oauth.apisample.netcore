@@ -46,7 +46,7 @@ namespace SampleApi.Logic.Claims
          */
         private string GetManagerId(JwtClaims jwtClaims)
         {
-            var managerId = jwtClaims.GetOptionalClaim(CustomClaimNames.ManagerId);
+            var managerId = jwtClaims.GetOptionalStringClaim(ExtraClaimNames.ManagerId);
             if (!string.IsNullOrWhiteSpace(managerId))
             {
                 // The preferred option is for the API to receive the business user identity in the JWT access token

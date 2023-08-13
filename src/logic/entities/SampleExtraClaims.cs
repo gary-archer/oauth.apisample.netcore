@@ -32,9 +32,9 @@ namespace SampleApi.Logic.Claims
          */
         public static new SampleExtraClaims ImportData(JObject data)
         {
-            var managerId = data.GetValue(CustomClaimNames.ManagerId).Value<string>();
-            var role = data.GetValue(CustomClaimNames.Role).Value<string>();
-            var regionNodes = data.GetValue(CustomClaimNames.Regions).Value<JArray>();
+            var managerId = data.GetValue(ExtraClaimNames.ManagerId).Value<string>();
+            var role = data.GetValue(ExtraClaimNames.Role).Value<string>();
+            var regionNodes = data.GetValue(ExtraClaimNames.Regions).Value<JArray>();
 
             var regionsList = new List<string>();
             foreach (var regionNode in regionNodes)
@@ -69,12 +69,12 @@ namespace SampleApi.Logic.Claims
          */
         public override void AddClaims(ClaimsIdentity identity)
         {
-            identity.AddClaim(new Claim(CustomClaimNames.ManagerId, this.ManagerId));
-            identity.AddClaim(new Claim(CustomClaimNames.Role, this.Role));
+            identity.AddClaim(new Claim(ExtraClaimNames.ManagerId, this.ManagerId));
+            identity.AddClaim(new Claim(ExtraClaimNames.Role, this.Role));
 
             foreach (var region in this.Regions)
             {
-                identity.AddClaim(new Claim(CustomClaimNames.Regions, region));
+                identity.AddClaim(new Claim(ExtraClaimNames.Regions, region));
             }
         }
 
@@ -83,7 +83,7 @@ namespace SampleApi.Logic.Claims
          */
         public override string GetRoleClaimType()
         {
-            return CustomClaimNames.Role;
+            return ExtraClaimNames.Role;
         }
     }
 }
