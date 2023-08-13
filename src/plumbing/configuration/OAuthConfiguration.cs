@@ -11,6 +11,9 @@ namespace SampleApi.Plumbing.Configuration
         // The expected audience in JWT access tokens received
         public string Audience { get; set; }
 
+        // A required scope to call the API
+        public string Scope { get; set; }
+
         // The endpoint from which to download the token signing public key
         public string JwksEndpoint { get; set; }
 
@@ -18,6 +21,6 @@ namespace SampleApi.Plumbing.Configuration
         public string ClaimsStrategy { get; set; }
 
         // Optional claims caching configuration
-        public ClaimsCacheConfiguration ClaimsCache { get; set; }
+        public int ClaimsCacheTimeToLiveMinutes { get; set; }
     }
 }

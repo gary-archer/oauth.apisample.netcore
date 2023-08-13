@@ -8,9 +8,7 @@
     using SampleApi.Logic.Entities;
     using SampleApi.Logic.Errors;
     using SampleApi.Logic.Repositories;
-    using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
-    using SampleApi.Plumbing.OAuth;
 
     /*
      * A controller for our company resources
@@ -31,10 +29,6 @@
         [HttpGet("")]
         public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
-            // First check we have access to this level of data
-            ScopeVerifier.Enforce(this.User.GetScopes(), "investments");
-
-            // Then return the list of companies
             return await this.service.GetCompanyListAsync();
         }
 
@@ -44,9 +38,6 @@
         [HttpGet("{id}/transactions")]
         public async Task<CompanyTransactions> GetCompanyTransactionsAsync(string id)
         {
-            // First check we have access to this level of data
-            ScopeVerifier.Enforce(this.User.GetScopes(), "investments");
-
             // Return a 400 if the id is not a number
             int idValue;
             if (!int.TryParse(id, NumberStyles.Any, CultureInfo.InvariantCulture, out idValue) || idValue <= 0)

@@ -145,7 +145,7 @@
             {
                 var claimsCache = new ClaimsCache(
                     cache,
-                    this.oauthConfiguration.ClaimsCache.TimeToLiveMinutes,
+                    this.oauthConfiguration.ClaimsCacheTimeToLiveMinutes,
                     container);
                 this.services.AddSingleton(claimsCache);
             }
