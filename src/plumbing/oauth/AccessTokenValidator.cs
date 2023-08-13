@@ -34,7 +34,7 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * Validate the access token using the jose-jwt library
          */
-        public async Task<ClaimsModel> ValidateTokenAsync(string accessToken)
+        public async Task<JwtClaims> ValidateTokenAsync(string accessToken)
         {
             using (this.logEntry.CreatePerformanceBreakdown("tokenValidator"))
             {
@@ -77,7 +77,7 @@ namespace SampleApi.Plumbing.OAuth
                         NamingStrategy = new SnakeCaseNamingStrategy(),
                     },
                 };
-                var claims = JsonConvert.DeserializeObject<ClaimsModel>(claimsJson, settings);
+                var claims = JsonConvert.DeserializeObject<JwtClaims>(claimsJson, settings);
 
                 // Verify the protocol claims according to best practices
                 this.ValidateProtocolClaims(claims);
@@ -102,34 +102,38 @@ namespace SampleApi.Plumbing.OAuth
         /*
          * jose-jwt does not support checking standard claims for issuer, audience and expiry, so make those checks here instead
          */
-        private void ValidateProtocolClaims(ClaimsModel claimsModel)
+        private void ValidateProtocolClaims(JwtClaims claims)
         {
-            if (claimsModel.Iss != this.configuration.Issuer)
+            // Check the expected issuer
+            if (claims.Iss != this.configuration.Issuer)
             {
                 throw ErrorFactory.CreateClient401Error("The issuer claim had an unexpected value");
             }
 
+            // Check the expected audience, and Cognito does not issue an audience claim to access tokens
             if (!string.IsNullOrWhiteSpace(this.configuration.Audience))
             {
-                var audiences = claimsModel.GetAudiences();
+                var audiences = claims.GetAudiences();
                 if (!audiences.Contains(this.configuration.Audience))
                 {
                     throw ErrorFactory.CreateClient401Error("The audience claim had an unexpected value");
                 }
             }
 
-            if (claimsModel.Exp < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            // Check that the JWT is not expired
+            if (claims.Exp < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
             {
                 throw ErrorFactory.CreateClient401Error("The access token is expired");
             }
 
-            if (string.IsNullOrWhiteSpace(claimsModel.Scope))
+            // Check there is a scope
+            if (string.IsNullOrWhiteSpace(claims.Scope))
             {
                 throw ErrorUtils.FromMissingClaim(OAuthClaimNames.Scope);
             }
 
             // The sample API requires the same scope for all endpoints, and it is enforced here
-            var scopes = claimsModel.Scope.Split(" ");
+            var scopes = claims.Scope.Split(" ");
             if (!scopes.Contains(this.configuration.Scope))
             {
                 throw ErrorFactory.CreateClientError(

@@ -6,7 +6,6 @@ namespace SampleApi.Plumbing.OAuth
     using System.Net.Http.Headers;
     using System.Threading.Tasks;
     using Jose;
-    using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
     using SampleApi.Plumbing.Utilities;

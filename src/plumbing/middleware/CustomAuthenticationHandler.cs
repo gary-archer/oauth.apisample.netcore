@@ -2,17 +2,14 @@ namespace SampleApi.Plumbing.Middleware
 {
     using System;
     using System.Collections.Generic;
-    using System.Net;
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
-    using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
     using SampleApi.Plumbing.Logging;
-    using SampleApi.Plumbing.Middleware;
     using SampleApi.Plumbing.OAuth;
     using SampleApi.Plumbing.Utilities;
 
@@ -22,7 +19,6 @@ namespace SampleApi.Plumbing.Middleware
     public sealed class CustomAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
         // Constant keys
-        private const string StatusCodeKey = "statusCode";
         private const string ClientErrorKey = "clientError";
 
         public CustomAuthenticationHandler(
@@ -57,26 +53,11 @@ namespace SampleApi.Plumbing.Middleware
                 var claimsPrincipal = await authorizer.ExecuteAsync(this.Request);
 
                 // Add identity details to logs
-                logEntry.SetIdentity(claimsPrincipal);
+                logEntry.SetIdentity(claimsPrincipal.JwtClaims.Sub);
 
-                // Set up .NET security
+                // Set up .NET security so that authorization attributes work in the expected way
                 var ticket = new AuthenticationTicket(claimsPrincipal, new AuthenticationProperties(), this.Scheme.Name);
                 return AuthenticateResult.Success(ticket);
-            }
-            catch (ClientError clientError)
-            {
-                // Handle 401 errors
-                var handler = new UnhandledExceptionMiddleware();
-                handler.HandleException(clientError, this.Context);
-
-                // Finish logging
-                logEntry.End(this.Context.Request, this.Context.Response);
-                logEntry.Write();
-
-                // Store fields for the challenge method which will fire later
-                this.Request.HttpContext.Items.TryAdd(StatusCodeKey, clientError.StatusCode);
-                this.Request.HttpContext.Items.TryAdd(ClientErrorKey, clientError);
-                return AuthenticateResult.NoResult();
             }
             catch (Exception exception)
             {
@@ -95,7 +76,7 @@ namespace SampleApi.Plumbing.Middleware
         }
 
         /*
-         * Return authentication error responses to the API caller
+         * Return authentication handler error responses to the API client
          */
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
         {

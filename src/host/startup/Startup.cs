@@ -100,7 +100,7 @@
         {
             new BaseCompositionRoot()
                 .UseOAuth(this.configuration.OAuth)
-                .WithCustomClaimsProvider(new SampleCustomClaimsProvider())
+                .WithExtraClaimsProvider(new SampleExtraClaimsProvider())
                 .WithLogging(this.configuration.Logging, this.loggerFactory)
                 .WithProxyConfiguration(this.configuration.Api.UseProxy, this.configuration.Api.ProxyUrl)
                 .WithServices(services)
@@ -112,7 +112,6 @@
          */
         private void ConfigureApiDependencies(IServiceCollection services)
         {
-            services.AddTransient<SampleCustomClaimsProvider>();
             services.AddTransient<JsonReader>();
             services.AddTransient<CompanyRepository>();
             services.AddTransient<CompanyService>();
