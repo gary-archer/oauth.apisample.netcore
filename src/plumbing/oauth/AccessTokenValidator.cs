@@ -125,7 +125,7 @@ namespace SampleApi.Plumbing.OAuth
 
             if (string.IsNullOrWhiteSpace(claimsModel.Scope))
             {
-                throw ErrorUtils.FromMissingClaim("scope");
+                throw ErrorUtils.FromMissingClaim(OAuthClaimNames.Scope);
             }
 
             // The sample API requires the same scope for all endpoints, and it is enforced here

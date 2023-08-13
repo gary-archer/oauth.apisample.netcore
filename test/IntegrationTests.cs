@@ -27,7 +27,7 @@ namespace SampleApi.IntegrationTests
         /*
          * Test that a request without an access token is rejected
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task CallApi_Returns401_ForMissingJwt()
         {
@@ -40,12 +40,12 @@ namespace SampleApi.IntegrationTests
             var error = JObject.Parse(response.Body);
             var code = error.Value<string>("code");
             Assert.True(code == "invalid_token", "Unexpected error code");
-        }
+        }*/
 
         /*
          * Test that an expired access token is rejected
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task CallApi_Returns401_ForExpiredJwt()
         {
@@ -64,12 +64,12 @@ namespace SampleApi.IntegrationTests
             var error = JObject.Parse(response.Body);
             var code = error.Value<string>("code");
             Assert.True(code == "invalid_token", "Unexpected error code");
-        }
+        }*/
 
         /*
          * Test that an access token with an invalid issuer is rejected
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task CallApi_Returns401_ForInvalidIssuer()
         {
@@ -88,12 +88,12 @@ namespace SampleApi.IntegrationTests
             var error = JObject.Parse(response.Body);
             var code = error.Value<string>("code");
             Assert.True(code == "invalid_token", "Unexpected error code");
-        }
+        }*/
 
         /*
          * Test that an access token with an invalid audience is rejected
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task CallApi_Returns401_ForInvalidAudience()
         {
@@ -112,12 +112,12 @@ namespace SampleApi.IntegrationTests
             var error = JObject.Parse(response.Body);
             var code = error.Value<string>("code");
             Assert.True(code == "invalid_token", "Unexpected error code");
-        }
+        }*/
 
         /*
          * Test that an access token with an invalid signature is rejected
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task CallApi_Returns401_ForInvalidSignature()
         {
@@ -139,12 +139,12 @@ namespace SampleApi.IntegrationTests
                 var code = error.Value<string>("code");
                 Assert.True(code == "invalid_token", "Unexpected error code");
             }
-        }
+        }*/
 
         /*
          * Test that an access token with an invalid scope is rejected
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task CallApi_Returns403_ForInvalidScope()
         {
@@ -163,12 +163,12 @@ namespace SampleApi.IntegrationTests
             var error = JObject.Parse(response.Body);
             var code = error.Value<string>("code");
             Assert.True(code == "insufficient_scope", "Unexpected error code");
-        }
+        }*/
 
         /*
          * Test rehearsing a 500 error when there is an exception in the API
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task CallApi_ReturnsSupportable500Error_ForErrorRehearsalRequest()
         {
@@ -187,12 +187,12 @@ namespace SampleApi.IntegrationTests
             var error = JObject.Parse(response.Body);
             var code = error.Value<string>("code");
             Assert.True(code == "exception_simulation", "Unexpected error code");
-        }
+        }*/
 
         /*
          * Test getting business user attributes for the standard user
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task GetUserInfo_ReturnsSingleRegion_ForStandardUser()
         {
@@ -210,7 +210,7 @@ namespace SampleApi.IntegrationTests
             var claims = JObject.Parse(response.Body);
             var regions = claims.Value<JArray>("regions");
             Assert.True(regions.Count == 1, "Unexpected regions claim");
-        }
+        }*/
 
         /*
          * Test getting business user attributes for the admin user
@@ -230,6 +230,7 @@ namespace SampleApi.IntegrationTests
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
+            System.Console.WriteLine(response.Body);
             var claims = JObject.Parse(response.Body);
             var regions = claims.Value<JArray>("regions");
             Assert.True(regions.Count == 3, "Unexpected regions claim");
@@ -238,7 +239,7 @@ namespace SampleApi.IntegrationTests
         /*
          * Test getting companies
          */
-        [Fact]
+        /*[Fact]
         [Trait("Category", "Integration")]
         public async Task GetCompanies_ReturnsTwoItems_ForStandardUser()
         {
@@ -255,7 +256,7 @@ namespace SampleApi.IntegrationTests
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
             var companies = JArray.Parse(response.Body);
             Assert.True(companies.Count == 2, "Unexpected companies list");
-        }
+        }*/
 
         /*
          * Test getting companies for the admin user

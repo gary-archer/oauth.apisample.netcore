@@ -19,42 +19,69 @@ namespace SampleApi.Logic.Claims
             string accessToken,
             IEnumerable<Claim> jwtClaims)
         {
-            var subject = jwtClaims.FirstOrDefault(c => c.Type == OAuthClaimNames.Subject)?.Value;
-            return this.Get(subject, string.Empty);
+            // It is common to need to get a business user ID for the authenticated user
+            // In our example a manager user may be able to view information about investors
+            var managerId = this.GetManagerId(jwtClaims);
+
+            // A real API would use a database, but this API uses a mock implementation
+            var businessClaims = new List<Claim>();
+            if (managerId == "20116")
+            {
+                // For admin users we hard code this user id, assign a role of 'admin' and grant access to all regions
+                // The CompanyService class will use these claims to return all transaction data
+                businessClaims.Add(new Claim(CustomClaimNames.ManagerId, "20116"));
+                businessClaims.Add(new Claim(CustomClaimNames.Role, "admin"));
+                businessClaims.Add(new Claim(CustomClaimNames.Regions, "Europe"));
+                businessClaims.Add(new Claim(CustomClaimNames.Regions, "USA"));
+                businessClaims.Add(new Claim(CustomClaimNames.Regions, "Asia"));
+            }
+            else
+            {
+                // These claims are used for the guestuser@mycompany.com user account
+                businessClaims.Add(new Claim(CustomClaimNames.ManagerId, "10345"));
+                businessClaims.Add(new Claim(CustomClaimNames.Role, "user"));
+                businessClaims.Add(new Claim(CustomClaimNames.Regions, "USA"));
+            }
+
+            return businessClaims;
         }
         #pragma warning restore 1998
 
         /*
-         * Receive user attributes from identity data, and return user attributes from business data
+         * Get a business user ID that corresponds to the user in the token
          */
-        #pragma warning disable 1998
-        private IEnumerable<Claim> Get(string subject, string email)
+        private string GetManagerId(IEnumerable<Claim> jwtClaims)
         {
-            var claims = new List<Claim>();
-
-            // A real system would do a database lookup here
-            var isAdmin = email.Contains("admin");
-            if (isAdmin)
+            var managerId = jwtClaims.FirstOrDefault(c => c.Type == CustomClaimNames.ManagerId);
+            if (managerId != null)
             {
-                // For admin users we hard code this user id, assign a role of 'admin' and grant access to all regions
-                // The CompanyService class will use these claims to return all transaction data
-                claims.Add(new Claim(CustomClaimNames.ManagerId, "20116"));
-                claims.Add(new Claim(CustomClaimNames.Role, "admin"));
-                claims.Add(new Claim(CustomClaimNames.Regions, "Europe"));
-                claims.Add(new Claim(CustomClaimNames.Regions, "USA"));
-                claims.Add(new Claim(CustomClaimNames.Regions, "Asia"));
+                // The preferred option is for the API to receive the business user identity in the JWT access token
+                return managerId.Value;
             }
             else
             {
-                // For other users we hard code this user id, assign a role of 'user' and grant access to only one region
-                // The CompanyService class will use these claims to return only transactions for the US region
-                claims.Add(new Claim(CustomClaimNames.ManagerId, "10345"));
-                claims.Add(new Claim(CustomClaimNames.Role, "user"));
-                claims.Add(new Claim(CustomClaimNames.Regions, "USA"));
+                // Otherwise the API must determine the value from the subject claim
+                var subject = jwtClaims.FirstOrDefault(c => c.Type == OAuthClaimNames.Subject);
+                return this.LookupManagerIdFromSubjectClaim(subject.Value);
             }
-
-            return claims;
         }
-        #pragma warning restore 1998
+
+        /*
+         * The API could store a mapping from the subject claim to the business user identity
+         */
+        private string LookupManagerIdFromSubjectClaim(string subject)
+        {
+            // A real API would use a database, but this API uses a mock implementation
+            // This subject value is for the guestadmin@mycompany.com user account
+            var isAdmin = subject == "77a97e5b-b748-45e5-bb6f-658e85b2df91";
+            if (isAdmin)
+            {
+                return "20116";
+            }
+            else
+            {
+                return "10345";
+            }
+        }
     }
 }
