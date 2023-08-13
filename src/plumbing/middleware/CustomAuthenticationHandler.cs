@@ -89,7 +89,6 @@ namespace SampleApi.Plumbing.Middleware
                 logEntry.Write();
 
                 // Store results for the below challenge method, which will fire later
-                this.Request.HttpContext.Items.TryAdd(StatusCodeKey, clientError.StatusCode);
                 this.Request.HttpContext.Items.TryAdd(ClientErrorKey, clientError);
                 return AuthenticateResult.NoResult();
             }
@@ -100,24 +99,10 @@ namespace SampleApi.Plumbing.Middleware
          */
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
         {
-            // Retrieve items
-            var statusCode = this.GetRequestItem<HttpStatusCode>(StatusCodeKey);
             var clientError = this.GetRequestItem<ClientError>(ClientErrorKey);
             if (clientError != null)
             {
-                if (statusCode == HttpStatusCode.Unauthorized)
-                {
-                    // Write 401 responses due to invalid tokens
-                    await ResponseErrorWriter.WriteInvalidTokenResponse(this.Response, clientError);
-                }
-                else if (statusCode == HttpStatusCode.InternalServerError)
-                {
-                    // Write 500 responses due to technical problems during authentication
-                    await ResponseErrorWriter.WriteErrorResponse(
-                        this.Response,
-                        statusCode,
-                        clientError.ToResponseFormat());
-                }
+                await ResponseErrorWriter.WriteErrorResponse(this.Response, clientError);
             }
         }
 

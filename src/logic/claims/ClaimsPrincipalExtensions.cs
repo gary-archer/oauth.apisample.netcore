@@ -10,19 +10,19 @@ namespace SampleApi.Logic.Claims
      */
     public static class ClaimsPrincipalExtensions
     {
-        public static string GetUserId(this ClaimsPrincipal principal)
+        public static string GetManagerId(this ClaimsPrincipal principal)
         {
-            return principal.ReadStringClaim(CustomClaimNames.UserId).Value;
+            return principal.ReadStringClaim(CustomClaimNames.ManagerId).Value;
         }
 
-        public static string GetUserRole(this ClaimsPrincipal principal)
+        public static string GetRole(this ClaimsPrincipal principal)
         {
-            return principal.ReadStringClaim(CustomClaimNames.UserRole).Value;
+            return principal.ReadStringClaim(CustomClaimNames.Role).Value;
         }
 
-        public static IEnumerable<string> GetUserRegions(this ClaimsPrincipal principal)
+        public static IEnumerable<string> GetRegions(this ClaimsPrincipal principal)
         {
-            return principal.Claims.Where(c => c.Type == CustomClaimNames.UserRegions).Select(s => s.Value);
+            return principal.Claims.Where(c => c.Type == CustomClaimNames.Regions).Select(s => s.Value);
         }
     }
 }

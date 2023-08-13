@@ -19,12 +19,12 @@ namespace SampleApi.Plumbing.Claims
 
         public string Sub { get; set; }
 
-        // Custom claims
-        public string UserId { get; set; }
+        // Extra claims
+        public string ManagerId { get; set; }
 
-        public string UserRole { get; set; }
+        public string Role { get; set; }
 
-        public object UserRegions { private get; set; }
+        public object Regions { private get; set; }
 
         /*
          * Return audiences as an array
@@ -37,9 +37,9 @@ namespace SampleApi.Plumbing.Claims
         /*
          * Return the custom regions claim as an array
          */
-        public IEnumerable<string> GetUserRegions()
+        public IEnumerable<string> GetRegions()
         {
-            return this.ObjectToArray(this.UserRegions);
+            return this.ObjectToArray(this.Regions);
         }
 
         /*

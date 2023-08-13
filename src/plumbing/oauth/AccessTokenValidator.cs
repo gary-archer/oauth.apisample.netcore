@@ -2,6 +2,7 @@ namespace SampleApi.Plumbing.OAuth
 {
     using System;
     using System.Linq;
+    using System.Net;
     using System.Threading.Tasks;
     using Jose;
     using Newtonsoft.Json;
@@ -37,49 +38,50 @@ namespace SampleApi.Plumbing.OAuth
         {
             using (this.logEntry.CreatePerformanceBreakdown("tokenValidator"))
             {
+                // Read the token without validating it, to get its key identifier
+                var kid = this.GetKeyIdentifier(accessToken);
+                if (kid == null)
+                {
+                    throw ErrorFactory.CreateClient401Error("Unable to read the kid field from the access token");
+                }
+
+                // Get the token signing public key as a JSON web key
+                var jwk = await this.jsonWebKeyResolver.GetKeyForId(kid);
+                if (jwk == null)
+                {
+                    throw ErrorFactory.CreateClient401Error($"The token kid {kid} was not found in the JWKS");
+                }
+
+                // Only accept supported token signing algorithms
+                if (jwk.Alg != "RS256")
+                {
+                    throw ErrorFactory.CreateClient401Error($"The access token kid was not found in the JWKS");
+                }
+
+                var claimsJson = string.Empty;
                 try
                 {
-                    // Read the token without validating it, to get its key identifier
-                    var kid = this.GetKeyIdentifier(accessToken);
-                    if (kid == null)
-                    {
-                        throw ErrorFactory.CreateClient401Error("Unable to read the kid field from the access token");
-                    }
-
-                    // Get the token signing public key as a JSON web key
-                    var jwk = await this.jsonWebKeyResolver.GetKeyForId(kid);
-                    if (jwk == null)
-                    {
-                        throw ErrorFactory.CreateClient401Error($"The token kid {kid} was not found in the JWKS");
-                    }
-
-                    // Only accept supported token signing algorithms
-                    if (jwk.Alg != "RS256")
-                    {
-                        throw ErrorFactory.CreateClient401Error($"The access token kid was not found in the JWKS");
-                    }
-
                     // Do the cryptographic validation of the JWT signature using the JWK public key
-                    var claimsJson = JWT.Decode(accessToken, jwk);
-
-                    // Deserialize to an object
-                    var settings = new JsonSerializerSettings
-                    {
-                        ContractResolver = new DefaultContractResolver
-                        {
-                            NamingStrategy = new SnakeCaseNamingStrategy(),
-                        },
-                    };
-                    var claims = JsonConvert.DeserializeObject<ClaimsModel>(claimsJson, settings);
-
-                    // Make extra validation checks that jose4j does not support, then return the principal
-                    this.ValidateProtocolClaims(claims);
-                    return claims;
+                    claimsJson = JWT.Decode(accessToken, jwk);
                 }
                 catch (Exception ex)
                 {
                     throw ErrorUtils.FromTokenValidationError(ex);
                 }
+
+                // Deserialize to an object
+                var settings = new JsonSerializerSettings
+                {
+                    ContractResolver = new DefaultContractResolver
+                    {
+                        NamingStrategy = new SnakeCaseNamingStrategy(),
+                    },
+                };
+                var claims = JsonConvert.DeserializeObject<ClaimsModel>(claimsJson, settings);
+
+                // Verify the protocol claims according to best practices
+                this.ValidateProtocolClaims(claims);
+                return claims;
             }
         }
 
@@ -119,6 +121,21 @@ namespace SampleApi.Plumbing.OAuth
             if (claimsModel.Exp < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
             {
                 throw ErrorFactory.CreateClient401Error("The access token is expired");
+            }
+
+            if (string.IsNullOrWhiteSpace(claimsModel.Scope))
+            {
+                throw ErrorUtils.FromMissingClaim("scope");
+            }
+
+            // The sample API requires the same scope for all endpoints, and it is enforced here
+            var scopes = claimsModel.Scope.Split(" ");
+            if (!scopes.Contains(this.configuration.Scope))
+            {
+                throw ErrorFactory.CreateClientError(
+                    HttpStatusCode.Forbidden,
+                    ErrorCodes.InsufficientScope,
+                    "The token does not contain sufficient scope for this API");
             }
         }
     }

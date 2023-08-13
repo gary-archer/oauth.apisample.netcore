@@ -18,8 +18,8 @@ namespace SampleApi.Host.Controllers
         public ClientUserInfo GetUserClaims()
         {
             return new ClientUserInfo(
-                this.User.GetUserRole(),
-                this.User.GetUserRegions().ToArray());
+                this.User.GetRole(),
+                this.User.GetRegions().ToArray());
         }
     }
 }

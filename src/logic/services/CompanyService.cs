@@ -55,12 +55,12 @@ namespace SampleApi.Logic.Repositories
          */
         private bool IsUserAuthorizedForCompany(Company company)
         {
-            if (this.claims.GetUserRole() == "admin")
+            if (this.claims.GetRole() == "admin")
             {
                 return true;
             }
 
-            return this.claims.GetUserRegions().Any(ur => ur == company.Region);
+            return this.claims.GetRegions().Any(ur => ur == company.Region);
         }
 
         /*

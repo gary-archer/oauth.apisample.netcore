@@ -84,7 +84,8 @@ namespace SampleApi.Test.Utils
                 { "exp", exp.ToUnixTimeSeconds() },
             };
 
-            return JWT.Encode(payload, this.tokenSigningPrivateKey, JwsAlgorithm.RS256, headers);
+            var jwkToUse = jwk ?? this.tokenSigningPrivateKey;
+            return JWT.Encode(payload, jwkToUse, JwsAlgorithm.RS256, headers);
         }
 
         /*

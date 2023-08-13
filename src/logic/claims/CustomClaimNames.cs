@@ -5,8 +5,8 @@ namespace SampleApi.Logic.Claims
      */
     public static class CustomClaimNames
     {
-        public static readonly string UserId = "user_id";
-        public static readonly string UserRole = "user_role";
-        public static readonly string UserRegions = "user_regions";
+        public static readonly string ManagerId = "manager_id";
+        public static readonly string Role = "role";
+        public static readonly string Regions = "regions";
     }
 }

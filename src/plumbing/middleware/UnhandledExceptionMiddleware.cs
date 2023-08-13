@@ -47,10 +47,7 @@ namespace SampleApi.Plumbing.Middleware
                 var clientError = this.HandleException(exception, context);
 
                 // Write the error response to the client
-                await ResponseErrorWriter.WriteErrorResponse(
-                    context.Response,
-                    clientError.StatusCode,
-                    clientError.ToResponseFormat());
+                await ResponseErrorWriter.WriteErrorResponse(context.Response, clientError);
             }
         }
 

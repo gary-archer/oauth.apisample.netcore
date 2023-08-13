@@ -56,7 +56,7 @@ namespace SampleApi.Plumbing.OAuth
             }
 
             // In Cognito we cannot issue custom claims so the API looks them up when the access token is first received
-            var customClaims = await this.customClaimsProvider.GetFromLookupAsync(accessToken, baseClaims);
+            var customClaims = await this.customClaimsProvider.LookupBusinessClaimsAsync(accessToken, baseClaims);
 
             // Cache the claims against the token hash until the token's expiry time
             var extraClaims = new List<Claim>();

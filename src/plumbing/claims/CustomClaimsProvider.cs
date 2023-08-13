@@ -10,22 +10,12 @@
     public class CustomClaimsProvider
     {
         /*
-         * This is called to read claims from the access token
-         */
-        #pragma warning disable 1998
-        public virtual IEnumerable<Claim> GetFromPayload(ClaimsModel claimsModel)
-        {
-            return new List<Claim>();
-        }
-        #pragma warning restore 1998
-
-        /*
          * This is called to get extra claims when the token is first received
          */
         #pragma warning disable 1998
-        public virtual async Task<IEnumerable<Claim>> GetFromLookupAsync(
+        public virtual async Task<IEnumerable<Claim>> LookupBusinessClaimsAsync(
             string accessToken,
-            IEnumerable<Claim> baseClaims)
+            IEnumerable<Claim> jwtClaims)
         {
             return new List<Claim>();
         }

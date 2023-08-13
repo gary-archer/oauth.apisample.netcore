@@ -12,24 +12,14 @@ namespace SampleApi.Logic.Claims
     public class SampleCustomClaimsProvider : CustomClaimsProvider
     {
         /*
-         * This is called to read claims from the access token
-         */
-        #pragma warning disable 1998
-        public override IEnumerable<Claim> GetFromPayload(ClaimsModel claimsModel)
-        {
-            return this.Get(claimsModel.Sub, string.Empty);
-        }
-        #pragma warning restore 1998
-
-        /*
          * This is called to get extra claims when the token is first received
          */
         #pragma warning disable 1998
-        public override async Task<IEnumerable<Claim>> GetFromLookupAsync(
+        public override async Task<IEnumerable<Claim>> LookupBusinessClaimsAsync(
             string accessToken,
-            IEnumerable<Claim> baseClaims)
+            IEnumerable<Claim> jwtClaims)
         {
-            var subject = baseClaims.FirstOrDefault(c => c.Type == OAuthClaimNames.Subject)?.Value;
+            var subject = jwtClaims.FirstOrDefault(c => c.Type == OAuthClaimNames.Subject)?.Value;
             return this.Get(subject, string.Empty);
         }
         #pragma warning restore 1998
@@ -48,19 +38,19 @@ namespace SampleApi.Logic.Claims
             {
                 // For admin users we hard code this user id, assign a role of 'admin' and grant access to all regions
                 // The CompanyService class will use these claims to return all transaction data
-                claims.Add(new Claim(CustomClaimNames.UserId, "20116"));
-                claims.Add(new Claim(CustomClaimNames.UserRole, "admin"));
-                claims.Add(new Claim(CustomClaimNames.UserRegions, "Europe"));
-                claims.Add(new Claim(CustomClaimNames.UserRegions, "USA"));
-                claims.Add(new Claim(CustomClaimNames.UserRegions, "Asia"));
+                claims.Add(new Claim(CustomClaimNames.ManagerId, "20116"));
+                claims.Add(new Claim(CustomClaimNames.Role, "admin"));
+                claims.Add(new Claim(CustomClaimNames.Regions, "Europe"));
+                claims.Add(new Claim(CustomClaimNames.Regions, "USA"));
+                claims.Add(new Claim(CustomClaimNames.Regions, "Asia"));
             }
             else
             {
                 // For other users we hard code this user id, assign a role of 'user' and grant access to only one region
                 // The CompanyService class will use these claims to return only transactions for the US region
-                claims.Add(new Claim(CustomClaimNames.UserId, "10345"));
-                claims.Add(new Claim(CustomClaimNames.UserRole, "user"));
-                claims.Add(new Claim(CustomClaimNames.UserRegions, "USA"));
+                claims.Add(new Claim(CustomClaimNames.ManagerId, "10345"));
+                claims.Add(new Claim(CustomClaimNames.Role, "user"));
+                claims.Add(new Claim(CustomClaimNames.Regions, "USA"));
             }
 
             return claims;
