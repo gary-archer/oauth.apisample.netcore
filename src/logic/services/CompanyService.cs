@@ -30,7 +30,7 @@ namespace SampleApi.Logic.Services
          */
         public async Task<IEnumerable<Company>> GetCompanyListAsync()
         {
-            // Use a micro services approach of getting all data
+            // This example starts by loading all data
             var data = await this.repository.GetCompanyListAsync();
 
             // Filter on what the user is allowed to access
