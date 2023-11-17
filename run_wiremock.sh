@@ -10,7 +10,7 @@ cd wiremock
 #
 # Build the standalone Wiremock if it has not been built yet
 #
-if [ ! -f ./bin/Debug/net7.0/wiremock ]; then
+if [ ! -f ./bin/Debug/net8.0/wiremock ]; then
   dotnet build
   if [ $? -ne 0 ]; then
     echo 'Problem encountered building Wiremock'
@@ -20,9 +20,14 @@ if [ ! -f ./bin/Debug/net7.0/wiremock ]; then
 fi
 
 #
+# On Linux ensure that you have first granted Wiremock permissions to listen on a port below 1024
+#
+if [ "$(uname -s)" == 'Linux' ]; then
+  sudo setcap 'cap_net_bind_service=+ep' ./bin/Debug/net8.0/wiremock
+fi
+
+#
 # Run Wiremock over HTTPS in this terminal
-# On Linux ensure that you have first granted wiremock permissions to listen on port 447:
-# - sudo setcap 'cap_net_bind_service=+ep' ./wiremock/bin/Debug/net7.0/wiremock
 #
 dotnet run
 if [ $? -ne 0 ]; then

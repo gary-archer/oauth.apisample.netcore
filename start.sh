@@ -40,9 +40,14 @@ if [ ! -d '../oauth.logs/api' ]; then
 fi
 
 #
+# On Linux ensure that you have first granted the API permissions to listen on a port below 1024
+#
+if [ "$(uname -s)" == 'Linux' ]; then
+  sudo setcap 'cap_net_bind_service=+ep' ./bin/Debug/net8.0/sampleapi
+fi
+
+#
 # Then start listening
-# On Linux ensure that you have first granted the API permissions to listen on port 446:
-# - sudo setcap 'cap_net_bind_service=+ep' ./bin/Debug/net7.0/sampleapi
 #
 dotnet run
 if [ $? -ne 0 ]; then

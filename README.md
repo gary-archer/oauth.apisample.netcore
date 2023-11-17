@@ -40,7 +40,7 @@ Follow the [Technical Support Queries](https://authguidance.com/2019/08/02/intel
 
 ## Commands
 
-Ensure that .NET 7+ is installed, then run the API with this command:
+Ensure that .NET 8 or later is installed, then run the API with this command:
 
 ```bash
 ./start.sh
@@ -85,7 +85,7 @@ Then run integration tests and a load test:
 
 ## Programming Languages
 
-* C# and .NET 7 are used to implement the REST API
+* C# and .NET are used to implement the REST API
 
 ## Infrastructure
 
