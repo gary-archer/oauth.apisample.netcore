@@ -1,15 +1,15 @@
 namespace SampleApi.Plumbing.Errors
 {
     using System;
-    using Newtonsoft.Json.Linq;
+    using System.Text.Json.Nodes;
 
     /*
      * A utility to read JSON and ignore errors, to make the calling code simpler
-     * This prevents 'double faults' during error handling
+     * This prevents potential 'double faults' during error handling
      */
     internal static class ErrorResponseReader
     {
-        public static JObject ReadJson(string jsonText)
+        public static JsonNode ReadJson(string jsonText)
         {
             if (jsonText == null || jsonText.Length == 0)
             {
@@ -18,7 +18,7 @@ namespace SampleApi.Plumbing.Errors
 
             try
             {
-                return JObject.Parse(jsonText);
+                return JsonNode.Parse(jsonText);
             }
             catch (Exception)
             {

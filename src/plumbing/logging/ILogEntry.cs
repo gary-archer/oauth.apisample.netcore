@@ -1,6 +1,6 @@
 ﻿namespace SampleApi.Plumbing.Logging
 {
-    using Newtonsoft.Json.Linq;
+    using System.Text.Json.Nodes;
 
     /*
      * Each API request writes a structured log entry containing fields we will query by
@@ -12,6 +12,6 @@
         IPerformanceBreakdown CreatePerformanceBreakdown(string name);
 
         // Add arbitrary data
-        void AddInfo(JToken info);
+        void AddInfo(JsonNode info);
     }
 }

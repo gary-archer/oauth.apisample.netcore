@@ -1,7 +1,8 @@
 ﻿namespace SampleApi.Plumbing.Logging
 {
     using System;
-    using Newtonsoft.Json.Linq;
+    using System.Collections.Generic;
+    using System.Text.Json.Nodes;
 
     /*
      * Each API request writes a structured log entry containing fields we will query by
@@ -33,7 +34,7 @@
             // Objects that are not directly queryable
             this.Performance = new PerformanceBreakdown("total");
             this.ErrorData = null;
-            this.InfoData = new JArray();
+            this.InfoData = new List<JsonNode>();
         }
 
         // A unique generated client side id, which becomes the unique id in the aggregated logs database
@@ -91,10 +92,10 @@
         public PerformanceBreakdown Performance { get; private set;  }
 
         // An object containing error data, written for failed requests
-        public JObject ErrorData { get; set; }
+        public JsonNode ErrorData { get; set; }
 
         // Can be populated in scenarios when extra text is useful
-        public JArray InfoData { get; private set; }
+        public List<JsonNode> InfoData { get; private set; }
 
         /*
         * Set fields at the end of a log entry
@@ -107,27 +108,27 @@
         /*
         * Produce the output format
         */
-        public JObject ToLogFormat()
+        public JsonNode ToLogFormat()
         {
             // Output fields used as top level queryable columns
-            dynamic output = new JObject();
-            this.OutputString((x) => output.id = x, this.Id);
-            this.OutputString((x) => output.utcTime = x, this.UtcTime.ToString("s"));
-            this.OutputString((x) => output.apiName = x, this.ApiName);
-            this.OutputString((x) => output.operationName = x, this.OperationName);
-            this.OutputString((x) => output.hostName = x, this.HostName);
-            this.OutputString((x) => output.method = x, this.Method);
-            this.OutputString((x) => output.path = x, this.Path);
-            this.OutputString((x) => output.resourceId = x, this.ResourceId);
-            this.OutputString((x) => output.clientApplicationName = x, this.ClientApplicationName);
-            this.OutputString((x) => output.userId = x, this.UserId);
-            this.OutputNumber((x) => output.statusCode = x, this.StatusCode);
-            this.OutputString((x) => output.errorCode = x, this.ErrorCode);
-            this.OutputNumber((x) => output.errorId = x, this.ErrorId);
-            this.OutputNumber((x) => output.millisecondsTaken = x, this.Performance.MillisecondsTaken, true);
-            this.OutputNumber((x) => output.millisecondsThreshold = x, this.PerformanceThresholdMilliseconds, true);
-            this.OutputString((x) => output.correlationId = x, this.CorrelationId);
-            this.OutputString((x) => output.sessionId = x, this.SessionId);
+            var output = new JsonObject();
+            this.OutputString((x) => output["id"] = x, this.Id);
+            this.OutputString((x) => output["utcTime"] = x, this.UtcTime.ToString("s"));
+            this.OutputString((x) => output["apiName"] = x, this.ApiName);
+            this.OutputString((x) => output["operationName"] = x, this.OperationName);
+            this.OutputString((x) => output["hostName"] = x, this.HostName);
+            this.OutputString((x) => output["method"] = x, this.Method);
+            this.OutputString((x) => output["path"] = x, this.Path);
+            this.OutputString((x) => output["resourceId"] = x, this.ResourceId);
+            this.OutputString((x) => output["clientApplicationName"] = x, this.ClientApplicationName);
+            this.OutputString((x) => output["userId"] = x, this.UserId);
+            this.OutputNumber((x) => output["statusCode"] = x, this.StatusCode);
+            this.OutputString((x) => output["errorCode"] = x, this.ErrorCode);
+            this.OutputNumber((x) => output["errorId"] = x, this.ErrorId);
+            this.OutputNumber((x) => output["millisecondsTaken"] = x, this.Performance.MillisecondsTaken, true);
+            this.OutputNumber((x) => output["millisecondsThreshold"] = x, this.PerformanceThresholdMilliseconds, true);
+            this.OutputString((x) => output["correlationId"] = x, this.CorrelationId);
+            this.OutputString((x) => output["sessionId"] = x, this.SessionId);
 
             // Output object data, which is looked up via top level fields
             this.OutputPerformance(output);
@@ -169,33 +170,33 @@
         /*
         * Add the performance breakdown if the threshold has been exceeded or there has been a 500 error
         */
-        private void OutputPerformance(dynamic output)
+        private void OutputPerformance(JsonNode output)
         {
             if (this.Performance.MillisecondsTaken >= this.PerformanceThresholdMilliseconds || this.ErrorId > 0)
             {
-                output.performance = this.Performance.GetData();
+                output["performance"] = this.Performance.GetData();
             }
         }
 
         /*
         * Add error details if applicable
         */
-        private void OutputError(dynamic output)
+        private void OutputError(JsonNode output)
         {
             if (this.ErrorData != null)
             {
-                output.errorData = this.ErrorData;
+                output["errorData"] = this.ErrorData;
             }
         }
 
         /*
         * Add info details if applicable
         */
-        private void OutputInfo(dynamic data)
+        private void OutputInfo(JsonNode output)
         {
             if (this.InfoData.Count > 0)
             {
-                data.infoData = this.InfoData;
+                output["infoData"] = new JsonArray(this.InfoData.ToArray());
             }
         }
     }
