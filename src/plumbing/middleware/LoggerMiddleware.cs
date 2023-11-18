@@ -1,5 +1,6 @@
 namespace SampleApi.Plumbing.Middleware
 {
+    using System.Text.Json.Nodes;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
     using SampleApi.Plumbing.Logging;
