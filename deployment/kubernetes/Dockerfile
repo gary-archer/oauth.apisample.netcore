@@ -1,6 +1,6 @@
 # Use the .NET Debian linux docker image
 # https://hub.docker.com/_/microsoft-dotnet-aspnet
-FROM mcr.microsoft.com/dotnet/aspnet:7.0
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 
 # Copy libraries and other files into our docker image
 WORKDIR /usr/api
