@@ -1,6 +1,5 @@
 namespace SampleApi.Host.Configuration
 {
-    using System;
     using System.IO;
     using System.Text.Json;
     using System.Text.Json.Nodes;

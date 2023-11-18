@@ -2,11 +2,11 @@ namespace SampleApi.Plumbing.Claims
 {
     using System;
     using System.Text;
+    using System.Text.Json.Nodes;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json.Linq;
 
     /*
      * A wrapper for a thread safe memory cache
@@ -81,7 +81,7 @@ namespace SampleApi.Plumbing.Claims
             // Deserialize bytes to claims
             this.traceLogger.LogDebug($"Found existing token in claims cache (hash: {accessTokenHash})");
             var json = Encoding.UTF8.GetString(bytes);
-            return this.extraClaimsProvider.DeserializeFromCache(JObject.Parse(json));
+            return this.extraClaimsProvider.DeserializeFromCache(JsonNode.Parse(json));
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿namespace SampleApi.Plumbing.Claims
 {
     using System;
+    using System.Text.Json.Nodes;
     using System.Threading.Tasks;
-    using Newtonsoft.Json.Linq;
 
     /*
      * Add extra claims that you cannot, or do not want to, manage in the authorization server
@@ -30,7 +30,7 @@
         /*
          * Deserialize extra claims after they have been read from the cache
          */
-        public virtual ExtraClaims DeserializeFromCache(JObject data)
+        public virtual ExtraClaims DeserializeFromCache(JsonNode data)
         {
             return ExtraClaims.ImportData(data);
         }
