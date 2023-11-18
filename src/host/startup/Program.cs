@@ -37,7 +37,7 @@
         private static IWebHost BuildWebHost(ILoggerFactory loggerFactory)
         {
             // Load the configuration file
-            var configuration = Configuration.Load("./api.config.json");
+            var configuration = Configuration.LoadAsync("./api.config.json").Result;
 
             // Build the web host
             return new WebHostBuilder()
