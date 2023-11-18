@@ -5,7 +5,6 @@
 ##############################################
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-cd wiremock
 
 #
 # Run Wiremock over HTTPS in this terminal
