@@ -20,7 +20,7 @@
         "filePrefix": "api",
         "dirName": "../../../../oauth.logs/api/",
         "maxSize": "10MB",
-        "maxFiles": "100"
+        "maxFiles": 100
       }]
     },
     "development": {

@@ -1,7 +1,9 @@
 namespace SampleApi.Host.Configuration
 {
+    using System;
     using System.IO;
-    using Newtonsoft.Json;
+    using System.Text.Json;
+    using System.Text.Json.Nodes;
     using SampleApi.Plumbing.Configuration;
 
     /*
@@ -24,13 +26,18 @@ namespace SampleApi.Host.Configuration
         public static Configuration Load(string filePath)
         {
             string text = File.ReadAllText(filePath);
-            dynamic data = JsonConvert.DeserializeObject(text);
+            var data = JsonNode.Parse(text);
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+            };
 
             return new Configuration
             {
-                Api = data.api.ToObject<ApiConfiguration>(),
-                Logging = data.logging.ToObject<LoggingConfiguration>(),
-                OAuth = data.oauth.ToObject<OAuthConfiguration>(),
+                Api = data["api"].Deserialize<ApiConfiguration>(options),
+                Logging = data["logging"].Deserialize<LoggingConfiguration>(options),
+                OAuth = data["oauth"].Deserialize<OAuthConfiguration>(options),
             };
         }
     }

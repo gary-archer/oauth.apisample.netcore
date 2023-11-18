@@ -3,12 +3,12 @@ namespace SampleApi.Plumbing.Logging
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.Json.Nodes;
     using log4net;
     using log4net.Appender;
     using log4net.Config;
     using log4net.Repository.Hierarchy;
     using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json.Linq;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
 
@@ -77,7 +77,7 @@ namespace SampleApi.Plumbing.Logging
          * Configure production logging, which works the same in all environments, to log queryable fields
          * https://blogs.perficient.com/2016/04/20/how-to-programmatically-create-log-instance-by-log4net-library/
          */
-        private void ConfigureProductionLogging(ILoggingBuilder builder, JObject loggingConfiguration)
+        private void ConfigureProductionLogging(ILoggingBuilder builder, JsonNode loggingConfiguration)
         {
             // Tell .NET to use log4net
             var options = new Log4NetProviderOptions
@@ -89,10 +89,10 @@ namespace SampleApi.Plumbing.Logging
             builder.AddLog4Net(options);
 
             // Create a repository for production JSON logging
-            var level = loggingConfiguration["level"].ToString();
+            var level = loggingConfiguration["level"].GetValue<string>();
             var repository = (Hierarchy)LogManager.CreateRepository($"{InstanceName}Repository", typeof(Hierarchy));
             repository.Root.Level = repository.LevelMap[level];
-            this.performanceThresholdMilliseconds = loggingConfiguration["performanceThresholdMilliseconds"].ToObject<int>();
+            this.performanceThresholdMilliseconds = loggingConfiguration["performanceThresholdMilliseconds"].GetValue<int>();
 
             #pragma warning disable S125
             /* Uncomment to view internal messages such as problems creating log files
@@ -101,7 +101,7 @@ namespace SampleApi.Plumbing.Logging
             #pragma warning restore S125
 
             // Create appenders from configuration
-            var appenders = this.CreateProductionAppenders((JArray)loggingConfiguration["appenders"]);
+            var appenders = this.CreateProductionAppenders(loggingConfiguration["appenders"].AsArray());
             BasicConfigurator.Configure(repository, appenders);
         }
 
@@ -117,20 +117,20 @@ namespace SampleApi.Plumbing.Logging
          * Use Microsoft .NET logging only for developer trace logging, which only ever runs on a developer PC
          * This logging is off by default
          */
-        private void ConfigureDevelopmentTraceLogging(ILoggingBuilder builder, JObject loggingConfiguration)
+        private void ConfigureDevelopmentTraceLogging(ILoggingBuilder builder, JsonNode loggingConfiguration)
         {
             // Set the base log level from configuration
-            var level = this.ReadDevelopmentLogLevel(loggingConfiguration["level"].ToString());
+            var level = this.ReadDevelopmentLogLevel(loggingConfiguration["level"].GetValue<string>());
             builder.SetMinimumLevel(level);
 
             // Process override levels
-            var overrideLevels = (JObject)loggingConfiguration["overrideLevels"];
+            var overrideLevels = loggingConfiguration["overrideLevels"]?.AsObject();
             if (overrideLevels != null)
             {
                 foreach (var overrideLevel in overrideLevels)
                 {
-                    var className = overrideLevel.Key.ToString();
-                    var classLevel = this.ReadDevelopmentLogLevel(overrideLevel.Value.ToString());
+                    var className = overrideLevel.Key;
+                    var classLevel = this.ReadDevelopmentLogLevel(overrideLevel.Value.GetValue<string>());
                     builder.AddFilter(className, classLevel);
                 }
             }
@@ -142,14 +142,14 @@ namespace SampleApi.Plumbing.Logging
         /*
          * Create appenders from configuration
          */
-        private IAppender[] CreateProductionAppenders(JArray appendersConfiguration)
+        private IAppender[] CreateProductionAppenders(JsonArray appendersConfiguration)
         {
             var appenders = new List<IAppender>();
 
             if (appendersConfiguration != null)
             {
                 // Add the console appender if configured
-                var consoleConfig = appendersConfiguration.Children<JObject>().FirstOrDefault(a => a["type"] != null && a["type"].ToString() == "console");
+                var consoleConfig = appendersConfiguration.FirstOrDefault(a => a["type"]?.GetValue<string>() == "console");
                 if (consoleConfig != null)
                 {
                     var consoleAppender = this.CreateProductionConsoleAppender(consoleConfig);
@@ -160,7 +160,7 @@ namespace SampleApi.Plumbing.Logging
                 }
 
                 // Add the file appender if configured
-                var fileConfig = appendersConfiguration.Children<JObject>().FirstOrDefault(a => a["type"] != null && a["type"].ToString() == "file");
+                var fileConfig = appendersConfiguration.FirstOrDefault(a => a["type"]?.GetValue<string>() == "file");
                 if (fileConfig != null)
                 {
                     var fileAppender = this.CreateProductionFileAppender(fileConfig);
@@ -177,14 +177,17 @@ namespace SampleApi.Plumbing.Logging
         /*
          * Create a console appender that uses JSON with pretty printing
          */
-        private IAppender CreateProductionConsoleAppender(JObject consoleConfiguration)
+        private IAppender CreateProductionConsoleAppender(JsonNode consoleConfiguration)
         {
-            var prettyPrint = consoleConfiguration["prettyPrint"].ToObject<bool>();
+            var prettyPrint = consoleConfiguration["prettyPrint"].GetValue<bool>();
             var jsonLayout = new JsonLayout(prettyPrint);
             jsonLayout.ActivateOptions();
 
-            var consoleAppender = new ConsoleAppender();
-            consoleAppender.Layout = jsonLayout;
+            var consoleAppender = new ConsoleAppender()
+            {
+                Layout = jsonLayout,
+            };
+
             consoleAppender.ActivateOptions();
             return consoleAppender;
         }
@@ -193,26 +196,29 @@ namespace SampleApi.Plumbing.Logging
          * Create a rolling file appender that uses JSON with an object per line
          * We use a new file per day and infinite backups of the form 2020-02-06.1.log
          */
-        private IAppender CreateProductionFileAppender(JObject fileConfiguration)
+        private IAppender CreateProductionFileAppender(JsonNode fileConfiguration)
         {
             // Get values
-            var prefix = fileConfiguration["filePrefix"].ToString();
-            var folder = fileConfiguration["dirName"].ToString();
-            var maxSize = fileConfiguration["maxSize"].ToString();
-            var maxFiles = fileConfiguration["maxFiles"].ToObject<int>();
+            var prefix = fileConfiguration["filePrefix"].GetValue<string>();
+            var folder = fileConfiguration["dirName"].GetValue<string>();
+            var maxSize = fileConfiguration["maxSize"].GetValue<string>();
+            var maxFiles = fileConfiguration["maxFiles"].GetValue<int>();
 
             var jsonLayout = new JsonLayout(false);
-            var fileAppender = new RollingFileAppender();
-            fileAppender.File = folder;
-            fileAppender.StaticLogFileName = false;
-            fileAppender.DatePattern = $"{prefix}-yyyy-MM-dd'.log'";
-            fileAppender.AppendToFile = true;
-            fileAppender.PreserveLogFileNameExtension = true;
-            fileAppender.Layout = jsonLayout;
-            fileAppender.LockingModel = new FileAppender.MinimalLock();
-            fileAppender.MaximumFileSize = maxSize;
-            fileAppender.MaxSizeRollBackups = maxFiles;
-            fileAppender.RollingStyle = RollingFileAppender.RollingMode.Composite;
+            var fileAppender = new RollingFileAppender()
+            {
+                File = folder,
+                StaticLogFileName = false,
+                DatePattern = $"{prefix}-yyyy-MM-dd'.log'",
+                AppendToFile = true,
+                PreserveLogFileNameExtension = true,
+                Layout = jsonLayout,
+                LockingModel = new FileAppender.MinimalLock(),
+                MaximumFileSize = maxSize,
+                MaxSizeRollBackups = maxFiles,
+                RollingStyle = RollingFileAppender.RollingMode.Composite,
+            };
+
             fileAppender.ActivateOptions();
             return fileAppender;
         }

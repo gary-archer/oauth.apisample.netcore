@@ -16,10 +16,10 @@
     <!-- Use utility classes from the main API-->
     <ProjectReference Include="..\sampleapi.csproj" />
 
-    <!-- OAuth processing -->
+    <!-- JWT acess token handling -->
     <PackageReference Include="jose-jwt" Version="4.1.0" />
 
-    <!-- JSON processing -->
+    <!-- JSON handling -->
     <PackageReference Include="System.Text.Json" Version="8.0.0" />
 
     <!-- Use code quality checks for test code -->

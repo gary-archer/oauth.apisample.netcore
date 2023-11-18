@@ -2,12 +2,10 @@ namespace SampleApi.Plumbing.Logging
 {
     using System;
     using System.Collections.Generic;
-    using System.Security.Claims;
     using log4net;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Routing;
     using Newtonsoft.Json.Linq;
-    using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
     using SampleApi.Plumbing.Utilities;
 

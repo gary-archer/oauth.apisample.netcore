@@ -5,8 +5,6 @@ namespace SampleApi.Plumbing.OAuth
     using System.Net;
     using System.Threading.Tasks;
     using Jose;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Serialization;
     using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Configuration;
     using SampleApi.Plumbing.Errors;
