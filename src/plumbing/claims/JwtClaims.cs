@@ -4,21 +4,21 @@ namespace SampleApi.Plumbing.Claims
     using System.Collections.Generic;
     using System.Globalization;
     using System.Security.Claims;
-    using Newtonsoft.Json.Linq;
+    using System.Text.Json.Nodes;
 
     /*
      * The claims of interest from the JWT access token
      */
     public class JwtClaims
     {
-        private readonly JObject payload;
+        private readonly JsonNode payload;
 
         /*
          * Wrap the raw payload
          */
         public JwtClaims(string claimsJson)
         {
-            this.payload = JObject.Parse(claimsJson);
+            this.payload = JsonNode.Parse(claimsJson);
         }
 
         /*
@@ -52,8 +52,7 @@ namespace SampleApi.Plumbing.Claims
         {
             get
             {
-                var exp = ClaimsReader.GetStringClaim(this.payload, OAuthClaimNames.Exp);
-                return Convert.ToInt32(exp, CultureInfo.InvariantCulture);
+                return ClaimsReader.GetIntegerClaim(this.payload, OAuthClaimNames.Exp);
             }
         }
 
@@ -73,8 +72,8 @@ namespace SampleApi.Plumbing.Claims
             identity.AddClaim(new Claim(OAuthClaimNames.Scope, this.Scope));
             identity.AddClaim(new Claim(OAuthClaimNames.Subject, this.Sub));
 
-            var exp = ClaimsReader.GetStringClaim(this.payload, OAuthClaimNames.Exp);
-            identity.AddClaim(new Claim(OAuthClaimNames.Exp, exp));
+            var exp = ClaimsReader.GetIntegerClaim(this.payload, OAuthClaimNames.Exp);
+            identity.AddClaim(new Claim(OAuthClaimNames.Exp, exp.ToString()));
         }
 
         /*
@@ -100,20 +99,20 @@ namespace SampleApi.Plumbing.Claims
         {
             var results = new List<string>();
 
-            var aud = ClaimsReader.GetOptionalClaim(this.payload, OAuthClaimNames.Audience);
-            if (aud != null)
+            var audienceNode = this.payload[OAuthClaimNames.Audience];
+            if (audienceNode != null)
             {
-                if (aud is JArray)
+                var audiences = audienceNode as JsonArray;
+                if (audiences != null)
                 {
-                    var audiences = aud as JArray;
                     foreach (var audience in audiences)
                     {
-                        results.Add(audience.Value<string>());
+                        results.Add(audience.GetValue<string>());
                     }
                 }
                 else
                 {
-                    results.Add(aud.Value<string>());
+                    results.Add(audienceNode.GetValue<string>());
                 }
             }
 

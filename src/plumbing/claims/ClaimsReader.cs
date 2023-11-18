@@ -1,6 +1,6 @@
 namespace SampleApi.Plumbing.Claims
 {
-    using Newtonsoft.Json.Linq;
+    using System.Text.Json.Nodes;
     using SampleApi.Plumbing.Errors;
 
     /*
@@ -11,32 +11,37 @@ namespace SampleApi.Plumbing.Claims
         /*
          * Return a mandatory string claim
          */
-        public static string GetStringClaim(JObject claims, string name)
+        public static string GetStringClaim(JsonNode claims, string name)
         {
-            JToken claim = GetOptionalClaim(claims, name).Value<string>();
+            var claim = GetOptionalStringClaim(claims, name);
             if (claim == null)
             {
                 throw ErrorUtils.FromMissingClaim(name);
             }
 
-            return claim.Value<string>();
+            return claim;
+        }
+
+        /*
+         * Return a mandatory integer claim
+         */
+        public static int GetIntegerClaim(JsonNode claims, string name)
+        {
+            var claim = claims[name]?.GetValue<int>();
+            if (claim == null)
+            {
+                throw ErrorUtils.FromMissingClaim(name);
+            }
+
+            return claim.Value;
         }
 
         /*
          * Return an optional string claim
          */
-        public static string GetOptionalStringClaim(JObject claims, string name)
+        public static string GetOptionalStringClaim(JsonNode claims, string name)
         {
-            var claim = claims.GetValue(name);
-            return claim?.Value<string>();
-        }
-
-        /*
-         * Get a claim of any type, checking that it exists first
-         */
-        public static JToken GetOptionalClaim(JObject claims, string name)
-        {
-            return claims.GetValue(name);
+            return claims[name]?.GetValue<string>();
         }
     }
 }
