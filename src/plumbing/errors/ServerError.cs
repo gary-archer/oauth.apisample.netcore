@@ -1,7 +1,7 @@
 ﻿namespace SampleApi.Plumbing.Errors
 {
     using System;
-    using Newtonsoft.Json.Linq;
+    using System.Text.Json.Nodes;
 
     /*
      * An interface for errors internal to the API
@@ -29,10 +29,10 @@
         public abstract int InstanceId { get; }
 
         // Set details from an object node
-        public abstract void SetDetails(JToken details);
+        public abstract void SetDetails(JsonNode details);
 
         // Return the log format
-        public abstract JObject ToLogFormat(string apiName);
+        public abstract JsonNode ToLogFormat(string apiName);
 
         // Return the client error for the server error
         public abstract ClientError ToClientError(string apiName);

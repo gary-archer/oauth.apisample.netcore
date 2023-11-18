@@ -1,8 +1,8 @@
 namespace SampleApi.Logic.Claims
 {
     using System;
+    using System.Text.Json.Nodes;
     using System.Threading.Tasks;
-    using Newtonsoft.Json.Linq;
     using SampleApi.Logic.Repositories;
     using SampleApi.Plumbing.Claims;
 
@@ -48,7 +48,7 @@ namespace SampleApi.Logic.Claims
         /*
          * Deserialize extra claims after they have been read from the cache
          */
-        public override ExtraClaims DeserializeFromCache(JObject data)
+        public override ExtraClaims DeserializeFromCache(JsonNode data)
         {
             return SampleExtraClaims.ImportData(data);
         }

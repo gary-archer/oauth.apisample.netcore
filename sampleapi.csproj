@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- OAuth security -->
+    <!-- JWT acess token handling -->
     <PackageReference Include="jose-jwt" Version="4.1.0" />
 
     <!-- API logging -->
@@ -19,7 +19,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="7.0.0" />
 
     <!-- JSON handling -->
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Text.Json" Version="8.0.0" />
 
     <!-- Exclude child projects when running dotnet build -->
     <Compile Remove="test\**" />

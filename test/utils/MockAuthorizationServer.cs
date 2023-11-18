@@ -6,9 +6,9 @@ namespace SampleApi.Test.Utils
     using System.Net.Http.Headers;
     using System.Security.Cryptography;
     using System.Text;
+    using System.Text.Json.Nodes;
     using System.Threading.Tasks;
     using Jose;
-    using Newtonsoft.Json.Linq;
     using SampleApi.Plumbing.Utilities;
 
     /*
@@ -102,25 +102,23 @@ namespace SampleApi.Test.Utils
          */
         private async Task RegisterJsonWebWeys(string keysJson)
         {
-            dynamic data = new JObject();
-            data.Guid = this.keyId;
-            data.Priority = 1;
+            var data = new JsonObject
+            {
+                ["Guid"] = this.keyId,
+                ["Priority"] = 1,
+                ["Request"] = new JsonObject
+                {
+                    ["Path"] = "/.well-known/jwks.json",
+                    ["Methods"] = new JsonArray("get"),
+                },
+                ["Response"] = new JsonObject
+                {
+                    ["StatusCode"] = 200,
+                    ["Body"] = keysJson,
+                },
+            };
 
-            dynamic request = new JObject();
-            request.Path = "/.well-known/jwks.json";
-
-            dynamic methods = new JArray();
-            methods.Add("get");
-            request.Methods = methods;
-
-            data.Request = request;
-
-            dynamic response = new JObject();
-            response.StatusCode = 200;
-            response.Body = keysJson;
-            data.Response = response;
-
-            await this.Register(data.ToString());
+            await this.Register(data.ToJsonString());
         }
 
         /*

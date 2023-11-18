@@ -3,8 +3,9 @@ namespace SampleApi.Test
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.Json;
+    using System.Text.Json.Nodes;
     using System.Threading.Tasks;
-    using Newtonsoft.Json.Linq;
     using SampleApi.Test.Utils;
     using Xunit;
 
@@ -252,16 +253,15 @@ namespace SampleApi.Test
 
             if ((int)response.StatusCode >= 400)
             {
-                var error = JObject.Parse(response.Body);
-
-                if (error.ContainsKey("code"))
+                var error = JsonSerializer.Deserialize<JsonNode>(response.Body);
+                if (error["code"] != null)
                 {
-                    errorCode = error.Value<string>("code");
+                    errorCode = error["code"].GetValue<string>();
                 }
 
-                if (error.ContainsKey("id"))
+                if (error["id"] != null)
                 {
-                    errorId = error.Value<string>("id");
+                    errorId = error["id"].GetValue<int>().ToString();
                 }
             }
 
@@ -284,8 +284,8 @@ namespace SampleApi.Test
          */
         private void OutputMessage(ConsoleColor color, string message)
         {
-            System.Console.ForegroundColor = color;
-            System.Console.WriteLine(message);
+            Console.ForegroundColor = color;
+            Console.WriteLine(message);
         }
     }
 }

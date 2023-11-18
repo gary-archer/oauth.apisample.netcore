@@ -1,7 +1,7 @@
 namespace SampleApi.Host.Configuration
 {
-    using System.IO;
-    using Newtonsoft.Json;
+    using System.Threading.Tasks;
+    using SampleApi.Logic.Utilities;
     using SampleApi.Plumbing.Configuration;
 
     /*
@@ -10,28 +10,21 @@ namespace SampleApi.Host.Configuration
     public class Configuration
     {
         // The API's specific configuration
-        public ApiConfiguration Api { get; private set; }
+        public ApiConfiguration Api { get; set; }
 
         // Common logging
-        public LoggingConfiguration Logging { get; private set; }
+        public LoggingConfiguration Logging { get; set; }
 
         // Common OAuth processing
-        public OAuthConfiguration OAuth { get; private set; }
+        public OAuthConfiguration OAuth { get; set; }
 
         /*
          * A utility method to load the file and deal with casing
          */
-        public static Configuration Load(string filePath)
+        public static Task<Configuration> LoadAsync(string filePath)
         {
-            string text = File.ReadAllText(filePath);
-            dynamic data = JsonConvert.DeserializeObject(text);
-
-            return new Configuration
-            {
-                Api = data.api.ToObject<ApiConfiguration>(),
-                Logging = data.logging.ToObject<LoggingConfiguration>(),
-                OAuth = data.oauth.ToObject<OAuthConfiguration>(),
-            };
+            var reader = new JsonReader();
+            return reader.ReadDataAsync<Configuration>(filePath);
         }
     }
 }

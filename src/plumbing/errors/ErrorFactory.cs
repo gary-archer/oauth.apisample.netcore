@@ -2,7 +2,7 @@
 {
     using System;
     using System.Net;
-    using Newtonsoft.Json.Linq;
+    using System.Text.Json.Nodes;
 
     /*
      * An error factory class that returns the interface rather than the concrete type
@@ -40,7 +40,7 @@
             HttpStatusCode statusCode,
             string errorCode,
             string userMessage,
-            JToken logContext)
+            JsonNode logContext)
         {
             var error = new ClientErrorImpl(statusCode, errorCode, userMessage);
             error.SetLogContext(logContext);

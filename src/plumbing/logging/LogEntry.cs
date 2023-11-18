@@ -2,12 +2,10 @@ namespace SampleApi.Plumbing.Logging
 {
     using System;
     using System.Collections.Generic;
-    using System.Security.Claims;
+    using System.Text.Json.Nodes;
     using log4net;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Routing;
-    using Newtonsoft.Json.Linq;
-    using SampleApi.Plumbing.Claims;
     using SampleApi.Plumbing.Errors;
     using SampleApi.Plumbing.Utilities;
 
@@ -135,7 +133,7 @@ namespace SampleApi.Plumbing.Logging
         /*
          * Enable arbitrary data to be added
          */
-        public void AddInfo(JToken info)
+        public void AddInfo(JsonNode info)
         {
             this.data.InfoData.Add(info);
         }

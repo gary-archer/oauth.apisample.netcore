@@ -1,8 +1,9 @@
 namespace SampleApi.Logic.Claims
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Security.Claims;
-    using Newtonsoft.Json.Linq;
+    using System.Text.Json.Nodes;
     using SampleApi.Plumbing.Claims;
 
     /*
@@ -32,25 +33,25 @@ namespace SampleApi.Logic.Claims
         /*
          * Called when claims are deserialized during claims caching
          */
-        public static new SampleExtraClaims ImportData(JObject data)
+        public static new SampleExtraClaims ImportData(JsonNode data)
         {
             // These claims are always stored in the cache
-            var title = data.GetValue(CustomClaimNames.Title).Value<string>();
-            var regionNodes = data.GetValue(CustomClaimNames.Regions).Value<JArray>();
+            var title = data[CustomClaimNames.Title].GetValue<string>();
+            var regionNodes = data[CustomClaimNames.Regions].AsArray();
             var regionsList = new List<string>();
             foreach (var regionNode in regionNodes)
             {
-                regionsList.Add(regionNode.Value<string>());
+                regionsList.Add(regionNode.GetValue<string>());
             }
 
             var claims = new SampleExtraClaims(title, regionsList.ToArray());
 
             // These are only stored in the cache when the authorization server cannot issue them to access tokens
-            var managerIdNode = data.GetValue(CustomClaimNames.ManagerId);
-            var roleNode = data.GetValue(CustomClaimNames.Role);
-            if (managerIdNode != null && roleNode != null)
+            var managerId = data[CustomClaimNames.ManagerId]?.GetValue<string>();
+            var role = data[CustomClaimNames.Role]?.GetValue<string>();
+            if (!string.IsNullOrWhiteSpace(managerId) && !string.IsNullOrWhiteSpace(role))
             {
-                claims.AddCoreClaims(managerIdNode.Value<string>(), roleNode.Value<string>());
+                claims.AddCoreClaims(managerId, role);
             }
 
             return claims;
@@ -69,25 +70,20 @@ namespace SampleApi.Logic.Claims
         /*
          * Export claims when saving to the cache
          */
-        public override JObject ExportData()
+        public override JsonNode ExportData()
         {
-            dynamic data = new JObject();
-
             // These claims are always stored in the cache
-            data.title = this.Title;
-            var regions = new JArray();
-            foreach (var region in this.Regions)
+            var data = new JsonObject()
             {
-                regions.Add(region);
-            }
-
-            data.regions = regions;
+                ["title"] = this.Title,
+                ["regions"] = new JsonArray(this.Regions.Select(r => JsonValue.Create(r)).ToArray()),
+            };
 
             // These are only stored in the cache when the authorization server cannot issue them to access tokens
             if (!string.IsNullOrWhiteSpace(this.ManagerId) && !string.IsNullOrWhiteSpace(this.Role))
             {
-                data.manager_id = this.ManagerId;
-                data.role = this.Role;
+                data["manager_id"] = this.ManagerId;
+                data["role"] = this.Role;
             }
 
             return data;

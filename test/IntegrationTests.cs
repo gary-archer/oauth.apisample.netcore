@@ -1,10 +1,12 @@
 namespace SampleApi.IntegrationTests
 {
+    using System.Linq;
     using System.Net;
     using System.Security.Cryptography;
+    using System.Text.Json;
+    using System.Text.Json.Nodes;
     using System.Threading.Tasks;
     using Jose;
-    using Newtonsoft.Json.Linq;
     using SampleApi.Test.Utils;
     using Xunit;
 
@@ -41,8 +43,8 @@ namespace SampleApi.IntegrationTests
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.Unauthorized, "Unexpected HTTP status code");
-            var error = JObject.Parse(response.Body);
-            var code = error.Value<string>("code");
+            var error = JsonSerializer.Deserialize<JsonNode>(response.Body);
+            var code = error["code"].GetValue<string>();
             Assert.True(code == "invalid_token", "Unexpected error code");
         }
 
@@ -66,8 +68,8 @@ namespace SampleApi.IntegrationTests
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.Unauthorized, "Unexpected HTTP status code");
-            var error = JObject.Parse(response.Body);
-            var code = error.Value<string>("code");
+            var error = JsonSerializer.Deserialize<JsonNode>(response.Body);
+            var code = error["code"].GetValue<string>();
             Assert.True(code == "invalid_token", "Unexpected error code");
         }
 
@@ -91,8 +93,8 @@ namespace SampleApi.IntegrationTests
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.Unauthorized, "Unexpected HTTP status code");
-            var error = JObject.Parse(response.Body);
-            var code = error.Value<string>("code");
+            var error = JsonSerializer.Deserialize<JsonNode>(response.Body);
+            var code = error["code"].GetValue<string>();
             Assert.True(code == "invalid_token", "Unexpected error code");
         }
 
@@ -116,8 +118,8 @@ namespace SampleApi.IntegrationTests
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.Unauthorized, "Unexpected HTTP status code");
-            var error = JObject.Parse(response.Body);
-            var code = error.Value<string>("code");
+            var error = JsonSerializer.Deserialize<JsonNode>(response.Body);
+            var code = error["code"].GetValue<string>();
             Assert.True(code == "invalid_token", "Unexpected error code");
         }
 
@@ -143,8 +145,8 @@ namespace SampleApi.IntegrationTests
 
                 // Assert expected results
                 Assert.True(response.StatusCode == HttpStatusCode.Unauthorized, "Unexpected HTTP status code");
-                var error = JObject.Parse(response.Body);
-                var code = error.Value<string>("code");
+                var error = JsonSerializer.Deserialize<JsonNode>(response.Body);
+                var code = error["code"].GetValue<string>();
                 Assert.True(code == "invalid_token", "Unexpected error code");
             }
         }
@@ -169,8 +171,8 @@ namespace SampleApi.IntegrationTests
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.Forbidden, "Unexpected HTTP status code");
-            var error = JObject.Parse(response.Body);
-            var code = error.Value<string>("code");
+            var error = JsonSerializer.Deserialize<JsonNode>(response.Body);
+            var code = error["code"].GetValue<string>();
             Assert.True(code == "insufficient_scope", "Unexpected error code");
         }
 
@@ -194,8 +196,8 @@ namespace SampleApi.IntegrationTests
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.InternalServerError, "Unexpected HTTP status code");
-            var error = JObject.Parse(response.Body);
-            var code = error.Value<string>("code");
+            var error = JsonSerializer.Deserialize<JsonNode>(response.Body);
+            var code = error["code"].GetValue<string>();
             Assert.True(code == "exception_simulation", "Unexpected error code");
         }
 
@@ -218,9 +220,10 @@ namespace SampleApi.IntegrationTests
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
-            var claims = JObject.Parse(response.Body);
-            var regions = claims.Value<JArray>("regions");
-            Assert.True(regions.Count == 1, "Unexpected regions claim");
+
+            var claims = JsonSerializer.Deserialize<JsonNode>(response.Body);
+            var regions = claims["regions"].AsArray().GetValues<string>();
+            Assert.True(regions.Count() == 1, "Unexpected regions claim");
         }
 
         /*
@@ -242,9 +245,9 @@ namespace SampleApi.IntegrationTests
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
-            var claims = JObject.Parse(response.Body);
-            var regions = claims.Value<JArray>("regions");
-            Assert.True(regions.Count == 3, "Unexpected regions claim");
+            var claims = JsonSerializer.Deserialize<JsonNode>(response.Body);
+            var regions = claims["regions"].AsArray().GetValues<string>();
+            Assert.True(regions.Count() == 3, "Unexpected regions claim");
         }
 
         /*
@@ -266,7 +269,7 @@ namespace SampleApi.IntegrationTests
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
-            var companies = JArray.Parse(response.Body);
+            var companies = JsonSerializer.Deserialize<JsonNode>(response.Body).AsArray();
             Assert.True(companies.Count == 2, "Unexpected companies list");
         }
 
@@ -289,7 +292,7 @@ namespace SampleApi.IntegrationTests
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
-            var companies = JArray.Parse(response.Body);
+            var companies = JsonSerializer.Deserialize<JsonNode>(response.Body).AsArray();
             Assert.True(companies.Count == 4, "Unexpected companies list");
         }
 
@@ -312,8 +315,8 @@ namespace SampleApi.IntegrationTests
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.OK, "Unexpected HTTP status code");
-            var payload = JObject.Parse(response.Body);
-            var transactions = payload.Value<JArray>("transactions");
+            var payload = JsonSerializer.Deserialize<JsonNode>(response.Body);
+            var transactions = payload["transactions"].AsArray();
             Assert.True(transactions.Count == 8, "Unexpected transactions list");
         }
 
@@ -336,8 +339,8 @@ namespace SampleApi.IntegrationTests
 
             // Assert expected results
             Assert.True(response.StatusCode == HttpStatusCode.NotFound, "Unexpected HTTP status code");
-            var error = JObject.Parse(response.Body);
-            var code = error.Value<string>("code");
+            var error = JsonSerializer.Deserialize<JsonNode>(response.Body);
+            var code = error["code"].GetValue<string>();
             Assert.True(code == "company_not_found", "Unexpected error code");
         }
     }

@@ -1,6 +1,6 @@
 ﻿namespace SampleApi.Plumbing.Configuration
 {
-    using Newtonsoft.Json.Linq;
+    using System.Text.Json.Nodes;
 
     /*
      * Logging configuration settings
@@ -11,9 +11,9 @@
         public string ApiName { get; set; }
 
         // The production configuration
-        public JObject Production { get; set; }
+        public JsonNode Production { get; set; }
 
         // The development configuration
-        public JObject Development { get; set; }
+        public JsonNode Development { get; set; }
     }
 }

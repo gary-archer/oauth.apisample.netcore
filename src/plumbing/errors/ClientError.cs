@@ -2,7 +2,7 @@
 {
     using System;
     using System.Net;
-    using Newtonsoft.Json.Linq;
+    using System.Text.Json.Nodes;
 
     /*
      * An interface that all types of client error object support
@@ -33,9 +33,9 @@
         public abstract void SetExceptionDetails(string area, int instanceId, string utcTime);
 
         // Return the JSON response format
-        public abstract JObject ToResponseFormat();
+        public abstract JsonNode ToResponseFormat();
 
         // Return the log format
-        public abstract JObject ToLogFormat();
+        public abstract JsonNode ToLogFormat();
     }
 }

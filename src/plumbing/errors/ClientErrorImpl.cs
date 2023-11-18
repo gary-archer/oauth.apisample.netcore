@@ -1,7 +1,7 @@
 namespace SampleApi.Plumbing.Errors
 {
     using System.Net;
-    using Newtonsoft.Json.Linq;
+    using System.Text.Json.Nodes;
 
     /*
      * The error type for an incorrect client request
@@ -11,7 +11,7 @@ namespace SampleApi.Plumbing.Errors
         // Mandatory fields for both 4xx and 500 errors
         private readonly HttpStatusCode statusCode;
         private readonly string errorCode;
-        private JToken logContext;
+        private JsonNode logContext;
 
         // Extra fields returned to the client for UI displays of 500 errors
         private string area;
@@ -51,7 +51,7 @@ namespace SampleApi.Plumbing.Errors
             }
         }
 
-        public void SetLogContext(JToken value)
+        public void SetLogContext(JsonNode value)
         {
             this.logContext = value;
         }
@@ -69,17 +69,19 @@ namespace SampleApi.Plumbing.Errors
         /*
          * Return a dynamic object that can be serialized by calling toString
          */
-        public override JObject ToResponseFormat()
+        public override JsonNode ToResponseFormat()
         {
-            dynamic data = new JObject();
-            data.code = this.errorCode;
-            data.message = this.Message;
+            var data = new JsonObject
+            {
+                ["code"] = this.errorCode,
+                ["message"] = this.Message,
+            };
 
             if (this.id > 0 && this.area.Length > 0 && this.utcTime.Length > 0)
             {
-                data.id = this.id;
-                data.area = this.area;
-                data.utcTime = this.utcTime;
+                data["id"] = this.id;
+                data["area"] = this.area;
+                data["utcTime"] = this.utcTime;
             }
 
             return data;
@@ -88,15 +90,17 @@ namespace SampleApi.Plumbing.Errors
         /*
          * Contribute the error data to logs
          */
-        public override JObject ToLogFormat()
+        public override JsonNode ToLogFormat()
         {
-            dynamic data = new JObject();
-            data.statusCode = this.StatusCode;
-            data.body = this.ToResponseFormat();
+            var data = new JsonObject
+            {
+                ["statusCode"] = (int)this.StatusCode,
+                ["clientError"] = this.ToResponseFormat(),
+            };
 
             if (this.logContext != null)
             {
-                data.context = this.logContext;
+                data["context"] = this.logContext;
             }
 
             return data;

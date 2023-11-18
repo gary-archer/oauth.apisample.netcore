@@ -1,7 +1,7 @@
 namespace SampleApi.Plumbing.Claims
 {
     using System.Security.Claims;
-    using Newtonsoft.Json.Linq;
+    using System.Text.Json.Nodes;
 
     /*
      * Claims that you cannot, or do not want to, manage in the authorization server
@@ -11,7 +11,7 @@ namespace SampleApi.Plumbing.Claims
         /*
          * Overridden by derived classes when reading claims from the cache
          */
-        public static ExtraClaims ImportData(JObject data)
+        public static ExtraClaims ImportData(JsonNode data)
         {
             return new ExtraClaims();
         }
@@ -19,9 +19,9 @@ namespace SampleApi.Plumbing.Claims
         /*
          * Overridden by derived classes when saving claims to the cache
          */
-        public virtual JObject ExportData()
+        public virtual JsonNode ExportData()
         {
-            return new JObject();
+            return new JsonObject();
         }
 
         /*

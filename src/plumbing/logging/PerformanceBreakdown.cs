@@ -2,7 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Diagnostics;
-    using Newtonsoft.Json.Linq;
+    using System.Linq;
+    using System.Text.Json.Nodes;
 
     /*
      * The full implementation class for capturing a performance breakdown
@@ -12,7 +13,7 @@
         private readonly string name;
         private readonly Stopwatch stopWatch;
         private readonly IList<PerformanceBreakdown> children;
-        private JToken details;
+        private JsonNode details;
 
         public PerformanceBreakdown(string name)
         {
@@ -39,7 +40,7 @@
         /*
         * Set details to associate with the performance breakdown, such as SQL and parameters
         */
-        public void SetDetails(JToken value)
+        public void SetDetails(JsonNode value)
         {
             this.details = value;
         }
@@ -56,24 +57,22 @@
         /*
         * Return data as an object
         */
-        public JObject GetData()
+        public JsonNode GetData()
         {
-            dynamic data = new JObject();
-            data.name = this.name;
-            data.millisecondsTaken = this.MillisecondsTaken;
+            var data = new JsonObject()
+            {
+                ["name"] = this.name,
+                ["millisecondsTaken"] = this.MillisecondsTaken,
+            };
 
             if (this.details != null)
             {
-                data.details = this.details;
+                data["details"] = this.details;
             }
 
             if (this.children.Count > 0)
             {
-                data.children = new JArray();
-                foreach (var child in this.children)
-                {
-                    data.children.Add(child.GetData());
-                }
+                data["children"] = new JsonArray(this.children.Select(c => c.GetData()).ToArray());
             }
 
             return data;

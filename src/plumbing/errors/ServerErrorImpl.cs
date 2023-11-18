@@ -2,8 +2,9 @@ namespace SampleApi.Plumbing.Errors
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
-    using Newtonsoft.Json.Linq;
+    using System.Text.Json.Nodes;
 
     /*
      * A default representation of a server error, including how it is logged and translated to a client error
@@ -19,7 +20,7 @@ namespace SampleApi.Plumbing.Errors
         private readonly HttpStatusCode statusCode;
         private readonly int instanceId;
         private readonly string utcTime;
-        private JToken details;
+        private JsonNode details;
 
         /*
          * The default constructor
@@ -58,7 +59,7 @@ namespace SampleApi.Plumbing.Errors
             }
         }
 
-        public override void SetDetails(JToken details)
+        public override void SetDetails(JsonNode details)
         {
             this.details = details;
         }
@@ -66,28 +67,23 @@ namespace SampleApi.Plumbing.Errors
         /*
          * Return a dynamic object that can be serialized by calling toString
          */
-        public override JObject ToLogFormat(string apiName)
+        public override JsonNode ToLogFormat(string apiName)
         {
-            dynamic data = new JObject();
-            data.statusCode = this.statusCode;
-            data.clientError = this.ToClientError(apiName).ToResponseFormat();
-            data.serviceError = new JObject();
-            data.serviceError.errorCode = this.errorCode;
-            data.serviceError.details = this.GetErrorDetails();
+            var data = new JsonObject
+            {
+                ["statusCode"] = (int)this.statusCode,
+                ["clientError"] = this.ToClientError(apiName).ToResponseFormat(),
+                ["serviceError"] = new JsonObject()
+                {
+                    ["details"] = this.GetErrorDetails(),
+                },
+            };
 
             // Output the stack trace of the original error
-            var stack = this.GetOriginalException().StackTrace;
-            if (stack != null)
+            var frames = this.GetOriginalException().StackTrace?.Split('\n');
+            if (frames?.Length > 0)
             {
-                var frames = stack.Split('\n');
-                if (frames.Length > 0)
-                {
-                    data.serviceError.stack = new JArray();
-                    foreach (var frame in frames)
-                    {
-                        data.serviceError.stack.Add(frame.Trim());
-                    }
-                }
+                data["serviceError"]["stack"] = new JsonArray(frames.Select(f => JsonValue.Create(f.Trim())).ToArray());
             }
 
             return data;
