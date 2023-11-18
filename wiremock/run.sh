@@ -9,7 +9,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #
 # Run Wiremock over HTTPS in this terminal
 #
-dotnet run
+dotnet run --no-build
 if [ $? -ne 0 ]; then
   echo 'Problem encountered running Wiremock'
   read -n 1

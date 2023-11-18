@@ -6,8 +6,6 @@
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-rm -rf bin
-
 #
 # Build the app
 #

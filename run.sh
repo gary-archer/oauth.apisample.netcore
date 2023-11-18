@@ -9,7 +9,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #
 # Run the previously built API
 #
-dotnet run
+dotnet run --no-build
 if [ $? -ne 0 ]; then
   echo 'Problem encountered running the API'
   read -n 1
