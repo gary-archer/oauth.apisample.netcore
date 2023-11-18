@@ -5,8 +5,6 @@ namespace SampleApi.Plumbing.Middleware
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authentication;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
     using SampleApi.Plumbing.Errors;
     using SampleApi.Plumbing.Logging;
@@ -24,9 +22,8 @@ namespace SampleApi.Plumbing.Middleware
         public CustomAuthenticationHandler(
             IOptionsMonitor<AuthenticationSchemeOptions> options,
             Microsoft.Extensions.Logging.ILoggerFactory developmentLoggerFactory,
-            UrlEncoder urlEncoder,
-            ISystemClock clock)
-                : base(options, developmentLoggerFactory, urlEncoder, clock)
+            UrlEncoder urlEncoder)
+                : base(options, developmentLoggerFactory, urlEncoder)
         {
         }
 

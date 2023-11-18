@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/Debug/net7.0/sampleapi.dll",
+            "program": "${workspaceFolder}/bin/Debug/net8.0/sampleapi.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
