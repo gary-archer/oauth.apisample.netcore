@@ -1,8 +1,9 @@
 #!/bin/bash
 
-#############################################################
+##############################################################
 # A script to build and run the API with a test configuration
-#############################################################
+# The script also runs Wiremock as a mock authorization server
+##############################################################
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
@@ -11,13 +12,31 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #
 ./downloadcerts.sh
 if [ $? -ne 0 ]; then
-  exit
+  exit 1
 fi
 
 #
 # Copy down the test configuration, to point the API to Wiremock rather than AWS Cognito
 #
 cp deployment/environments/test/api.config.json ./api.config.json
+
+#
+# Build the API every time
+#
+./build.sh
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+#
+# Build Wiremock only once
+#
+if [ ! -f ./bin/Debug/net8.0/wiremock ]; then
+  ./wiremock/build.sh
+  if [ $? -ne 0 ]; then
+    exit 1
+  fi
+fi
 
 #
 # Get the platform
@@ -37,26 +56,25 @@ case "$(uname -s)" in
 	;;
 esac
 
-
 #
-# Then run the API and Wiremock in a child window
+# Run the API and Wiremock in child windows
 #
 echo 'Running API ...'
 if [ "$PLATFORM" == 'MACOS' ]; then
   
-  open -a Terminal ./run_wiremock.sh
-  open -a Terminal ./run_api.sh
+  open -a Terminal ./wiremock/run.sh
+  open -a Terminal ./run.sh
 
 elif [ "$PLATFORM" == 'WINDOWS' ]; then
   
   GIT_BASH='C:\Program Files\Git\git-bash.exe'
-  "$GIT_BASH" -c ./run_wiremock.sh &
-  "$GIT_BASH" -c ./run_api.sh &
+  "$GIT_BASH" -c ./wiremock/run.sh &
+  "$GIT_BASH" -c ./run.sh &
 
 elif [ "$PLATFORM" == 'LINUX' ]; then
 
-  gnome-terminal -- ./run_wiremock.sh
-  gnome-terminal -- ./run_api.sh
+  gnome-terminal -- ./wiremock/run.sh
+  gnome-terminal -- ./run.sh
 
 fi
 
@@ -70,7 +88,7 @@ while [ "$(curl -k -s -X GET -o /dev/null -w '%{http_code}' "$API_URL")" != '401
 done
 
 #
-# Wait for endpoints to become available
+# Wait for Wiremock endpoints to become available
 #
 echo 'Waiting for Wiremock endpoints to come up ...'
 WIREMOCK_URL='https://login.authsamples-dev.com:447/__admin/mappings'

@@ -58,7 +58,7 @@
                 // Configure the Kestrel web server
                 .UseKestrel(options =>
                 {
-                    options.Listen(IPAddress.Any, configuration.Api.Port, listenOptions =>
+                    options.ListenAnyIP(configuration.Api.Port, listenOptions =>
                     {
                         if (!string.IsNullOrWhiteSpace(configuration.Api.SslCertificateFileName) &&
                             !string.IsNullOrWhiteSpace(configuration.Api.SslCertificatePassword))
