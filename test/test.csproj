@@ -16,9 +16,11 @@
     <!-- Use utility classes from the main API-->
     <ProjectReference Include="..\sampleapi.csproj" />
 
-    <!-- Import libraries used by test code -->
+    <!-- OAuth processing -->
     <PackageReference Include="jose-jwt" Version="4.1.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+
+    <!-- JSON processing -->
+    <PackageReference Include="System.Text.Json" Version="8.0.0" />
 
     <!-- Use code quality checks for test code -->
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
