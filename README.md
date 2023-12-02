@@ -40,7 +40,7 @@ Follow the [Technical Support Queries](https://authguidance.com/2019/08/02/intel
 
 ## Commands
 
-Ensure that the .NET 8 SDK is installed, then run the API with this command:
+Ensure that a .NET 8+ SDK is installed, then run the API with this command:
 
 ```bash
 ./start.sh
