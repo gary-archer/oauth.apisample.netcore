@@ -131,10 +131,10 @@ namespace SampleApi.IntegrationTests
         [Trait("Category", "Integration")]
         public async Task CallApi_Returns401_ForInvalidSignature()
         {
-            using (var rsa = RSA.Create(2048))
+            using (var keypair = ECDsa.Create(ECCurve.NamedCurves.nistP256))
             {
                 // Get an access token signed with a malicious token signing key
-                var jwk = new Jwk(rsa, true);
+                var jwk = new Jwk(keypair, true);
                 var jwtOptions = new MockTokenOptions();
                 jwtOptions.UseStandardUser();
                 var accessToken = this.state.MockAuthorizationServer.IssueAccessToken(jwtOptions, jwk);
