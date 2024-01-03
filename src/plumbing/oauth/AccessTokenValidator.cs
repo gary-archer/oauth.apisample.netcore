@@ -34,7 +34,6 @@ namespace SampleApi.Plumbing.OAuth
          */
         public async Task<JwtClaims> ValidateTokenAsync(string accessToken)
         {
-            Console.WriteLine(accessToken);
             using (this.logEntry.CreatePerformanceBreakdown("tokenValidator"))
             {
                 var claimsJson = string.Empty;
