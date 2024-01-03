@@ -18,7 +18,7 @@ namespace SampleApi.Test.Utils
     {
         private readonly string adminBaseUrl;
         private readonly HttpProxy httpProxy;
-        private readonly RSA rsa;
+        private readonly ECDsa keypair;
         private readonly Jwk tokenSigningPrivateKey;
         private readonly Jwk tokenSigningPublicKey;
         private readonly string keyId;
@@ -28,15 +28,15 @@ namespace SampleApi.Test.Utils
             this.adminBaseUrl = "https://login.authsamples-dev.com:447/__admin/mappings";
             this.httpProxy = new HttpProxy(useProxy, "http://127.0.0.1:8888");
 
-            var algorithm = "RS256";
-            this.rsa = RSA.Create(2048);
+            var algorithm = "ES256";
+            this.keypair = ECDsa.Create(ECCurve.NamedCurves.nistP256);
             this.keyId = Guid.NewGuid().ToString();
 
-            this.tokenSigningPrivateKey = new Jwk(this.rsa, true);
+            this.tokenSigningPrivateKey = new Jwk(this.keypair, true);
             this.tokenSigningPrivateKey.Alg = algorithm;
             this.tokenSigningPrivateKey.KeyId = this.keyId;
 
-            this.tokenSigningPublicKey = new Jwk(this.rsa, false);
+            this.tokenSigningPublicKey = new Jwk(this.keypair, false);
             this.tokenSigningPublicKey.Alg = algorithm;
             this.tokenSigningPublicKey.KeyId = this.keyId;
         }
@@ -44,6 +44,7 @@ namespace SampleApi.Test.Utils
         public void Start()
         {
             var keyset = this.GetTokenSigningPublicKeys();
+            Console.WriteLine(keyset);
             this.RegisterJsonWebWeys(keyset).Wait();
         }
 
@@ -86,7 +87,7 @@ namespace SampleApi.Test.Utils
             };
 
             var jwkToUse = jwk ?? this.tokenSigningPrivateKey;
-            return JWT.Encode(payload, jwkToUse, JwsAlgorithm.RS256, headers);
+            return JWT.Encode(payload, jwkToUse, JwsAlgorithm.ES256, headers);
         }
 
         /*
@@ -94,7 +95,7 @@ namespace SampleApi.Test.Utils
          */
         public void Dispose()
         {
-            this.rsa.Dispose();
+            this.keypair.Dispose();
         }
 
         /*

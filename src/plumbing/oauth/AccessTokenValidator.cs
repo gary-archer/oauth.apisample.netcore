@@ -34,6 +34,7 @@ namespace SampleApi.Plumbing.OAuth
          */
         public async Task<JwtClaims> ValidateTokenAsync(string accessToken)
         {
+            Console.WriteLine(accessToken);
             using (this.logEntry.CreatePerformanceBreakdown("tokenValidator"))
             {
                 var claimsJson = string.Empty;
@@ -54,7 +55,7 @@ namespace SampleApi.Plumbing.OAuth
                     }
 
                     // Only accept supported token signing algorithms
-                    if (jwk.Alg != "RS256")
+                    if (jwk.Alg != this.configuration.Algorithm)
                     {
                         throw ErrorFactory.CreateClient401Error($"The access token kid was not found in the JWKS");
                     }
