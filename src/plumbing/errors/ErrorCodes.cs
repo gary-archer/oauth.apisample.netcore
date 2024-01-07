@@ -9,8 +9,6 @@
 
         public static readonly string InvalidToken = "invalid_token";
 
-        public static readonly string ClaimsFailure = "claims_failure";
-
         public static readonly string TokenSigningKeysDownloadError = "jwks_download_failure";
 
         public static readonly string InsufficientScope = "insufficient_scope";

@@ -101,9 +101,9 @@
         {
             return ErrorFactory.CreateClientErrorWithContext(
                 System.Net.HttpStatusCode.BadRequest,
-                ErrorCodes.ClaimsFailure,
-                "Authorization data not found",
-                $"Missing claim in input: {claimName}");
+                ErrorCodes.InsufficientScope,
+                "The token does not contain sufficient scope for this API",
+                $"Missing claim in input: '{claimName}'");
         }
 
         /*
