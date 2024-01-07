@@ -96,6 +96,7 @@
 
         /*
          * Handle unexpected data errors if an expected claim was not found in an OAuth message
+         * This is the same underlying problem as a missing scope and typically caused by incorrect configuration
          */
         public static ClientError FromMissingClaim(string claimName)
         {
