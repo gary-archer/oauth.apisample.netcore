@@ -17,12 +17,12 @@ namespace SampleApi.Logic.Services
     public class CompanyService
     {
         private readonly CompanyRepository repository;
-        private readonly SampleClaimsPrincipal claims;
+        private readonly CustomClaimsPrincipal claims;
 
         public CompanyService(CompanyRepository repository, CustomClaimsPrincipal claims)
         {
             this.repository = repository;
-            this.claims = claims as SampleClaimsPrincipal;
+            this.claims = claims;
         }
 
         /*
@@ -57,15 +57,14 @@ namespace SampleApi.Logic.Services
         private bool IsUserAuthorizedForCompany(Company company)
         {
             // The admin role is granted access to all resources
-            var isAdmin = this.claims.GetRole() == "admin";
-            if (isAdmin)
+            var role = this.claims.JwtClaims.GetStringClaim(CustomClaimNames.Role).ToLower();
+            if (role == "admin")
             {
                 return true;
             }
 
             // Unknown roles are granted no access to resources
-            var isUser = this.claims.GetRole() == "user";
-            if (!isUser)
+            if (role != "user")
             {
                 return false;
             }

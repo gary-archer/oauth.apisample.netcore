@@ -8,13 +8,13 @@ namespace SampleApi.Host.Controllers
 
     /*
      * Return user info from the business data to the client
-     * Clients call the authorization server's user info endpoint to get OAuth user attributes
+     * These values are separate to the core identity data returned from the OAuth user info endpoint
      */
     [Route("investments/userinfo")]
     public class UserInfoController : Controller
     {
         /*
-         * Return attributes that are not stored in the authorization server that the UI needs
+         * Return user attributes that are not stored in the authorization server that the UI needs
          */
         [HttpGet("")]
         public ClientUserInfo GetUserInfo()
@@ -23,7 +23,7 @@ namespace SampleApi.Host.Controllers
             var extraClaims = claimsPrincipal.ExtraClaims as SampleExtraClaims;
 
             return new ClientUserInfo(
-                extraClaims.Role,
+                extraClaims.Title,
                 extraClaims.Regions.ToArray());
         }
     }

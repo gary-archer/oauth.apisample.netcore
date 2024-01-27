@@ -1,6 +1,7 @@
 ﻿namespace SampleApi.Plumbing.Claims
 {
     using System;
+    using System.Security.Claims;
     using System.Text.Json.Nodes;
     using System.Threading.Tasks;
 
@@ -24,7 +25,10 @@
          */
         public virtual CustomClaimsPrincipal CreateClaimsPrincipal(JwtClaims jwtClaims, ExtraClaims extraClaims)
         {
-            return new CustomClaimsPrincipal(jwtClaims, extraClaims);
+            var identity = new ClaimsIdentity("Bearer", OAuthClaimNames.Subject, null);
+            jwtClaims.AddToClaimsIdentity(identity);
+            extraClaims.AddToClaimsIdentity(identity);
+            return new CustomClaimsPrincipal(jwtClaims, extraClaims, identity);
         }
 
         /*

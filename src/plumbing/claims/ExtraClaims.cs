@@ -27,16 +27,8 @@ namespace SampleApi.Plumbing.Claims
         /*
          * Add claims to the identity in order for .NET authorization to work as expected
          */
-        public virtual void AddClaims(ClaimsIdentity identity)
+        public virtual void AddToClaimsIdentity(ClaimsIdentity identity)
         {
-        }
-
-        /*
-         * A derived class can set the role claim type
-         */
-        public virtual string GetRoleClaimType()
-        {
-            return null;
         }
     }
 }

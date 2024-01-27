@@ -13,7 +13,7 @@ namespace SampleApi.Plumbing.Claims
          */
         public static string GetStringClaim(JsonNode claims, string name)
         {
-            var claim = GetOptionalStringClaim(claims, name);
+            var claim = claims[name]?.GetValue<string>();
             if (claim == null)
             {
                 throw ErrorUtils.FromMissingClaim(name);
@@ -34,14 +34,6 @@ namespace SampleApi.Plumbing.Claims
             }
 
             return claim.Value;
-        }
-
-        /*
-         * Return an optional string claim
-         */
-        public static string GetOptionalStringClaim(JsonNode claims, string name)
-        {
-            return claims[name]?.GetValue<string>();
         }
     }
 }

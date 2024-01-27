@@ -1,8 +1,6 @@
 namespace SampleApi.Plumbing.Claims
 {
-    using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Security.Claims;
     using System.Text.Json.Nodes;
 
@@ -56,40 +54,9 @@ namespace SampleApi.Plumbing.Claims
             }
         }
 
-        /*
-         * Add claims to the identity in order for .NET authorization to work as expected
-         */
-        public void AddClaims(ClaimsIdentity identity)
+        public string GetStringClaim(string name)
         {
-            identity.AddClaim(new Claim(OAuthClaimNames.Issuer, this.Iss));
-
-            var audiences = this.GetAudiences();
-            foreach (var audience in audiences)
-            {
-                identity.AddClaim(new Claim(OAuthClaimNames.Audience, audience));
-            }
-
-            identity.AddClaim(new Claim(OAuthClaimNames.Scope, this.Scope));
-            identity.AddClaim(new Claim(OAuthClaimNames.Subject, this.Sub));
-
-            var exp = ClaimsReader.GetIntegerClaim(this.payload, OAuthClaimNames.Exp);
-            identity.AddClaim(new Claim(OAuthClaimNames.Exp, exp.ToString()));
-        }
-
-        /*
-         * Set the name claim type to the subject claim
-         */
-        public string GetNameClaimType()
-        {
-            return OAuthClaimNames.Subject;
-        }
-
-        /*
-         * Look up an optional claim in the JWT
-         */
-        public string GetOptionalStringClaim(string name)
-        {
-            return ClaimsReader.GetOptionalStringClaim(this.payload, name);
+            return ClaimsReader.GetStringClaim(this.payload, name);
         }
 
         /*
@@ -117,6 +84,26 @@ namespace SampleApi.Plumbing.Claims
             }
 
             return results;
+        }
+
+        /*
+         * Add claims to the identity in order for .NET authorization to work as expected
+         */
+        public void AddToClaimsIdentity(ClaimsIdentity identity)
+        {
+            identity.AddClaim(new Claim(OAuthClaimNames.Issuer, this.Iss));
+
+            var audiences = this.GetAudiences();
+            foreach (var audience in audiences)
+            {
+                identity.AddClaim(new Claim(OAuthClaimNames.Audience, audience));
+            }
+
+            identity.AddClaim(new Claim(OAuthClaimNames.Scope, this.Scope));
+            identity.AddClaim(new Claim(OAuthClaimNames.Subject, this.Sub));
+
+            var exp = ClaimsReader.GetIntegerClaim(this.payload, OAuthClaimNames.Exp);
+            identity.AddClaim(new Claim(OAuthClaimNames.Exp, exp.ToString()));
         }
     }
 }

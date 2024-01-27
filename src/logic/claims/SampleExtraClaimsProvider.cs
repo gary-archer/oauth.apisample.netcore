@@ -1,6 +1,7 @@
 namespace SampleApi.Logic.Claims
 {
     using System;
+    using System.Security.Claims;
     using System.Text.Json.Nodes;
     using System.Threading.Tasks;
     using SampleApi.Logic.Repositories;
@@ -20,29 +21,32 @@ namespace SampleApi.Logic.Claims
             // Get the user repository for this request
             var userRepository = (UserRepository)serviceProvider.GetService(typeof(UserRepository));
 
-            // First, see which claims are included in access tokens
-            var managerId = jwtClaims.GetOptionalStringClaim(CustomClaimNames.ManagerId);
-            if (!string.IsNullOrWhiteSpace(managerId))
-            {
-                // The best model is to receive a useful user identity in access tokens, along with the user role
-                // This ensures a locked down token and also simpler code
-                return userRepository.GetClaimsForManagerId(managerId);
-            }
-            else
-            {
-                // With AWS Cognito, there is a lack of support for custom claims in access tokens at the time of writing
-                // So the API has to map the subject to its own user identity and look up all custom claims
-                return userRepository.GetClaimsForSubject(jwtClaims.Sub);
-            }
+            // The manager ID is a business user identity from which other claims can be looked up
+            var managerId = jwtClaims.GetStringClaim(CustomClaimNames.ManagerId);
+            return userRepository.GetClaimsForManagerId(managerId);
         }
         #pragma warning restore 1998
 
         /*
-         * Create a claims principal that manages lookups across both token claims and extra claims
+         * Create a claims principal containing all claims
          */
         public override CustomClaimsPrincipal CreateClaimsPrincipal(JwtClaims jwtClaims, ExtraClaims extraClaims)
         {
-            return new SampleClaimsPrincipal(jwtClaims, extraClaims);
+            // Create the identity
+            var identity = new ClaimsIdentity("Bearer", OAuthClaimNames.Subject, CustomClaimNames.Role);
+
+            // Add generic JWT claims
+            jwtClaims.AddToClaimsIdentity(identity);
+
+            // Add custom JWT claims
+            identity.AddClaim(new Claim(CustomClaimNames.ManagerId, jwtClaims.GetStringClaim(CustomClaimNames.ManagerId)));
+            identity.AddClaim(new Claim(CustomClaimNames.Role, jwtClaims.GetStringClaim(CustomClaimNames.Role)));
+
+            // Add claims not included in the JWT
+            extraClaims.AddToClaimsIdentity(identity);
+
+            // Return the final claims principal
+            return new CustomClaimsPrincipal(jwtClaims, extraClaims, identity);
         }
 
         /*

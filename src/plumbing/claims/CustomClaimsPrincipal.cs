@@ -7,8 +7,8 @@ namespace SampleApi.Plumbing.Claims
      */
     public class CustomClaimsPrincipal : ClaimsPrincipal
     {
-        public CustomClaimsPrincipal(JwtClaims jwtClaims, ExtraClaims extraClaims)
-            : base(GetClaimsIdentity(jwtClaims, extraClaims))
+        public CustomClaimsPrincipal(JwtClaims jwtClaims, ExtraClaims extraClaims, ClaimsIdentity identity)
+            : base(identity)
         {
             this.JwtClaims = jwtClaims;
             this.ExtraClaims = extraClaims;
@@ -17,16 +17,5 @@ namespace SampleApi.Plumbing.Claims
         public JwtClaims JwtClaims { get; private set; }
 
         public ExtraClaims ExtraClaims { get; private set; }
-
-        /*
-         * Wire up the claims principal in Microsoft terms, so that authorization attributes work as expected
-         */
-        private static ClaimsIdentity GetClaimsIdentity(JwtClaims jwtClaims, ExtraClaims extraClaims)
-        {
-            var identity = new ClaimsIdentity("Bearer", jwtClaims.GetNameClaimType(), extraClaims.GetRoleClaimType());
-            jwtClaims.AddClaims(identity);
-            extraClaims.AddClaims(identity);
-            return identity;
-        }
     }
 }
