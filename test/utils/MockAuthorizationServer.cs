@@ -105,17 +105,17 @@ namespace SampleApi.Test.Utils
         {
             var data = new JsonObject
             {
-                ["Guid"] = this.keyId,
-                ["Priority"] = 1,
-                ["Request"] = new JsonObject
+                ["id"] = this.keyId,
+                ["priority"] = 1,
+                ["request"] = new JsonObject
                 {
-                    ["Path"] = "/.well-known/jwks.json",
-                    ["Methods"] = new JsonArray("get"),
+                    ["method"] = "GET",
+                    ["url"] = "/.well-known/jwks.json",
                 },
-                ["Response"] = new JsonObject
+                ["response"] = new JsonObject
                 {
-                    ["StatusCode"] = 200,
-                    ["Body"] = keysJson,
+                    ["status"] = 200,
+                    ["body"] = keysJson,
                 },
             };
 
@@ -146,7 +146,7 @@ namespace SampleApi.Test.Utils
                 {
                     var status = (int)response.StatusCode;
                     var text = await response.Content.ReadAsStringAsync();
-                    throw new InvalidOperationException($"Register call failed: {status}");
+                    throw new InvalidOperationException($"Register call failed: {status} {text}");
                 }
             }
         }

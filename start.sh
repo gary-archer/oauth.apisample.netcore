@@ -31,7 +31,7 @@ fi
 #
 # Then run the API
 #
-./run.sh
+./run_api.sh
 if [ $? -ne 0 ]; then
   exit 1
 fi

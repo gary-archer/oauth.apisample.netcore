@@ -29,16 +29,6 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Build Wiremock only once
-#
-if [ ! -f ./bin/Debug/net8.0/wiremock ]; then
-  ./wiremock/build.sh
-  if [ $? -ne 0 ]; then
-    exit 1
-  fi
-fi
-
-#
 # Get the platform
 #
 case "$(uname -s)" in
@@ -62,19 +52,19 @@ esac
 echo 'Running API ...'
 if [ "$PLATFORM" == 'MACOS' ]; then
   
-  open -a Terminal ./wiremock/run.sh
-  open -a Terminal ./run.sh
+  open -a Terminal ./run_wiremock.sh
+  open -a Terminal ./run_api.sh
 
 elif [ "$PLATFORM" == 'WINDOWS' ]; then
   
   GIT_BASH='C:\Program Files\Git\git-bash.exe'
-  "$GIT_BASH" -c ./wiremock/run.sh &
-  "$GIT_BASH" -c ./run.sh &
+  "$GIT_BASH" -c ./run_wiremock.sh &
+  "$GIT_BASH" -c ./run_api.sh &
 
 elif [ "$PLATFORM" == 'LINUX' ]; then
 
-  gnome-terminal -- ./wiremock/run.sh
-  gnome-terminal -- ./run.sh
+  gnome-terminal -- ./run_wiremock.sh
+  gnome-terminal -- ./run_api.sh
 
 fi
 

@@ -40,7 +40,14 @@ Follow the [Technical Support Queries](https://authguidance.com/2019/08/02/intel
 
 ## Commands
 
-Ensure that a .NET 8+ SDK is installed, then run the API with this command:
+### Prerequisites
+
+- Ensure that a .NET 8+ SDK is installed
+- Integration tests run Wiremock in Docker, so ensure that Docker is installed
+
+### Run the API
+
+Run the API with this command:
 
 ```bash
 ./start.sh

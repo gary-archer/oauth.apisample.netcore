@@ -23,7 +23,6 @@
 
     <!-- Exclude child projects when running dotnet build -->
     <Compile Remove="test\**" />
-    <Compile Remove="wiremock\**" />
 
     <!-- Code quality checks -->
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
