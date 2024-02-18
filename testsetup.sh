@@ -8,25 +8,9 @@
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 #
-# Download development SSL certificates if required
-#
-./downloadcerts.sh
-if [ $? -ne 0 ]; then
-  exit 1
-fi
-
-#
 # Copy down the test configuration, to point the API to Wiremock rather than AWS Cognito
 #
 cp deployment/environments/test/api.config.json ./api.config.json
-
-#
-# Build the API every time
-#
-./build.sh
-if [ $? -ne 0 ]; then
-  exit 1
-fi
 
 #
 # Get the platform
@@ -53,18 +37,18 @@ echo 'Running API ...'
 if [ "$PLATFORM" == 'MACOS' ]; then
   
   open -a Terminal ./test/scripts/run_wiremock.sh
-  open -a Terminal ./test/scripts/run_api.sh
+  open -a Terminal ./run_api.sh
 
 elif [ "$PLATFORM" == 'WINDOWS' ]; then
   
   GIT_BASH='C:\Program Files\Git\git-bash.exe'
   "$GIT_BASH" -c ./test/scripts/run_wiremock.sh &
-  "$GIT_BASH" -c ./test/scripts/run_api.sh &
+  "$GIT_BASH" -c ./run_api.sh &
 
 elif [ "$PLATFORM" == 'LINUX' ]; then
 
   gnome-terminal -- ./test/scripts/run_wiremock.sh
-  gnome-terminal -- ./test/scripts/run_api.sh
+  gnome-terminal -- ./run_api.sh
 
 fi
 
