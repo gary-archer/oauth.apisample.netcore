@@ -12,7 +12,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #
 ./downloadcerts.sh
 if [ $? -ne 0 ]; then
-  exit
+  read -n 1
+  exit 1
 fi
 
 #
