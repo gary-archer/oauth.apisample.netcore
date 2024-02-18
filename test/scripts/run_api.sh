@@ -5,6 +5,7 @@
 ##################################################
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+cd ../..
 
 #
 # Run the previously built API

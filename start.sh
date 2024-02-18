@@ -31,7 +31,11 @@ fi
 #
 # Then run the API
 #
-./run_api.sh
+#
+# Run the previously built API
+#
+dotnet run --no-build
 if [ $? -ne 0 ]; then
+  echo 'Problem encountered running the API'
   exit 1
 fi

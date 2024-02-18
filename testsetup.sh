@@ -52,19 +52,19 @@ esac
 echo 'Running API ...'
 if [ "$PLATFORM" == 'MACOS' ]; then
   
-  open -a Terminal ./run_wiremock.sh
-  open -a Terminal ./run_api.sh
+  open -a Terminal ./test/scripts/run_wiremock.sh
+  open -a Terminal ./test/scripts/run_api.sh
 
 elif [ "$PLATFORM" == 'WINDOWS' ]; then
   
   GIT_BASH='C:\Program Files\Git\git-bash.exe'
-  "$GIT_BASH" -c ./run_wiremock.sh &
-  "$GIT_BASH" -c ./run_api.sh &
+  "$GIT_BASH" -c ./test/scripts/run_wiremock.sh &
+  "$GIT_BASH" -c ./test/scripts/run_api.sh &
 
 elif [ "$PLATFORM" == 'LINUX' ]; then
 
-  gnome-terminal -- ./run_wiremock.sh
-  gnome-terminal -- ./run_api.sh
+  gnome-terminal -- ./test/scripts/run_wiremock.sh
+  gnome-terminal -- ./test/scripts/run_api.sh
 
 fi
 
