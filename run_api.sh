@@ -34,13 +34,10 @@ if [ "$(uname -s)" == 'Linux' ]; then
 fi
 
 #
-# Ensure that folders for log files exist
+# Ensure that the logs folder exists
 #
-if [ ! -d '../oauth.logs' ]; then
-  mkdir '../oauth.logs'
-fi
-if [ ! -d '../oauth.logs/api' ]; then
-  mkdir '../oauth.logs/api'
+if [ ! -d './logs' ]; then
+  mkdir './logs'
 fi
 
 #

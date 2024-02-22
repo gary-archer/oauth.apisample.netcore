@@ -16,13 +16,10 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Ensure that log folders exist
+# Ensure that the logs folder exists
 #
-if [ ! -d '../oauth.logs' ]; then
-  mkdir '../oauth.logs'
-fi
-if [ ! -d '../oauth.logs/api' ]; then
-  mkdir '../oauth.logs/api'
+if [ ! -d './logs' ]; then
+  mkdir './logs'
 fi
 
 #

@@ -18,7 +18,7 @@
       {
         "type": "file",
         "filePrefix": "api",
-        "dirName": "../../../../oauth.logs/api/",
+        "dirName": "../../../logs/",
         "maxSize": "10MB",
         "maxFiles": 100
       }]
