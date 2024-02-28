@@ -14,13 +14,14 @@ namespace SampleApi.IntegrationTests
         public IntegrationTestState()
         {
             // Create the mock authorization server, which enables productive API tests
-            this.MockAuthorizationServer = new MockAuthorizationServer();
+            var useProxy = false;
+            this.MockAuthorizationServer = new MockAuthorizationServer(useProxy);
             this.MockAuthorizationServer.Start();
 
             // Create the API client
             var apiBaseUrl = "https://apilocal.authsamples-dev.com:446";
             var sessionId = Guid.NewGuid().ToString();
-            this.ApiClient = new ApiClient(apiBaseUrl, "IntegrationTests", sessionId);
+            this.ApiClient = new ApiClient(apiBaseUrl, "IntegrationTests", sessionId, useProxy);
         }
 
         // Wiremock and a JOSE library act as the mock authorization server

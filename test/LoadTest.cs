@@ -26,13 +26,14 @@ namespace SampleApi.Test
         public LoadTest()
         {
             // Create the mock authorization server, which enables productive API tests
-            this.mockAuthorizationServer = new MockAuthorizationServer();
+            var useProxy = false;
+            this.mockAuthorizationServer = new MockAuthorizationServer(useProxy);
             this.mockAuthorizationServer.Start();
 
             // Create the API client
             var apiBaseUrl = "https://apilocal.authsamples-dev.com:446";
             this.sessionId = Guid.NewGuid().ToString();
-            this.apiClient = new ApiClient(apiBaseUrl, "LoadTest", this.sessionId);
+            this.apiClient = new ApiClient(apiBaseUrl, "LoadTest", this.sessionId, useProxy);
 
             // Initialise other fields
             this.totalCount = 0;

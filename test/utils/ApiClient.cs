@@ -16,7 +16,7 @@ namespace SampleApi.Test.Utils
         private readonly string sessionId;
         private readonly HttpProxy httpProxy;
 
-        public ApiClient(string baseUrl, string clientName, string sessionId, bool useProxy = false)
+        public ApiClient(string baseUrl, string clientName, string sessionId, bool useProxy)
         {
             this.baseUrl = baseUrl;
             this.clientName = clientName;

@@ -23,7 +23,7 @@ namespace SampleApi.Test.Utils
         private readonly Jwk tokenSigningPublicKey;
         private readonly string keyId;
 
-        public MockAuthorizationServer(bool useProxy = false)
+        public MockAuthorizationServer(bool useProxy)
         {
             this.adminBaseUrl = "https://login.authsamples-dev.com:447/__admin/mappings";
             this.httpProxy = new HttpProxy(useProxy, "http://127.0.0.1:8888");
