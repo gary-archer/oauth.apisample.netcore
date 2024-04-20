@@ -17,7 +17,7 @@
     <ProjectReference Include="..\sampleapi.csproj" />
 
     <!-- JWT acess token handling -->
-    <PackageReference Include="jose-jwt" Version="4.1.0" />
+    <PackageReference Include="jose-jwt" Version="5.0.0" />
 
     <!-- JSON handling -->
     <PackageReference Include="System.Text.Json" Version="8.0.0" />
