@@ -56,7 +56,7 @@ namespace SampleApi.Plumbing.OAuth
                     // Only accept supported token signing algorithms
                     if (jwk.Alg != this.configuration.Algorithm)
                     {
-                        throw ErrorFactory.CreateClient401Error($"The access token kid was not found in the JWKS");
+                        throw ErrorFactory.CreateClient401Error($"The access token algorithm does not have the expected value");
                     }
 
                     // Do the cryptographic validation of the JWT signature using the JWK public key
