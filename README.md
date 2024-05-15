@@ -88,7 +88,7 @@ Then run integration tests and a load test:
 
 * See the [API Journey - Server Side](https://apisandclients.com/posts/api-journey-server-side) for further information on the API behaviour
 * See the [Overview Page](https://apisandclients.com/posts/net-core-code-sample-overview) for instructions on how to run the API
-* See the [OAuth Integration Page](https://apisandclients.com/posts/net-core-api-key-coding-points) for the security implementation
+* See the [OAuth Integration Page](https://apisandclients.com/posts/net-core-api-oauth-integration) for the security implementation
 
 ## Programming Languages
 
