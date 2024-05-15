@@ -4,7 +4,7 @@
 
 ## Behaviour
 
-The final OAuth secured .NET API code sample, referenced in my blog at https://authguidance.com:
+The final OAuth secured .NET API code sample:
 
 - The API has a fictional business area of `investments`, but simply returns hard coded data
 - The API takes finer control over OAuth and claims to enable the best security with good manageability
@@ -34,7 +34,7 @@ This ensures no concurrency problems, and error rehearsal is used, to ensure use
 ### API is Supportable
 
 API logs can be analysed in use case based manner by running Elasticsearch SQL and Lucene queries.\
-Follow the [Technical Support Queries](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/) for some people friendly examples:
+Follow the [Technical Support Queries](https://apisandclients.com/posts/api-technical-support-analysis) for some people friendly examples:
 
 ![Support Queries](./images/support-queries.png)
 
@@ -67,7 +67,7 @@ Then call an endpoint over port 446:
 curl -k https://apilocal.authsamples-dev.com:446/investments/companies
 ```
 
-Then configure [.NET SSL trust](https://authguidance.com/2017/11/11/developer-ssl-setup/#os-ssl-trust) for the root CA at `./certs/authsamples-dev.ca.pem`.
+Then configure [.NET SSL trust](https://apisandclients.com/posts/developer-ssl-setup) for the root CA at `./certs/authsamples-dev.ca.pem`.
 
 ### Test the API
 
@@ -86,9 +86,9 @@ Then run integration tests and a load test:
 
 ## Further Details
 
-* See the [API Journey - Server Side](https://authguidance.com/api-journey-server-side/) for further information on the API behaviour
-* See the [Overview Page](https://authguidance.com/2018/01/05/net-core-code-sample-overview) for instructions on how to run the API
-* See the [OAuth Integration Page](https://authguidance.com/2018/01/06/net-core-api-key-coding-points) for the security implementation
+* See the [API Journey - Server Side](https://apisandclients.com/posts/api-journey-server-side) for further information on the API behaviour
+* See the [Overview Page](https://apisandclients.com/posts/net-core-code-sample-overview) for instructions on how to run the API
+* See the [OAuth Integration Page](https://apisandclients.com/posts/net-core-api-key-coding-points) for the security implementation
 
 ## Programming Languages
 
