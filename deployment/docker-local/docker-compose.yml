@@ -1,9 +1,8 @@
-version: '3.8'
 services:
 
   finalapi:
     image: finalnetcoreapi:latest
-    hostname: apilocal.authsamples-dev.com
+    hostname: local.authsamples-dev.com
     ports:
       - 446:8000
     volumes:

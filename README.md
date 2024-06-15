@@ -58,13 +58,13 @@ Run the API with this command:
 Configure DNS by adding these domains to your hosts file:
 
 ```text
-127.0.0.1 localhost apilocal.authsamples-dev.com login.authsamples-dev.com
+127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
 ```
 
 Then call an endpoint over port 446:
 
 ```bash
-curl -k https://apilocal.authsamples-dev.com:446/investments/companies
+curl -k https://api.authsamples-dev.com:446/investments/companies
 ```
 
 Then configure [.NET SSL trust](https://apisandclients.com/posts/developer-ssl-setup) for the root CA at `./certs/authsamples-dev.ca.pem`.

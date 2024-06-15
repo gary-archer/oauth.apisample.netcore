@@ -19,7 +19,7 @@ namespace SampleApi.IntegrationTests
             this.MockAuthorizationServer.Start();
 
             // Create the API client
-            var apiBaseUrl = "https://apilocal.authsamples-dev.com:446";
+            var apiBaseUrl = "https://api.authsamples-dev.com:446";
             var sessionId = Guid.NewGuid().ToString();
             this.ApiClient = new ApiClient(apiBaseUrl, "IntegrationTests", sessionId, useProxy);
         }
