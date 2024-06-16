@@ -70,12 +70,12 @@ namespace SampleApi.Test.Utils
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", options.AccessToken);
 
                 // Add headers
-                request.Headers.Add("x-mycompany-api-client", this.clientName);
-                request.Headers.Add("x-mycompany-session-id", this.sessionId);
-                request.Headers.Add("x-mycompany-correlation-id", correlationId);
+                request.Headers.Add("x-authsamples-api-client", this.clientName);
+                request.Headers.Add("x-authsamples-session-id", this.sessionId);
+                request.Headers.Add("x-authsamples-correlation-id", correlationId);
                 if (options.RehearseException)
                 {
-                    request.Headers.Add("x-mycompany-test-exception", "SampleApi");
+                    request.Headers.Add("x-authsamples-test-exception", "SampleApi");
                 }
 
                 // Send the request

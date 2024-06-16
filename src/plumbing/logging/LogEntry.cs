@@ -61,14 +61,14 @@ namespace SampleApi.Plumbing.Logging
                 }
 
                 // Our callers can supply a custom header so that we can keep track of who is calling each API
-                var clientApplicationName = request.GetHeader("x-mycompany-api-client");
+                var clientApplicationName = request.GetHeader("x-authsamples-api-client");
                 if (!string.IsNullOrWhiteSpace(clientApplicationName))
                 {
                     this.data.ClientApplicationName = clientApplicationName;
                 }
 
                 // Use the correlation id from request headers or create one
-                var correlationId = request.GetHeader("x-mycompany-correlation-id");
+                var correlationId = request.GetHeader("x-authsamples-correlation-id");
                 if (!string.IsNullOrWhiteSpace(correlationId))
                 {
                     this.data.CorrelationId = correlationId;
@@ -79,7 +79,7 @@ namespace SampleApi.Plumbing.Logging
                 }
 
                 // Log an optional session id if supplied
-                var sessionId = request.GetHeader("x-mycompany-session-id");
+                var sessionId = request.GetHeader("x-authsamples-session-id");
                 if (!string.IsNullOrWhiteSpace(sessionId))
                 {
                     this.data.SessionId = sessionId;
