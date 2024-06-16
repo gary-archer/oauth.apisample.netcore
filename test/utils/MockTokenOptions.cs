@@ -8,7 +8,7 @@ namespace SampleApi.Test.Utils
         public MockTokenOptions()
         {
             this.Issuer = "https://login.authsamples-dev.com";
-            this.Audience = "api.mycompany.com";
+            this.Audience = "api.authsamples.com";
             this.Scope = "openid profile investments";
             this.Role = string.Empty;
             this.ExpiryMinutes = 15;
