@@ -115,7 +115,7 @@
 
             // Create the main objects for validating tokens and creating the claims principal
             this.services.AddScoped<AccessTokenValidator>();
-            this.services.AddScoped<OAuthAuthorizer>();
+            this.services.AddScoped<OAuthFilter>();
 
             // Register a singleton to store JWKS keys in a thread safe cache
             var jwksCache = new JwksCache(cache);

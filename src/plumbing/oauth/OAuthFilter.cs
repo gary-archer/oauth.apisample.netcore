@@ -11,13 +11,13 @@ namespace SampleApi.Plumbing.OAuth
     /*
      * A class to create the claims principal at the start of every secured request
      */
-    public sealed class OAuthAuthorizer
+    public sealed class OAuthFilter
     {
         private readonly ClaimsCache cache;
         private readonly AccessTokenValidator accessTokenValidator;
         private readonly ExtraClaimsProvider extraClaimsProvider;
 
-        public OAuthAuthorizer(
+        public OAuthFilter(
             ClaimsCache cache,
             AccessTokenValidator accessTokenValidator,
             ExtraClaimsProvider extraClaimsProvider)

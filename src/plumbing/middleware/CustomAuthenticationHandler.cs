@@ -39,8 +39,8 @@ namespace SampleApi.Plumbing.Middleware
             try
             {
                 // Do the authorization work and get a claims principal
-                var authorizer = (OAuthAuthorizer)this.Context.RequestServices.GetService(typeof(OAuthAuthorizer));
-                var claimsPrincipal = await authorizer.ExecuteAsync(this.Request);
+                var oauthFilter = (OAuthFilter)this.Context.RequestServices.GetService(typeof(OAuthFilter));
+                var claimsPrincipal = await oauthFilter.ExecuteAsync(this.Request);
 
                 // Add identity details to logs
                 logEntry.SetIdentity(claimsPrincipal.JwtClaims.Sub);
