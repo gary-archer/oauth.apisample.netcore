@@ -67,7 +67,7 @@ Then call an endpoint over port 446:
 curl -k https://api.authsamples-dev.com:446/investments/companies
 ```
 
-Then configure [.NET SSL trust](https://apisandclients.com/posts/developer-ssl-setup) for the root CA at `./certs/authsamples-dev.ca.pem`.
+Then configure [.NET SSL trust](https://apisandclients.com/posts/developer-ssl-setup) for the root CA at `./certs/authsamples-dev.ca.crt`.
 
 ### Test the API
 
