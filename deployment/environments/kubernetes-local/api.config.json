@@ -1,0 +1,41 @@
+{
+  "api": {
+    "port": 8000,
+    "sslCertificateFileName": "",
+    "sslCertificatePassword": "",
+    "useProxy": false,
+    "proxyUrl": ""
+  },
+  "logging": {
+    "apiName": "SampleApi",
+    "production": {
+      "level": "Info",
+      "performanceThresholdMilliseconds": 500,
+      "appenders": [{
+        "type": "console",
+        "prettyPrint": false
+      }]
+    },
+    "development": {
+      "level": "Info",
+      "appenders": [{
+        "type": "console"
+      }],
+      "overrideLevels": {
+        "Microsoft": "Warning",
+        "Microsoft.AspNetCore.Server.Kestrel": "Error",
+        "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
+        "SampleApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",
+        "SampleApi.Plumbing.Claims.ClaimsCache": "Info"
+      }
+    }
+  },
+  "oauth": {
+    "issuer":                       "https://login.authsamples-k8s-dev.com/oauth/v2/oauth-anonymous",
+    "audience":                     "api.authsamples.com",
+    "algorithm":                    "ES256",
+    "scope":                        "investments",
+    "jwksEndpoint":                 "http://curity-idsvr-runtime-svc.curity.svc:8443/oauth/v2/oauth-anonymous/jwks",
+    "claimsCacheTimeToLiveMinutes": 15
+  }
+}
