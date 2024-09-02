@@ -2,52 +2,44 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d84025db3811465f80e72313bb9ba274)](https://app.codacy.com/gh/gary-archer/oauth.apisample.netcore?utm_source=github.com&utm_medium=referral&utm_content=gary-archer/oauth.apisample.netcore&utm_campaign=Badge_Grade)
 
-## Behaviour
+The final OAuth secured Node.js API code sample, which returns mock `investments` data:
 
-The final OAuth secured .NET API code sample:
+- The API takes finer control over claims-based authorization to enable security with good manageability.
+- The API uses structured logging and log aggregation, for the best supportability.
 
-- The API has a fictional business area of `investments`, but simply returns hard coded data
-- The API takes finer control over OAuth and claims to enable the best security with good manageability
-- The API uses structured logging and log aggregation, for the best supportability
-
-### API integrates with UI Clients
+### API Serves Frontend Clients
 
 The API can run as part of an OAuth end-to-end setup, to serve my blog's UI code samples.\
-Running the API in this manner forces it to be consumer focused to its clients:
+Running the API in this manner forces it to be consumer-focused to its clients:
 
 ![SPA and API](./images/spa-and-api.png)
 
-### API can be Productively Tested
+### API Security is Testable
 
-The API's clients are UIs, which get user level access tokens by running an OpenID Connect code flow.\
-For productive test driven development, the API instead mocks the Authorization Server:
+The API's clients are UIs, which get user-level access tokens by running an OpenID Connect code flow.\
+For productive test-driven development, the API instead mocks the authorization server:
 
 ![Test Driven Development](./images/tests.png)
 
-### API can be Load Tested
+### API is Load Testable
 
-A basic load test uses Tasks to fire 5 parallel requests at a time at the API.\
-This ensures no concurrency problems, and error rehearsal is used, to ensure useful error responses:
+A basic load test fires batches of concurrent requests at the API.\
+This enables reliability testing and error rehearsal to ensure useful client responses and API logs:
 
 ![Load Test](./images/loadtest.png)
 
 ### API is Supportable
 
-API logs can be analysed in use case based manner by running Elasticsearch SQL and Lucene queries.\
-Follow the [Technical Support Queries](https://apisandclients.com/posts/api-technical-support-analysis) for some people friendly examples:
+You can aggregate API logs to Elasticsearch and run [Technical Support Queries](https://apisandclients.com/posts/api-technical-support-analysis).
 
 ![Support Queries](./images/support-queries.png)
 
-## Commands
+## How to Run the API
 
-### Prerequisites
+- Install a .NET 8+ SDK.
+- Also install Docker to run integration tests that use Wiremock.
 
-- Ensure that a .NET 8+ SDK is installed
-- Integration tests run Wiremock in Docker, so ensure that Docker is installed
-
-### Run the API
-
-Run the API with this command:
+Then run the API with this command:
 
 ```bash
 ./start.sh
@@ -55,7 +47,7 @@ Run the API with this command:
 
 ### Configure DNS and SSL
 
-Configure DNS by adding these domains to your hosts file:
+Add these domains to your hosts file to configure DNS:
 
 ```text
 127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
@@ -67,7 +59,7 @@ Then call an endpoint over port 446:
 curl -k https://api.authsamples-dev.com:446/investments/companies
 ```
 
-Then configure [.NET SSL trust](https://apisandclients.com/posts/developer-ssl-setup) for the root CA at `./certs/authsamples-dev.ca.crt`.
+Then configure [Operating system trust](https://apisandclients.com/posts/developer-ssl-setup#configure-operating-system-trust) for the root CA at `./certs/authsamples-dev.ca.crt`.
 
 ### Test the API
 
@@ -86,17 +78,17 @@ Then run integration tests and a load test:
 
 ## Further Details
 
-* See the [API Journey - Server Side](https://apisandclients.com/posts/api-journey-server-side) for further information on the API behaviour
-* See the [Overview Page](https://apisandclients.com/posts/net-core-code-sample-overview) for instructions on how to run the API
-* See the [OAuth Integration Page](https://apisandclients.com/posts/net-core-api-oauth-integration) for the security implementation
+* See the [API Journey - Server Side](https://apisandclients.com/posts/api-journey-server-side) for further information on the API's behaviour.
+* See the [Overview Page](https://apisandclients.com/posts/net-core-code-sample-overview) for further details on how to run the API.
+* See the [OAuth Integration Page](https://apisandclients.com/posts/net-core-api-oauth-integration) for some implementation details.
 
 ## Programming Languages
 
-* C# and .NET are used to implement the REST API
+* The API uses C# and .NET.
 
 ## Infrastructure
 
-* The Kestrel web server is used to host the API over SSL
-* AWS Cognito is used as the default Authorization Server
-* The [jose-jwt](https://github.com/dvsekhvalnov/jose-jwt) library is used to manage in memory validation of JWTs
-* The project includes API deployment resources for Docker and Kubernetes
+* Kestrel is the HTTP server that hosts the API endpoints.
+* AWS Cognito is used as the default authorization server.
+* The [jose-jwt](https://github.com/dvsekhvalnov/jose-jwt) library manages in memory validation of JWTs.
+* The project includes API deployment resources for Docker and Kubernetes.
