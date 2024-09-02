@@ -73,7 +73,7 @@ namespace SampleApi.Test
                 "ERROR-ID".PadRight(12, ' '),
             };
             var header = string.Join(string.Empty, headings);
-            this.OutputMessage(ConsoleColor.Yellow, header);
+            this.OutputMessage(ConsoleColor.DarkYellow, header);
 
             // Get some access tokens to send to the API and send the API requests
             var accessTokens = this.GetAccessTokens();
