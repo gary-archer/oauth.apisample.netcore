@@ -2,7 +2,7 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d84025db3811465f80e72313bb9ba274)](https://app.codacy.com/gh/gary-archer/oauth.apisample.netcore?utm_source=github.com&utm_medium=referral&utm_content=gary-archer/oauth.apisample.netcore&utm_campaign=Badge_Grade)
 
-The final OAuth secured Node.js API code sample, which returns mock `investments` data:
+The final OAuth secured .NET API code sample, which returns mock `investments` data:
 
 - The API takes finer control over claims-based authorization to enable security with good manageability.
 - The API uses structured logging and log aggregation, for the best supportability.
