@@ -19,14 +19,14 @@ Running the API in this manner forces it to be consumer-focused to its clients:
 The API's clients are UIs, which get user-level access tokens by running an OpenID Connect code flow.\
 For productive test-driven development, the API instead mocks the authorization server:
 
-![Test Driven Development](./images/tests.png)
+![Test Driven Development](./images/tests.png?v=20240902)
 
 ### API is Load Testable
 
 A basic load test fires batches of concurrent requests at the API.\
 This enables reliability testing and error rehearsal to ensure useful client responses and API logs:
 
-![Load Test](./images/loadtest.png)
+![Load Test](./images/loadtest.png?v=20240902)
 
 ### API is Supportable
 
