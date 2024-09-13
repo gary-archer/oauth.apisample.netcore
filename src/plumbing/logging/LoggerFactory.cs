@@ -1,4 +1,4 @@
-namespace SampleApi.Plumbing.Logging
+namespace FinalApi.Plumbing.Logging
 {
     using System;
     using System.Collections.Generic;
@@ -9,8 +9,8 @@ namespace SampleApi.Plumbing.Logging
     using log4net.Config;
     using log4net.Repository.Hierarchy;
     using Microsoft.Extensions.Logging;
-    using SampleApi.Plumbing.Configuration;
-    using SampleApi.Plumbing.Errors;
+    using FinalApi.Plumbing.Configuration;
+    using FinalApi.Plumbing.Errors;
 
     /*
      * The entry point for configuring logging and getting a logger

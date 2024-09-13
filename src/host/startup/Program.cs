@@ -1,11 +1,11 @@
-﻿namespace SampleApi.Host.Startup
+﻿namespace FinalApi.Host.Startup
 {
     using System;
     using System.Net;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.DependencyInjection;
-    using SampleApi.Host.Configuration;
-    using SampleApi.Plumbing.Logging;
+    using FinalApi.Host.Configuration;
+    using FinalApi.Plumbing.Logging;
 
     /*
      * Our entry point class

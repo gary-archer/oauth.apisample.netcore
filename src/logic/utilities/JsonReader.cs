@@ -1,11 +1,11 @@
-namespace SampleApi.Logic.Utilities
+namespace FinalApi.Logic.Utilities
 {
     using System;
     using System.IO;
     using System.Text.Json;
     using System.Threading.Tasks;
-    using SampleApi.Logic.Errors;
-    using SampleApi.Plumbing.Errors;
+    using FinalApi.Logic.Errors;
+    using FinalApi.Plumbing.Errors;
 
     /*
      * A utility reader class

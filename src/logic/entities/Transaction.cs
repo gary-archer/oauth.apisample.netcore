@@ -1,4 +1,4 @@
-namespace SampleApi.Logic.Entities
+namespace FinalApi.Logic.Entities
 {
     /*
      * A single transaction

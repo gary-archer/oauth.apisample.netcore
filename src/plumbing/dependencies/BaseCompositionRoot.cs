@@ -1,13 +1,13 @@
-﻿namespace SampleApi.Plumbing.Dependencies
+﻿namespace FinalApi.Plumbing.Dependencies
 {
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
-    using SampleApi.Plumbing.Claims;
-    using SampleApi.Plumbing.Configuration;
-    using SampleApi.Plumbing.Logging;
-    using SampleApi.Plumbing.OAuth;
-    using SampleApi.Plumbing.Utilities;
+    using FinalApi.Plumbing.Claims;
+    using FinalApi.Plumbing.Configuration;
+    using FinalApi.Plumbing.Logging;
+    using FinalApi.Plumbing.OAuth;
+    using FinalApi.Plumbing.Utilities;
 
     /*
      * A class to manage composing core API behaviour

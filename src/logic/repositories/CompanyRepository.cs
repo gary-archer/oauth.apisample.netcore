@@ -1,11 +1,11 @@
-namespace SampleApi.Logic.Repositories
+namespace FinalApi.Logic.Repositories
 {
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using SampleApi.Logic.Entities;
-    using SampleApi.Logic.Utilities;
-    using SampleApi.Plumbing.Logging;
+    using FinalApi.Logic.Entities;
+    using FinalApi.Logic.Utilities;
+    using FinalApi.Plumbing.Logging;
 
     /*
      * A repository class for serving data

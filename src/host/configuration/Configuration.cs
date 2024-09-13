@@ -1,8 +1,8 @@
-namespace SampleApi.Host.Configuration
+namespace FinalApi.Host.Configuration
 {
     using System.Threading.Tasks;
-    using SampleApi.Logic.Utilities;
-    using SampleApi.Plumbing.Configuration;
+    using FinalApi.Logic.Utilities;
+    using FinalApi.Plumbing.Configuration;
 
     /*
      * A class to manage our JSON configuration as an object

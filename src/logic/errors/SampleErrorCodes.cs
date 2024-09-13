@@ -1,4 +1,4 @@
-﻿namespace SampleApi.Logic.Errors
+﻿namespace FinalApi.Logic.Errors
 {
     /*
      * A list of API specific error codes

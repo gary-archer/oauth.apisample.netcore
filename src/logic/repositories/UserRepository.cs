@@ -1,6 +1,6 @@
-namespace SampleApi.Logic.Repositories
+namespace FinalApi.Logic.Repositories
 {
-    using SampleApi.Logic.Claims;
+    using FinalApi.Logic.Claims;
 
     public class UserRepository
     {

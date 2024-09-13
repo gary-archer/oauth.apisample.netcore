@@ -1,14 +1,14 @@
-﻿namespace SampleApi.Host.Controllers
+﻿namespace FinalApi.Host.Controllers
 {
     using System.Collections.Generic;
     using System.Globalization;
     using System.Net;
     using System.Threading.Tasks;
+    using FinalApi.Logic.Entities;
+    using FinalApi.Logic.Errors;
+    using FinalApi.Logic.Services;
+    using FinalApi.Plumbing.Errors;
     using Microsoft.AspNetCore.Mvc;
-    using SampleApi.Logic.Entities;
-    using SampleApi.Logic.Errors;
-    using SampleApi.Logic.Services;
-    using SampleApi.Plumbing.Errors;
 
     /*
      * A controller for our company resources

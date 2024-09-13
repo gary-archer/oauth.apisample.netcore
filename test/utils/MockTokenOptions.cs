@@ -1,4 +1,4 @@
-namespace SampleApi.Test.Utils
+namespace FinalApi.Test.Utils
 {
     /*
      * Options to use when issuing mock access tokens

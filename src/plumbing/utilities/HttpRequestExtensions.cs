@@ -1,4 +1,4 @@
-namespace SampleApi.Plumbing.Utilities
+namespace FinalApi.Plumbing.Utilities
 {
     using Microsoft.AspNetCore.Http;
 

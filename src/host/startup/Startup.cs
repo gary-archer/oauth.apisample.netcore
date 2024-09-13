@@ -1,18 +1,18 @@
-﻿namespace SampleApi.Host.Startup
+﻿namespace FinalApi.Host.Startup
 {
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.DependencyInjection;
-    using SampleApi.Host.Configuration;
-    using SampleApi.Logic.Claims;
-    using SampleApi.Logic.Repositories;
-    using SampleApi.Logic.Services;
-    using SampleApi.Logic.Utilities;
-    using SampleApi.Plumbing.Dependencies;
-    using SampleApi.Plumbing.Logging;
-    using SampleApi.Plumbing.Middleware;
+    using FinalApi.Host.Configuration;
+    using FinalApi.Logic.Claims;
+    using FinalApi.Logic.Repositories;
+    using FinalApi.Logic.Services;
+    using FinalApi.Logic.Utilities;
+    using FinalApi.Plumbing.Dependencies;
+    using FinalApi.Plumbing.Logging;
+    using FinalApi.Plumbing.Middleware;
 
     /*
      * The application startup class configures authentication and authorization

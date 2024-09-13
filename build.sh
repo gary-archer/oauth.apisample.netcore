@@ -26,5 +26,5 @@ fi
 # On Linux ensure that the API has permissions to listen on a port below 1024
 #
 if [ "$(uname -s)" == 'Linux' ]; then
-  sudo setcap 'cap_net_bind_service=+ep' ./bin/Debug/net8.0/sampleapi
+  sudo setcap 'cap_net_bind_service=+ep' ./bin/Debug/net8.0/finalapi
 fi

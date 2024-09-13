@@ -1,4 +1,4 @@
-namespace SampleApi.Plumbing.Claims
+namespace FinalApi.Plumbing.Claims
 {
     /*
      * Claim names from the Authorization Server

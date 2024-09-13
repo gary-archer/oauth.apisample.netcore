@@ -1,4 +1,4 @@
-namespace SampleApi.Plumbing.Errors
+namespace FinalApi.Plumbing.Errors
 {
     using System;
     using System.Collections.Generic;

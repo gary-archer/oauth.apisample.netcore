@@ -1,4 +1,4 @@
-namespace SampleApi.Test
+namespace FinalApi.Test
 {
     using System;
     using System.Collections.Generic;
@@ -6,7 +6,7 @@ namespace SampleApi.Test
     using System.Text.Json;
     using System.Text.Json.Nodes;
     using System.Threading.Tasks;
-    using SampleApi.Test.Utils;
+    using FinalApi.Test.Utils;
     using Xunit;
 
     /*

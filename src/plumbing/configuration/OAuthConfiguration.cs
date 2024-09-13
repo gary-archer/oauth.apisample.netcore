@@ -1,4 +1,4 @@
-namespace SampleApi.Plumbing.Configuration
+namespace FinalApi.Plumbing.Configuration
 {
     /*
      * Configuration settings to enable standard security and extensible use of claims

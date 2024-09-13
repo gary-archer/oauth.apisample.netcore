@@ -1,4 +1,4 @@
-namespace SampleApi.Plumbing.OAuth
+namespace FinalApi.Plumbing.OAuth
 {
     using System;
     using System.Linq;
@@ -6,9 +6,9 @@ namespace SampleApi.Plumbing.OAuth
     using System.Net.Http.Headers;
     using System.Threading.Tasks;
     using Jose;
-    using SampleApi.Plumbing.Configuration;
-    using SampleApi.Plumbing.Errors;
-    using SampleApi.Plumbing.Utilities;
+    using FinalApi.Plumbing.Configuration;
+    using FinalApi.Plumbing.Errors;
+    using FinalApi.Plumbing.Utilities;
 
     /*
     * Do the signing key download without needing to plug a website library into an API

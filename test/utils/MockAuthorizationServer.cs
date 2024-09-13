@@ -1,4 +1,4 @@
-namespace SampleApi.Test.Utils
+namespace FinalApi.Test.Utils
 {
     using System;
     using System.Collections.Generic;
@@ -8,8 +8,8 @@ namespace SampleApi.Test.Utils
     using System.Text;
     using System.Text.Json.Nodes;
     using System.Threading.Tasks;
+    using FinalApi.Plumbing.Utilities;
     using Jose;
-    using SampleApi.Plumbing.Utilities;
 
     /*
      * A mock authorization server implemented with wiremock and a JOSE library

@@ -1,7 +1,7 @@
-namespace SampleApi.Plumbing.OAuth
+namespace FinalApi.Plumbing.OAuth
 {
     using Microsoft.AspNetCore.Http;
-    using SampleApi.Plumbing.Utilities;
+    using FinalApi.Plumbing.Utilities;
 
     /*
      * A simple utility class to read the access token

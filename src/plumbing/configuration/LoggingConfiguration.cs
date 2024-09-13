@@ -1,4 +1,4 @@
-﻿namespace SampleApi.Plumbing.Configuration
+﻿namespace FinalApi.Plumbing.Configuration
 {
     using System.Text.Json.Nodes;
 

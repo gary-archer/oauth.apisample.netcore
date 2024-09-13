@@ -1,4 +1,4 @@
-namespace SampleApi.Plumbing.Middleware
+namespace FinalApi.Plumbing.Middleware
 {
     using System;
     using System.Collections.Generic;
@@ -6,10 +6,10 @@ namespace SampleApi.Plumbing.Middleware
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.Extensions.Options;
-    using SampleApi.Plumbing.Errors;
-    using SampleApi.Plumbing.Logging;
-    using SampleApi.Plumbing.OAuth;
-    using SampleApi.Plumbing.Utilities;
+    using FinalApi.Plumbing.Errors;
+    using FinalApi.Plumbing.Logging;
+    using FinalApi.Plumbing.OAuth;
+    using FinalApi.Plumbing.Utilities;
 
     /*
      * The Microsoft specific class for authenticating API requests

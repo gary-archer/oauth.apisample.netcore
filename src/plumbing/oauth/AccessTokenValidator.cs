@@ -1,14 +1,14 @@
-namespace SampleApi.Plumbing.OAuth
+namespace FinalApi.Plumbing.OAuth
 {
     using System;
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
     using Jose;
-    using SampleApi.Plumbing.Claims;
-    using SampleApi.Plumbing.Configuration;
-    using SampleApi.Plumbing.Errors;
-    using SampleApi.Plumbing.Logging;
+    using FinalApi.Plumbing.Claims;
+    using FinalApi.Plumbing.Configuration;
+    using FinalApi.Plumbing.Errors;
+    using FinalApi.Plumbing.Logging;
 
     /*
      * A class to verify the JWT access token, to authenticate the request

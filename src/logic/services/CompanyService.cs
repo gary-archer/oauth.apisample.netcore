@@ -1,15 +1,15 @@
-namespace SampleApi.Logic.Services
+namespace FinalApi.Logic.Services
 {
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
-    using SampleApi.Logic.Claims;
-    using SampleApi.Logic.Entities;
-    using SampleApi.Logic.Errors;
-    using SampleApi.Logic.Repositories;
-    using SampleApi.Plumbing.Claims;
-    using SampleApi.Plumbing.Errors;
+    using FinalApi.Logic.Claims;
+    using FinalApi.Logic.Entities;
+    using FinalApi.Logic.Errors;
+    using FinalApi.Logic.Repositories;
+    using FinalApi.Plumbing.Claims;
+    using FinalApi.Plumbing.Errors;
 
     /*
      * The entry point to service logic

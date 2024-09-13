@@ -1,7 +1,7 @@
-namespace SampleApi.Plumbing.Claims
+namespace FinalApi.Plumbing.Claims
 {
     using System.Text.Json.Nodes;
-    using SampleApi.Plumbing.Errors;
+    using FinalApi.Plumbing.Errors;
 
     /*
      * A simple utility class to read claim values safely

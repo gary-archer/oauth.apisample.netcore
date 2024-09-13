@@ -1,12 +1,12 @@
-namespace SampleApi.Plumbing.Middleware
+namespace FinalApi.Plumbing.Middleware
 {
     using System;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
-    using SampleApi.Plumbing.Configuration;
-    using SampleApi.Plumbing.Errors;
-    using SampleApi.Plumbing.Logging;
-    using SampleApi.Plumbing.Utilities;
+    using FinalApi.Plumbing.Configuration;
+    using FinalApi.Plumbing.Errors;
+    using FinalApi.Plumbing.Logging;
+    using FinalApi.Plumbing.Utilities;
 
     /*
      * The unhandled exception handler, primarily called when an HTTP request fails

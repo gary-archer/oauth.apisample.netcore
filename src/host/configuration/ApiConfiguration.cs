@@ -1,4 +1,4 @@
-namespace SampleApi.Host.Configuration
+namespace FinalApi.Host.Configuration
 {
     /*
      * Application specific settings

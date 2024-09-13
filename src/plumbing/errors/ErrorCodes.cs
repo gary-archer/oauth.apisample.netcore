@@ -1,4 +1,4 @@
-﻿namespace SampleApi.Plumbing.Errors
+﻿namespace FinalApi.Plumbing.Errors
 {
     /*
      * Error codes that could be used by multiple APIs

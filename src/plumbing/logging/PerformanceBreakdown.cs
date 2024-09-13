@@ -1,4 +1,4 @@
-﻿namespace SampleApi.Plumbing.Logging
+﻿namespace FinalApi.Plumbing.Logging
 {
     using System.Collections.Generic;
     using System.Diagnostics;

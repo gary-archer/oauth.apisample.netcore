@@ -1,8 +1,8 @@
-namespace SampleApi.Plumbing.Logging
+namespace FinalApi.Plumbing.Logging
 {
     using System;
     using Microsoft.Extensions.Logging;
-    using SampleApi.Plumbing.Configuration;
+    using FinalApi.Plumbing.Configuration;
 
     /*
      * A logger factory interface

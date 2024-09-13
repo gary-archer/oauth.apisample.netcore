@@ -1,7 +1,7 @@
-namespace SampleApi.IntegrationTests
+namespace FinalApi.IntegrationTests
 {
     using System;
-    using SampleApi.Test.Utils;
+    using FinalApi.Test.Utils;
 
     /*
      * Contains state that is created once for the whole suite of integration tests

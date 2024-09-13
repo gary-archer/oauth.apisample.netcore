@@ -7,7 +7,7 @@
     "proxyUrl": ""
   },
   "logging": {
-    "apiName": "SampleApi",
+    "apiName": "FinalApi",
     "production": {
       "level": "Info",
       "performanceThresholdMilliseconds": 500,
@@ -25,8 +25,8 @@
         "Microsoft": "Warning",
         "Microsoft.AspNetCore.Server.Kestrel": "Error",
         "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
-        "SampleApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",
-        "SampleApi.Plumbing.Claims.ClaimsCache": "Info"
+        "FinalApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",
+        "FinalApi.Plumbing.Claims.ClaimsCache": "Info"
       }
     }
   },

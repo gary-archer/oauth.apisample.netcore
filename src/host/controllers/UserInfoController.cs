@@ -1,10 +1,10 @@
-namespace SampleApi.Host.Controllers
+namespace FinalApi.Host.Controllers
 {
     using System.Linq;
+    using FinalApi.Logic.Claims;
+    using FinalApi.Logic.Entities;
+    using FinalApi.Plumbing.Claims;
     using Microsoft.AspNetCore.Mvc;
-    using SampleApi.Logic.Claims;
-    using SampleApi.Logic.Entities;
-    using SampleApi.Plumbing.Claims;
 
     /*
      * Return user info from the business data to the client

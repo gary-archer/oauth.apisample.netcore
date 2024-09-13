@@ -1,10 +1,10 @@
-namespace SampleApi.Test.Utils
+namespace FinalApi.Test.Utils
 {
     using System;
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Threading.Tasks;
-    using SampleApi.Plumbing.Utilities;
+    using FinalApi.Plumbing.Utilities;
 
     /*
      * A utility class to call the API in a parameterized manner
@@ -75,7 +75,7 @@ namespace SampleApi.Test.Utils
                 request.Headers.Add("x-authsamples-correlation-id", correlationId);
                 if (options.RehearseException)
                 {
-                    request.Headers.Add("x-authsamples-test-exception", "SampleApi");
+                    request.Headers.Add("x-authsamples-test-exception", "FinalApi");
                 }
 
                 // Send the request

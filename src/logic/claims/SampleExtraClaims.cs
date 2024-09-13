@@ -1,10 +1,10 @@
-namespace SampleApi.Logic.Claims
+namespace FinalApi.Logic.Claims
 {
     using System.Collections.Generic;
     using System.Linq;
     using System.Security.Claims;
     using System.Text.Json.Nodes;
-    using SampleApi.Plumbing.Claims;
+    using FinalApi.Plumbing.Claims;
 
     /*
      * Represents extra claims not received in access tokens

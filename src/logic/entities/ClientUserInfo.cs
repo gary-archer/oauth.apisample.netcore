@@ -1,4 +1,4 @@
-namespace SampleApi.Logic.Entities
+namespace FinalApi.Logic.Entities
 {
     /*
      * User info from the API's own data, returned to clients for display

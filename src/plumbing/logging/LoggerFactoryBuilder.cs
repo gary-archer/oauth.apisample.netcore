@@ -1,4 +1,4 @@
-namespace SampleApi.Plumbing.Logging
+namespace FinalApi.Plumbing.Logging
 {
     /*
      * A simple builder class to expose a segregated interface

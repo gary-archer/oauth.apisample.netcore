@@ -1,8 +1,8 @@
-namespace SampleApi.Plumbing.Utilities
+namespace FinalApi.Plumbing.Utilities
 {
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
-    using SampleApi.Plumbing.Errors;
+    using FinalApi.Plumbing.Errors;
 
     /*
      * Return secure errors to clients

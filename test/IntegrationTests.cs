@@ -1,4 +1,4 @@
-namespace SampleApi.IntegrationTests
+namespace FinalApi.IntegrationTests
 {
     using System.Linq;
     using System.Net;
@@ -6,15 +6,15 @@ namespace SampleApi.IntegrationTests
     using System.Text.Json;
     using System.Text.Json.Nodes;
     using System.Threading.Tasks;
+    using FinalApi.Test.Utils;
     using Jose;
-    using SampleApi.Test.Utils;
     using Xunit;
 
     /*
      * Test the API in isolation, without any dependencies on the Authorization Server
      */
     [TestCaseOrderer(
-        ordererTypeName: "SampleApi.Test.Utils.TestOrderer",
+        ordererTypeName: "FinalApi.Test.Utils.TestOrderer",
         ordererAssemblyName: "test")]
     public class IntegrationTests : IClassFixture<IntegrationTestState>
     {

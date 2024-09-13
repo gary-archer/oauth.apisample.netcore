@@ -14,7 +14,7 @@
   <ItemGroup>
 
     <!-- Use utility classes from the main API-->
-    <ProjectReference Include="..\sampleapi.csproj" />
+    <ProjectReference Include="..\finalapi.csproj" />
 
     <!-- JWT acess token handling -->
     <PackageReference Include="jose-jwt" Version="5.0.0" />

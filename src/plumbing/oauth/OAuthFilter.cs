@@ -1,12 +1,12 @@
-namespace SampleApi.Plumbing.OAuth
+namespace FinalApi.Plumbing.OAuth
 {
     using System;
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
-    using SampleApi.Plumbing.Claims;
-    using SampleApi.Plumbing.Errors;
+    using FinalApi.Plumbing.Claims;
+    using FinalApi.Plumbing.Errors;
 
     /*
      * A class to create the claims principal at the start of every secured request

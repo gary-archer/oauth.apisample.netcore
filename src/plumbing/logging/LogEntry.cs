@@ -1,4 +1,4 @@
-namespace SampleApi.Plumbing.Logging
+namespace FinalApi.Plumbing.Logging
 {
     using System;
     using System.Collections.Generic;
@@ -6,8 +6,8 @@ namespace SampleApi.Plumbing.Logging
     using log4net;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Routing;
-    using SampleApi.Plumbing.Errors;
-    using SampleApi.Plumbing.Utilities;
+    using FinalApi.Plumbing.Errors;
+    using FinalApi.Plumbing.Utilities;
 
     /*
      * A basic log entry object with a per request scope

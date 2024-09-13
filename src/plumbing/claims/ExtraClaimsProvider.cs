@@ -1,4 +1,4 @@
-﻿namespace SampleApi.Plumbing.Claims
+﻿namespace FinalApi.Plumbing.Claims
 {
     using System;
     using System.Security.Claims;

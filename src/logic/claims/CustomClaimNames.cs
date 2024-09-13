@@ -1,4 +1,4 @@
-namespace SampleApi.Logic.Claims
+namespace FinalApi.Logic.Claims
 {
     /*
      * Custom claims used in the API's authorization, or for user identification

@@ -1,11 +1,11 @@
-namespace SampleApi.Logic.Claims
+namespace FinalApi.Logic.Claims
 {
     using System;
     using System.Security.Claims;
     using System.Text.Json.Nodes;
     using System.Threading.Tasks;
-    using SampleApi.Logic.Repositories;
-    using SampleApi.Plumbing.Claims;
+    using FinalApi.Logic.Repositories;
+    using FinalApi.Plumbing.Claims;
 
     /*
      * Add extra claims that you cannot, or do not want to, manage in the authorization server
