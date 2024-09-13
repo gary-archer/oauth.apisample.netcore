@@ -126,7 +126,6 @@
             this.OutputString((x) => output["errorCode"] = x, this.ErrorCode);
             this.OutputNumber((x) => output["errorId"] = x, this.ErrorId);
             this.OutputNumber((x) => output["millisecondsTaken"] = x, this.Performance.MillisecondsTaken, true);
-            this.OutputNumber((x) => output["millisecondsThreshold"] = x, this.PerformanceThresholdMilliseconds, true);
             this.OutputString((x) => output["correlationId"] = x, this.CorrelationId);
             this.OutputString((x) => output["sessionId"] = x, this.SessionId);
 
