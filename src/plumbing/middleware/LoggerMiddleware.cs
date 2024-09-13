@@ -2,8 +2,8 @@ namespace FinalApi.Plumbing.Middleware
 {
     using System.Text.Json.Nodes;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Http;
     using FinalApi.Plumbing.Logging;
+    using Microsoft.AspNetCore.Http;
 
     /*
      * Middleware to do API request logging

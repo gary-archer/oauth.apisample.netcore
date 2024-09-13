@@ -5,10 +5,10 @@ namespace FinalApi.Plumbing.OAuth
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Threading.Tasks;
-    using Jose;
     using FinalApi.Plumbing.Configuration;
     using FinalApi.Plumbing.Errors;
     using FinalApi.Plumbing.Utilities;
+    using Jose;
 
     /*
     * Do the signing key download without needing to plug a website library into an API

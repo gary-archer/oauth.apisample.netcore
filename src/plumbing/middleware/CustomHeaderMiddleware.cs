@@ -1,10 +1,10 @@
 namespace FinalApi.Plumbing.Middleware
 {
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Http;
     using FinalApi.Plumbing.Configuration;
     using FinalApi.Plumbing.Errors;
     using FinalApi.Plumbing.Utilities;
+    using Microsoft.AspNetCore.Http;
 
     /*
      * A class to process custom headers to enable testers to control non functional behaviour

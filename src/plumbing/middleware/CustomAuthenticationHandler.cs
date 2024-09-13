@@ -4,12 +4,12 @@ namespace FinalApi.Plumbing.Middleware
     using System.Collections.Generic;
     using System.Text.Encodings.Web;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Authentication;
-    using Microsoft.Extensions.Options;
     using FinalApi.Plumbing.Errors;
     using FinalApi.Plumbing.Logging;
     using FinalApi.Plumbing.OAuth;
     using FinalApi.Plumbing.Utilities;
+    using Microsoft.AspNetCore.Authentication;
+    using Microsoft.Extensions.Options;
 
     /*
      * The Microsoft specific class for authenticating API requests

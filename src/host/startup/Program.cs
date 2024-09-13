@@ -2,10 +2,10 @@
 {
     using System;
     using System.Net;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Extensions.DependencyInjection;
     using FinalApi.Host.Configuration;
     using FinalApi.Plumbing.Logging;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.DependencyInjection;
 
     /*
      * Our entry point class

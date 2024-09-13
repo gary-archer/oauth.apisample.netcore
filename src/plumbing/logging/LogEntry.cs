@@ -3,11 +3,11 @@ namespace FinalApi.Plumbing.Logging
     using System;
     using System.Collections.Generic;
     using System.Text.Json.Nodes;
+    using FinalApi.Plumbing.Errors;
+    using FinalApi.Plumbing.Utilities;
     using log4net;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Routing;
-    using FinalApi.Plumbing.Errors;
-    using FinalApi.Plumbing.Utilities;
 
     /*
      * A basic log entry object with a per request scope

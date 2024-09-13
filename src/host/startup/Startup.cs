@@ -1,10 +1,5 @@
 ﻿namespace FinalApi.Host.Startup
 {
-    using Microsoft.AspNetCore.Authentication;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Extensions.DependencyInjection;
     using FinalApi.Host.Configuration;
     using FinalApi.Logic.Claims;
     using FinalApi.Logic.Repositories;
@@ -13,6 +8,11 @@
     using FinalApi.Plumbing.Dependencies;
     using FinalApi.Plumbing.Logging;
     using FinalApi.Plumbing.Middleware;
+    using Microsoft.AspNetCore.Authentication;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.DependencyInjection;
 
     /*
      * The application startup class configures authentication and authorization

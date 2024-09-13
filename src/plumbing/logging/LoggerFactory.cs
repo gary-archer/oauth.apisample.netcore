@@ -4,13 +4,13 @@ namespace FinalApi.Plumbing.Logging
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.Json.Nodes;
+    using FinalApi.Plumbing.Configuration;
+    using FinalApi.Plumbing.Errors;
     using log4net;
     using log4net.Appender;
     using log4net.Config;
     using log4net.Repository.Hierarchy;
     using Microsoft.Extensions.Logging;
-    using FinalApi.Plumbing.Configuration;
-    using FinalApi.Plumbing.Errors;
 
     /*
      * The entry point for configuring logging and getting a logger

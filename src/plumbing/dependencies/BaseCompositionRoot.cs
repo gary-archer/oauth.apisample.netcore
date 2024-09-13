@@ -1,13 +1,13 @@
 ﻿namespace FinalApi.Plumbing.Dependencies
 {
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.Extensions.Caching.Distributed;
-    using Microsoft.Extensions.DependencyInjection;
     using FinalApi.Plumbing.Claims;
     using FinalApi.Plumbing.Configuration;
     using FinalApi.Plumbing.Logging;
     using FinalApi.Plumbing.OAuth;
     using FinalApi.Plumbing.Utilities;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.Caching.Distributed;
+    using Microsoft.Extensions.DependencyInjection;
 
     /*
      * A class to manage composing core API behaviour

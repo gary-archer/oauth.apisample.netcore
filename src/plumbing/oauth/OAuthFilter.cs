@@ -4,9 +4,9 @@ namespace FinalApi.Plumbing.OAuth
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Http;
     using FinalApi.Plumbing.Claims;
     using FinalApi.Plumbing.Errors;
+    using Microsoft.AspNetCore.Http;
 
     /*
      * A class to create the claims principal at the start of every secured request

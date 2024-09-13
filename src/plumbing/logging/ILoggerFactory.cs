@@ -1,8 +1,8 @@
 namespace FinalApi.Plumbing.Logging
 {
     using System;
-    using Microsoft.Extensions.Logging;
     using FinalApi.Plumbing.Configuration;
+    using Microsoft.Extensions.Logging;
 
     /*
      * A logger factory interface
