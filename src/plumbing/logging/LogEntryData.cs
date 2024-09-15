@@ -21,7 +21,7 @@
             this.Method = string.Empty;
             this.Path = string.Empty;
             this.ResourceId = string.Empty;
-            this.ClientApplicationName = string.Empty;
+            this.ClientName = string.Empty;
             this.UserId = string.Empty;
             this.StatusCode = 0;
             this.MillisecondsTaken = 0;
@@ -62,7 +62,7 @@
         public string ResourceId { get; set; }
 
         // The calling application name
-        public string ClientApplicationName { get; set; }
+        public string ClientName { get; set; }
 
         // The subject claim from the OAuth 2.0 access token
         public string UserId { get; set; }
@@ -120,7 +120,7 @@
             this.OutputString((x) => output["method"] = x, this.Method);
             this.OutputString((x) => output["path"] = x, this.Path);
             this.OutputString((x) => output["resourceId"] = x, this.ResourceId);
-            this.OutputString((x) => output["clientApplicationName"] = x, this.ClientApplicationName);
+            this.OutputString((x) => output["clientName"] = x, this.ClientName);
             this.OutputString((x) => output["userId"] = x, this.UserId);
             this.OutputNumber((x) => output["statusCode"] = x, this.StatusCode);
             this.OutputString((x) => output["errorCode"] = x, this.ErrorCode);

@@ -61,10 +61,10 @@ namespace FinalApi.Plumbing.Logging
                 }
 
                 // Our callers can supply a custom header so that we can keep track of who is calling each API
-                var clientApplicationName = request.GetHeader("x-authsamples-api-client");
-                if (!string.IsNullOrWhiteSpace(clientApplicationName))
+                var clientName = request.GetHeader("x-authsamples-api-client");
+                if (!string.IsNullOrWhiteSpace(clientName))
                 {
-                    this.data.ClientApplicationName = clientApplicationName;
+                    this.data.ClientName = clientName;
                 }
 
                 // Use the correlation id from request headers or create one
