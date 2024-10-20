@@ -30,7 +30,7 @@ This further verifies reliability and the correctness of API logs.
 
 ### API is Supportable
 
-You can aggregate API logs to Elasticsearch and run [Technical Support Queries](https://apisandclients.com/posts/api-technical-support-analysis).
+You can aggregate API logs to Elasticsearch and run [Technical Support Queries](https://github.com/gary-archer/oauth.blog/tree/master/public/posts/api-technical-support-analysis.mdx).
 
 ![Support Queries](./images/support-queries.png)
 
@@ -59,7 +59,7 @@ Then call an endpoint over port 446:
 curl -k https://api.authsamples-dev.com:446/investments/companies
 ```
 
-Then configure [Operating system trust](https://apisandclients.com/posts/developer-ssl-setup#configure-operating-system-trust) for the root CA at `./certs/authsamples-dev.ca.crt`.
+Then configure [Operating system trust](https://github.com/gary-archer/oauth.blog/tree/master/public/posts/developer-ssl-setup.mdx#configure-operating-system-trust) for the root CA at `./certs/authsamples-dev.ca.crt`.
 
 ### Test the API
 
@@ -78,9 +78,9 @@ Then run integration tests and a load test:
 
 ## Further Details
 
-* See the [API Journey - Server Side](https://apisandclients.com/posts/api-journey-server-side) for further information on the API's behaviour.
-* See the [Overview Page](https://apisandclients.com/posts/net-core-code-sample-overview) for further details on how to run the API.
-* See the [OAuth Integration Page](https://apisandclients.com/posts/net-core-api-oauth-integration) for some implementation details.
+* See the [API Journey - Server Side](https://github.com/gary-archer/oauth.blog/tree/master/public/posts/api-journey-server-side.mdx) for further information on the API's behaviour.
+* See the [Overview Page](https://github.com/gary-archer/oauth.blog/tree/master/public/posts/net-core-code-sample-overview.mdx) for further details on how to run the API.
+* See the [OAuth Integration Page](*https://github.com/gary-archer/oauth.blog/tree/master/public/posts/net-core-api-oauth-integration.mdx) for some implementation details.
 
 ## Programming Languages
 
