@@ -44,7 +44,6 @@ namespace FinalApi.Test.Utils
         public void Start()
         {
             var keyset = this.GetTokenSigningPublicKeys();
-            Console.WriteLine(keyset);
             this.RegisterJsonWebWeys(keyset).Wait();
         }
 
