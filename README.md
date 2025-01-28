@@ -50,7 +50,7 @@ Install OpenSSL if required, then create a folder in which to create development
 
 ```bash
 export SECRETS_FOLDER='~/secrets'
-mkdir ~/secrets
+mkdir -p ~/secrets
 ./certs/create.sh
 ```
 
