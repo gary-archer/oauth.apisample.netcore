@@ -207,9 +207,9 @@ namespace FinalApi.Plumbing.Logging
             var jsonLayout = new JsonLayout(false);
             var fileAppender = new RollingFileAppender()
             {
-                File = folder,
+                File = $"{folder}/{prefix}-",
                 StaticLogFileName = false,
-                DatePattern = $"{prefix}-yyyy-MM-dd'.log'",
+                DatePattern = "yyyy-MM-dd.'log'",
                 AppendToFile = true,
                 PreserveLogFileNameExtension = true,
                 Layout = jsonLayout,
