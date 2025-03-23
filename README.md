@@ -21,8 +21,6 @@ For productive test-driven development, the API instead mocks the authorization 
 
 ![Test Driven Development](./images/tests.png?v=20240902)
 
-### API is Load Testable
-
 A basic load test fires batches of concurrent requests at the API.\
 This further verifies reliability and the correctness of API logs.
 
