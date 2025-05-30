@@ -1,11 +1,10 @@
 namespace FinalApi.Plumbing.Claims
 {
     using System.Collections.Generic;
-    using System.Security.Claims;
     using System.Text.Json.Nodes;
 
     /*
-     * The claims of interest from the JWT access token
+     * The claims from the JWT access token
      */
     public class JwtClaims
     {
@@ -84,26 +83,6 @@ namespace FinalApi.Plumbing.Claims
             }
 
             return results;
-        }
-
-        /*
-         * Add claims to the identity in order for .NET authorization to work as expected
-         */
-        public void AddToClaimsIdentity(ClaimsIdentity identity)
-        {
-            identity.AddClaim(new Claim(OAuthClaimNames.Issuer, this.Iss));
-
-            var audiences = this.GetAudiences();
-            foreach (var audience in audiences)
-            {
-                identity.AddClaim(new Claim(OAuthClaimNames.Audience, audience));
-            }
-
-            identity.AddClaim(new Claim(OAuthClaimNames.Scope, this.Scope));
-            identity.AddClaim(new Claim(OAuthClaimNames.Subject, this.Sub));
-
-            var exp = ClaimsReader.GetIntegerClaim(this.payload, OAuthClaimNames.Exp);
-            identity.AddClaim(new Claim(OAuthClaimNames.Exp, exp.ToString()));
         }
     }
 }

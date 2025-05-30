@@ -16,7 +16,6 @@
 
     /*
      * The application startup class configures authentication and authorization
-     * https://github.com/mihirdilip/aspnetcore-allowanonymous-test/blob/main/Startup.cs
      */
     public class Startup
     {
@@ -101,7 +100,7 @@
         {
             new BaseCompositionRoot()
                 .UseOAuth(this.configuration.OAuth)
-                .WithExtraClaimsProvider(new SampleExtraClaimsProvider())
+                .WithExtraClaimsProvider(new ExtraClaimsProviderImpl())
                 .WithLogging(this.configuration.Logging, this.loggerFactory)
                 .WithProxyConfiguration(this.configuration.Api.UseProxy, this.configuration.Api.ProxyUrl)
                 .WithServices(services)

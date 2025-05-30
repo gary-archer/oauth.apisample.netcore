@@ -2,7 +2,7 @@ namespace FinalApi.Plumbing.Claims
 {
     using System;
     using System.Text;
-    using System.Text.Json.Nodes;
+    using System.Text.Json;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.DependencyInjection;
@@ -15,12 +15,12 @@ namespace FinalApi.Plumbing.Claims
     {
         private readonly IDistributedCache cache;
         private readonly int timeToLiveMinutes;
-        private readonly ExtraClaimsProvider extraClaimsProvider;
+        private readonly IExtraClaimsProvider extraClaimsProvider;
         private readonly ILogger traceLogger;
 
         public ClaimsCache(
             IDistributedCache cache,
-            ExtraClaimsProvider extraClaimsProvider,
+            IExtraClaimsProvider extraClaimsProvider,
             int timeToLiveMinutes,
             ServiceProvider container)
         {
@@ -33,7 +33,7 @@ namespace FinalApi.Plumbing.Claims
         /*
          * Add extra claims to the cache
          */
-        public async Task SetExtraUserClaimsAsync(string accessTokenHash, ExtraClaims extraClaims, int expiry)
+        public async Task SetExtraUserClaimsAsync(string accessTokenHash, object extraClaims, int expiry)
         {
             // Check for a race condition where the token passes validation but it expired when it gets here
             var now = DateTimeOffset.UtcNow;
@@ -42,7 +42,7 @@ namespace FinalApi.Plumbing.Claims
             if (secondsToCache > 0)
             {
                 // Get the hash and output debug info
-                this.traceLogger.LogDebug($"Token to be cached will expire in {secondsToCache} seconds (hash: {accessTokenHash})");
+                this.traceLogger.LogDebug($"Entry to be cached will expire in {secondsToCache} seconds (hash: {accessTokenHash})");
 
                 // Do not exceed the maximum time we configured
                 if (secondsToCache > this.timeToLiveMinutes * 60)
@@ -51,7 +51,7 @@ namespace FinalApi.Plumbing.Claims
                 }
 
                 // Serialize the data
-                var json = extraClaims.ExportData().ToString();
+                var json = JsonSerializer.Serialize(extraClaims);
                 var bytes = Encoding.UTF8.GetBytes(json);
 
                 // Cache the token until the above time
@@ -60,7 +60,7 @@ namespace FinalApi.Plumbing.Claims
                     AbsoluteExpiration = now.AddSeconds(secondsToCache),
                 };
 
-                this.traceLogger.LogDebug($"Adding token to claims cache for {secondsToCache} seconds (hash: {accessTokenHash})");
+                this.traceLogger.LogDebug($"Adding entry to claims cache for {secondsToCache} seconds (hash: {accessTokenHash})");
                 await this.cache.SetAsync(accessTokenHash, bytes, options);
             }
         }
@@ -68,20 +68,20 @@ namespace FinalApi.Plumbing.Claims
         /*
          * Read extra claims from the cache or return null if not found
          */
-        public async Task<ExtraClaims> GetExtraUserClaimsAsync(string accessTokenHash)
+        public async Task<object> GetExtraUserClaimsAsync(string accessTokenHash)
         {
             // Get the hash as a cache key and see if it exists in the cache
             var bytes = await this.cache.GetAsync(accessTokenHash);
             if (bytes == null)
             {
-                this.traceLogger.LogDebug($"New token will be added to claims cache (hash: {accessTokenHash})");
+                this.traceLogger.LogDebug($"New entry will be added to claims cache (hash: {accessTokenHash})");
                 return null;
             }
 
             // Deserialize bytes to claims
-            this.traceLogger.LogDebug($"Found existing token in claims cache (hash: {accessTokenHash})");
+            this.traceLogger.LogDebug($"Found existing entry in claims cache (hash: {accessTokenHash})");
             var json = Encoding.UTF8.GetString(bytes);
-            return this.extraClaimsProvider.DeserializeFromCache(JsonNode.Parse(json));
+            return this.extraClaimsProvider.DeserializeFromCache(json);
         }
     }
 }

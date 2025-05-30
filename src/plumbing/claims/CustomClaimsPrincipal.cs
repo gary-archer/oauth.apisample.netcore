@@ -3,11 +3,11 @@ namespace FinalApi.Plumbing.Claims
     using System.Security.Claims;
 
     /*
-     * The claims of interest from the JWT access token
+     * The total set of claims for this API
      */
     public class CustomClaimsPrincipal : ClaimsPrincipal
     {
-        public CustomClaimsPrincipal(JwtClaims jwtClaims, ExtraClaims extraClaims, ClaimsIdentity identity)
+        public CustomClaimsPrincipal(JwtClaims jwtClaims, object extraClaims, ClaimsIdentity identity)
             : base(identity)
         {
             this.JwtClaims = jwtClaims;
@@ -16,6 +16,6 @@ namespace FinalApi.Plumbing.Claims
 
         public JwtClaims JwtClaims { get; private set; }
 
-        public ExtraClaims ExtraClaims { get; private set; }
+        public object ExtraClaims { get; private set; }
     }
 }

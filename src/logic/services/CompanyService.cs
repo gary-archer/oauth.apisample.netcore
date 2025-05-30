@@ -70,7 +70,7 @@ namespace FinalApi.Logic.Services
             }
 
             // For the user role, authorize based on a business rule that links the user to regional data
-            var extraClaims = this.claims.ExtraClaims as SampleExtraClaims;
+            var extraClaims = this.claims.ExtraClaims as ExtraClaims;
             return extraClaims.Regions.Any(ur => ur == company.Region);
         }
 

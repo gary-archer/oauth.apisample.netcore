@@ -15,7 +15,7 @@
     public sealed class BaseCompositionRoot
     {
         private OAuthConfiguration oauthConfiguration;
-        private ExtraClaimsProvider extraClaimsProvider;
+        private IExtraClaimsProvider extraClaimsProvider;
         private LoggingConfiguration loggingConfiguration;
         private LoggerFactory loggerFactory;
         private HttpProxy httpProxy;
@@ -33,7 +33,7 @@
         /*
          * Receive an object to manage processing claims
          */
-        public BaseCompositionRoot WithExtraClaimsProvider(ExtraClaimsProvider extraClaimsProvider)
+        public BaseCompositionRoot WithExtraClaimsProvider(IExtraClaimsProvider extraClaimsProvider)
         {
             this.extraClaimsProvider = extraClaimsProvider;
             return this;

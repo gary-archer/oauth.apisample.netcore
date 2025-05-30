@@ -20,7 +20,7 @@ namespace FinalApi.Host.Controllers
         public ClientUserInfo GetUserInfo()
         {
             var claimsPrincipal = this.User as CustomClaimsPrincipal;
-            var extraClaims = claimsPrincipal.ExtraClaims as SampleExtraClaims;
+            var extraClaims = claimsPrincipal.ExtraClaims as ExtraClaims;
 
             return new ClientUserInfo(
                 extraClaims.Title,

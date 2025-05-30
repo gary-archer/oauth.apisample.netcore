@@ -1,9 +1,11 @@
 namespace FinalApi.Plumbing.OAuth
 {
     using System;
+    using System.Security.Claims;
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
+    using FinalApi.Logic.Claims;
     using FinalApi.Plumbing.Claims;
     using FinalApi.Plumbing.Errors;
     using Microsoft.AspNetCore.Http;
@@ -15,12 +17,12 @@ namespace FinalApi.Plumbing.OAuth
     {
         private readonly ClaimsCache cache;
         private readonly AccessTokenValidator accessTokenValidator;
-        private readonly ExtraClaimsProvider extraClaimsProvider;
+        private readonly IExtraClaimsProvider extraClaimsProvider;
 
         public OAuthFilter(
             ClaimsCache cache,
             AccessTokenValidator accessTokenValidator,
-            ExtraClaimsProvider extraClaimsProvider)
+            IExtraClaimsProvider extraClaimsProvider)
         {
             this.cache = cache;
             this.accessTokenValidator = accessTokenValidator;
@@ -47,7 +49,7 @@ namespace FinalApi.Plumbing.OAuth
             var extraClaims = await this.cache.GetExtraUserClaimsAsync(accessTokenHash);
             if (extraClaims != null)
             {
-                return this.extraClaimsProvider.CreateClaimsPrincipal(jwtClaims, extraClaims);
+                return this.CreateClaimsPrincipal(jwtClaims, extraClaims);
             }
 
             // Look up extra claims not in the JWT access token when the token is first received
@@ -57,7 +59,7 @@ namespace FinalApi.Plumbing.OAuth
             await this.cache.SetExtraUserClaimsAsync(accessTokenHash, extraClaims, jwtClaims.Exp);
 
             // Return the final claims used by the API's authorization logic
-            return this.extraClaimsProvider.CreateClaimsPrincipal(jwtClaims, extraClaims);
+            return this.CreateClaimsPrincipal(jwtClaims, extraClaims);
         }
 
         /*
@@ -71,6 +73,15 @@ namespace FinalApi.Plumbing.OAuth
                 var hash = sha.ComputeHash(bytes);
                 return Convert.ToBase64String(hash);
             }
+        }
+
+        /*
+         * This API uses an object based .NET claims principal
+         */
+        private CustomClaimsPrincipal CreateClaimsPrincipal(JwtClaims jwtClaims, object extraClaims)
+        {
+            var identity = new ClaimsIdentity("Bearer", OAuthClaimNames.Subject, CustomClaimNames.Role);
+            return new CustomClaimsPrincipal(jwtClaims, extraClaims, identity);
         }
     }
 }
