@@ -1,0 +1,45 @@
+{
+  "api": {
+    "port": 446,
+    "sslCertificateFileName": "../../../certs/authsamples-dev.ssl.p12",
+    "sslCertificatePassword": "Password1",
+    "useProxy": false,
+    "proxyUrl": "http://127.0.0.1:8888"
+  },
+  "logging": {
+    "apiName": "FinalApi",
+    "production": {
+      "level": "Info",
+      "performanceThresholdMilliseconds": 500,
+      "appenders": [{
+        "type": "console",
+        "prettyPrint": true
+      },
+      {
+        "type": "file",
+        "filePrefix": "api-final",
+        "dirName": "../../../logs/",
+        "maxSize": "10MB",
+        "maxFiles": 100
+      }]
+    },
+    "development": {
+      "level": "Info",
+      "overrideLevels": {
+        "Microsoft": "Warning",
+        "Microsoft.AspNetCore.Server.Kestrel": "Error",
+        "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
+        "FinalApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",
+        "FinalApi.Plumbing.Claims.ClaimsCache": "Info"
+      }
+    }
+  },
+  "oauth": {
+    "issuer":                       "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_CuhLeqiE9",
+    "audience":                     "",
+    "algorithm":                    "RS256",
+    "scope":                        "https://api.authsamples.com/investments",
+    "jwksEndpoint":                 "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_CuhLeqiE9/.well-known/jwks.json",
+    "claimsCacheTimeToLiveMinutes": 15
+  }
+}

@@ -1,0 +1,8 @@
+bin
+obj
+.DS_Store
+resources
+certs/*.p12
+certs/*.crt
+logs
+*.sln

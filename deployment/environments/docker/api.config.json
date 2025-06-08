@@ -1,0 +1,38 @@
+{
+  "api": {
+    "port": 8000,
+    "sslCertificateFileName": "./certs/authsamples-dev.ssl.p12",
+    "sslCertificatePassword": "Password1",
+    "useProxy": false,
+    "proxyUrl": "http://host.docker.internal:8888"
+  },
+  "logging": {
+    "apiName": "FinalApi",
+    "production": {
+      "level": "Info",
+      "performanceThresholdMilliseconds": 500,
+      "appenders": [{
+          "type": "console",
+          "prettyPrint": false
+        }]
+      },
+    "development": {
+      "level": "Info",
+      "overrideLevels": {
+        "Microsoft": "Warning",
+        "Microsoft.AspNetCore.Server.Kestrel": "Error",
+        "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
+        "FinalApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",
+        "FinalApi.Plumbing.Claims.ClaimsCache": "Info"
+      }
+    }
+  },
+  "oauth": {
+    "issuer":                       "https://login.authsamples-dev.com",
+    "audience":                     "api.authsamples.com",
+    "algorithm":                    "RS256",
+    "scope":                        "investments",
+    "jwksEndpoint":                 "https://login.authsamples-dev.com:447/.well-known/jwks.json",
+    "claimsCacheTimeToLiveMinutes": 15
+  }
+}
