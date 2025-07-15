@@ -12,14 +12,14 @@
 
   <ItemGroup>
     <!-- JWT acess token handling -->
-    <PackageReference Include="jose-jwt" Version="5.1.1" />
+    <PackageReference Include="jose-jwt" Version="5.2.0" />
 
     <!-- API logging -->
-    <PackageReference Include="log4net" Version="3.0.4" />
+    <PackageReference Include="log4net" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="8.0.0" />
 
     <!-- JSON handling -->
-    <PackageReference Include="System.Text.Json" Version="9.0.3" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
 
     <!-- Exclude child projects when running dotnet build -->
     <Compile Remove="test\**" />
