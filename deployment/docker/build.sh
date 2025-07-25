@@ -20,7 +20,7 @@ fi
 #
 dotnet publish finalapi.csproj -c Release -r linux-x64 --no-self-contained
 if [ $? -ne 0 ]; then
-  echo '*** .NET API build problem encountered'
+  echo '.NET API build problem encountered'
   exit 1
 fi
 
