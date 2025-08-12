@@ -4,5 +4,7 @@ obj
 resources
 certs/*.p12
 certs/*.crt
+certs/*.key
 logs
 *.sln
+
