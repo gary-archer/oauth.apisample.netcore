@@ -20,13 +20,15 @@ namespace FinalApi.Plumbing.Logging
     {
         private string apiName;
         private int performanceThresholdMilliseconds;
-        private bool isInitialized;
+        private bool hasRequestLogger;
+        private bool hasAuditLogger;
 
         public LoggerFactory()
         {
             this.apiName = string.Empty;
             this.performanceThresholdMilliseconds = 1000;
-            this.isInitialized = false;
+            this.hasRequestLogger = false;
+            this.hasAuditLogger = false;
         }
 
         /*
@@ -69,8 +71,6 @@ namespace FinalApi.Plumbing.Logging
             {
                 this.CreateDebugLoggers(builder, debugLogConfig);
             }
-
-            this.isInitialized = true;
         }
 
         /*
@@ -78,7 +78,7 @@ namespace FinalApi.Plumbing.Logging
          */
         public void LogStartupError(Exception exception)
         {
-            if (this.isInitialized)
+            if (this.hasRequestLogger)
             {
                 // Get the error into a loggable format
                 var error = (ServerError)ErrorUtils.FromException(exception);
@@ -91,7 +91,7 @@ namespace FinalApi.Plumbing.Logging
             }
             else
             {
-                // If logging is not set up yet use a plain exception dump
+                // Use a plain exception dump if there is no request logger
                 Console.WriteLine($"STARTUP ERROR : {exception}");
             }
         }
@@ -101,7 +101,7 @@ namespace FinalApi.Plumbing.Logging
          */
         public ILog GetRequestLogger()
         {
-            return LogManager.GetLogger("request", "requestLogger");
+            return this.hasRequestLogger ? LogManager.GetLogger("request", "request") : null;
         }
 
         /*
@@ -109,15 +109,15 @@ namespace FinalApi.Plumbing.Logging
          */
         public ILog GetAuditLogger()
         {
-            return LogManager.GetLogger("audit", "auditLogger");
+            return this.hasAuditLogger ? LogManager.GetLogger("audit", "audit") : null;
         }
 
         /*
-         * Get a named debug logger
+         * Get or create a named debug logger
          */
         public ILog GetDebugLogger(string name)
         {
-            return LogManager.GetLogger("debug", name);
+            return LogManager.GetLogger("default", name);
         }
 
         /*
@@ -138,6 +138,7 @@ namespace FinalApi.Plumbing.Logging
 
             var appenders = this.CreateAppenders(config["appenders"].AsArray());
             BasicConfigurator.Configure(repository, appenders);
+            this.hasRequestLogger = true;
         }
 
         /*
@@ -150,6 +151,7 @@ namespace FinalApi.Plumbing.Logging
 
             var appenders = this.CreateAppenders(config["appenders"].AsArray());
             BasicConfigurator.Configure(repository, appenders);
+            this.hasAuditLogger = true;
         }
 
         /*
@@ -237,7 +239,7 @@ namespace FinalApi.Plumbing.Logging
         }
 
         /*
-         * Add debug loggers
+         * Create debug loggers within the default repository
          */
         private void CreateDebugLoggers(ILoggingBuilder builder, JsonNode config)
         {

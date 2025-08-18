@@ -15,7 +15,7 @@ namespace FinalApi.Plumbing.Claims
     {
         private readonly IDistributedCache cache;
         private readonly int timeToLiveMinutes;
-        private readonly ILogger traceLogger;
+        private readonly ILogger debugLogger;
 
         public ClaimsCache(
             IDistributedCache cache,
@@ -24,7 +24,7 @@ namespace FinalApi.Plumbing.Claims
         {
             this.cache = cache;
             this.timeToLiveMinutes = timeToLiveMinutes;
-            this.traceLogger = container.GetService<ILoggerFactory>().CreateLogger<ClaimsCache>();
+            this.debugLogger = container.GetService<ILoggerFactory>().CreateLogger<ClaimsCache>();
         }
 
         /*
@@ -50,7 +50,7 @@ namespace FinalApi.Plumbing.Claims
                     AbsoluteExpiration = now.AddSeconds(secondsToCache),
                 };
 
-                this.traceLogger.LogDebug($"Adding item to cache for {secondsToCache} seconds (hash: {accessTokenHash})");
+                this.debugLogger.LogDebug($"Adding item to cache for {secondsToCache} seconds (hash: {accessTokenHash})");
                 await this.cache.SetAsync(accessTokenHash, bytes, options);
             }
         }
@@ -66,7 +66,7 @@ namespace FinalApi.Plumbing.Claims
                 return null;
             }
 
-            this.traceLogger.LogDebug($"Found existing item in cache (hash: {accessTokenHash})");
+            this.debugLogger.LogDebug($"Found existing item in cache (hash: {accessTokenHash})");
             var json = Encoding.UTF8.GetString(bytes);
             return JsonSerializer.Deserialize<ExtraClaims>(json);
         }
