@@ -96,4 +96,5 @@ if [ $? -ne 0 ]; then
 fi
 
 rm *.csr
+chmod 644 *
 echo 'All certificates created successfully'
