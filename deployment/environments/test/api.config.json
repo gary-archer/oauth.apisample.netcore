@@ -8,31 +8,48 @@
   },
   "logging": {
     "apiName": "FinalApi",
-    "production": {
-      "level": "Info",
-      "performanceThresholdMilliseconds": 500,
-      "appenders": [{
-        "type": "console",
-        "prettyPrint": true
+    "loggers": [
+      {
+        "type": "request",
+        "performanceThresholdMilliseconds": 500,
+        "appenders": [
+          {
+            "type": "console",
+            "prettyPrint": true
+          },
+          {
+            "type": "file",
+            "filePrefix": "request",
+            "dirName": "../../../logs/",
+            "maxSize": "10MB",
+            "maxFiles": 100
+          }
+        ]
       },
       {
-        "type": "file",
-        "filePrefix": "api-final",
-        "dirName": "../../../logs/",
-        "maxSize": "10MB",
-        "maxFiles": 100
-      }]
-    },
-    "development": {
-      "level": "Info",
-      "overrideLevels": {
-        "Microsoft": "Warning",
-        "Microsoft.AspNetCore.Server.Kestrel": "Error",
-        "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
-        "FinalApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",
-        "FinalApi.Plumbing.Claims.ClaimsCache": "Info"
+        "type": "audit",
+        "appenders": [
+          {
+            "type": "file",
+            "filePrefix": "audit",
+            "dirName": "../../../logs/",
+            "maxSize": "10MB",
+            "maxFiles": 100
+          }
+        ]
+      },
+      {
+        "type": "debug",
+        "level": "Info",
+        "overrideLevels": {
+          "Microsoft": "Warning",
+          "Microsoft.AspNetCore.Server.Kestrel": "Error",
+          "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
+          "FinalApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",
+          "FinalApi.Plumbing.Claims.ClaimsCache": "Info"
+        }
       }
-    }
+    ]
   },
   "oauth": {
     "issuer":                       "https://login.authsamples-dev.com",

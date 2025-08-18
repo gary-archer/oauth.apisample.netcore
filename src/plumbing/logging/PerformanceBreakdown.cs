@@ -6,7 +6,7 @@
     using System.Text.Json.Nodes;
 
     /*
-     * The full implementation class for capturing a performance breakdown
+     * Performs basic timing of expensive subtasks
      */
     internal sealed class PerformanceBreakdown : IPerformanceBreakdown
     {

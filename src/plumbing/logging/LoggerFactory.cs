@@ -54,14 +54,16 @@ namespace FinalApi.Plumbing.Logging
                 var logEntry = new LogEntry(this.apiName, this.GetProductionLogger());
                 logEntry.SetOperationName("startup");
                 logEntry.SetServerError(error);
-                logEntry.Write();
+
+                // GJA
+                // logEntry.Write();
             }
             else
             {
                 // If logging is not set up yet use a plain exception dump
-                #pragma warning disable S2228
+#pragma warning disable S2228
                 Console.WriteLine($"STARTUP ERROR : {exception}");
-                #pragma warning restore S2228
+#pragma warning restore S2228
             }
         }
 

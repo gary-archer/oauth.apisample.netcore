@@ -8,24 +8,27 @@
   },
   "logging": {
     "apiName": "FinalApi",
-    "production": {
-      "level": "Info",
-      "performanceThresholdMilliseconds": 500,
-      "appenders": [{
-          "type": "console",
-          "prettyPrint": false
-        }]
+    "loggers": [
+      {
+        "type": "request",
+        "performanceThresholdMilliseconds": 500,
+        "appenders": [
+          {
+            "type": "console",
+            "prettyPrint": true
+          }
+        ]
       },
-    "development": {
-      "level": "Info",
-      "overrideLevels": {
-        "Microsoft": "Warning",
-        "Microsoft.AspNetCore.Server.Kestrel": "Error",
-        "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
-        "FinalApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",
-        "FinalApi.Plumbing.Claims.ClaimsCache": "Info"
+      {
+        "type": "audit",
+        "appenders": [
+          {
+            "type": "console",
+            "prettyPrint": true
+          }
+        ]
       }
-    }
+    ]
   },
   "oauth": {
     "issuer":                       "https://login.authsamples-dev.com",

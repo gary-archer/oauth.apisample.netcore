@@ -43,7 +43,7 @@ namespace FinalApi.Plumbing.Middleware
                 var claimsPrincipal = await oauthFilter.ExecuteAsync(this.Request);
 
                 // Add identity details to logs
-                logEntry.SetIdentity(claimsPrincipal.Jwt.Sub);
+                // logEntry.SetIdentity(claimsPrincipal.Jwt.Sub);
 
                 // Set up .NET security so that authorization attributes work in the expected way
                 var ticket = new AuthenticationTicket(claimsPrincipal, new AuthenticationProperties(), this.Scheme.Name);
@@ -57,7 +57,9 @@ namespace FinalApi.Plumbing.Middleware
 
                 // Finish logging
                 logEntry.End(this.Context.Request, this.Context.Response);
-                logEntry.Write();
+
+                // GJA
+                // logEntry.Write();
 
                 // Store results for the below challenge method, which will fire later
                 this.Request.HttpContext.Items.TryAdd(ClientErrorKey, clientError);

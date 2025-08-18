@@ -5,14 +5,12 @@
     using System.Text.Json.Nodes;
 
     /*
-     * Each API request writes a structured log entry containing fields we will query by
-     * It also writes JSON blobs whose fields are not designed to be queried
+     * Log data collected during the lifetime of an API request
      */
     internal sealed class LogEntryData
     {
         public LogEntryData()
         {
-            // Queryable fields
             this.Id = Guid.NewGuid().ToString();
             this.UtcTime = DateTime.UtcNow;
             this.ApiName = string.Empty;
@@ -30,11 +28,11 @@
             this.ErrorId = 0;
             this.CorrelationId = string.Empty;
             this.SessionId = string.Empty;
-
-            // Objects that are not directly queryable
             this.Performance = new PerformanceBreakdown("total");
             this.ErrorData = null;
             this.InfoData = new List<JsonNode>();
+            this.Scope = new List<string>();
+            this.Claims = null;
         }
 
         // A unique generated client side id, which becomes the unique id in the aggregated logs database
@@ -97,6 +95,12 @@
         // Can be populated in scenarios when extra text is useful
         public List<JsonNode> InfoData { get; private set; }
 
+        // The OAuth scopes from the access token
+        public List<string> Scope { get; set; }
+
+        // The OAuth claims from the access token
+        public JsonNode Claims { get; set; }
+
         /*
         * Set fields at the end of a log entry
         */
@@ -106,12 +110,13 @@
         }
 
         /*
-        * Produce the output format
-        */
-        public JsonNode ToLogFormat()
+         * Output technical support details for troubleshooting but without sensitive data
+         */
+        public JsonNode ToRequestLog()
         {
             // Output fields used as top level queryable columns
             var output = new JsonObject();
+            output["type"] = "request";
             this.OutputString((x) => output["id"] = x, this.Id);
             this.OutputString((x) => output["utcTime"] = x, this.UtcTime.ToString("s"));
             this.OutputString((x) => output["apiName"] = x, this.ApiName);
@@ -133,6 +138,45 @@
             this.OutputPerformance(output);
             this.OutputError(output);
             this.OutputInfo(output);
+            return output;
+        }
+
+        /*
+         * Output audit logs for security visibility but without troubleshooting data
+         */
+        public JsonNode ToAuditLog()
+        {
+            var output = new JsonObject();
+            output["type"] = "audit";
+            this.OutputString((x) => output["id"] = x, this.Id);
+            this.OutputString((x) => output["utcTime"] = x, this.UtcTime.ToString("s"));
+            this.OutputString((x) => output["apiName"] = x, this.ApiName);
+            this.OutputString((x) => output["operationName"] = x, this.OperationName);
+            this.OutputString((x) => output["hostName"] = x, this.HostName);
+            this.OutputString((x) => output["method"] = x, this.Method);
+            this.OutputString((x) => output["path"] = x, this.Path);
+            this.OutputString((x) => output["resourceId"] = x, this.ResourceId);
+            this.OutputString((x) => output["clientName"] = x, this.ClientName);
+            this.OutputString((x) => output["userId"] = x, this.UserId);
+            this.OutputNumber((x) => output["statusCode"] = x, this.StatusCode);
+            this.OutputString((x) => output["errorCode"] = x, this.ErrorCode);
+            this.OutputString((x) => output["correlationId"] = x, this.CorrelationId);
+            this.OutputString((x) => output["sessionId"] = x, this.SessionId);
+
+            var isAuthenticated = !string.IsNullOrWhiteSpace(this.UserId);
+            output["isAuthenticated"] = isAuthenticated;
+            output["isAuthorized"] = isAuthenticated && (this.StatusCode >= 200 && this.StatusCode <= 299);
+
+            if (this.Scope.Count > 0)
+            {
+                output["scope"] = new JsonArray(this.Scope);
+            }
+
+            if (this.Claims != null)
+            {
+                output["claims"] = this.Claims;
+            }
+
             return output;
         }
 

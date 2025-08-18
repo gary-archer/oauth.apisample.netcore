@@ -33,7 +33,25 @@ namespace FinalApi.Plumbing.Middleware
 
             // Log response details before exiting
             logEntry.End(context.Request, context.Response);
-            logEntry.Write();
+
+            // GJA
+            // logEntry.Write();
+            /*
+
+
+            // Get the object to log
+            var logData = this.data.ToLogFormat();
+
+            // Output it
+            if (item.ErrorData != null)
+            {
+                this.productionLogger.Error(logData);
+            }
+            else
+            {
+                this.productionLogger.Info(logData);
+            }
+            */
         }
     }
 }
