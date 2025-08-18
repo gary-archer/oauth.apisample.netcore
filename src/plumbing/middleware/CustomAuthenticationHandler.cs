@@ -2,8 +2,13 @@ namespace FinalApi.Plumbing.Middleware
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
     using System.Text.Encodings.Web;
+    using System.Text.Json.Nodes;
     using System.Threading.Tasks;
+    using FinalApi.Plumbing.Claims;
+    using FinalApi.Plumbing.Configuration;
     using FinalApi.Plumbing.Errors;
     using FinalApi.Plumbing.Logging;
     using FinalApi.Plumbing.OAuth;
@@ -42,8 +47,25 @@ namespace FinalApi.Plumbing.Middleware
                 var oauthFilter = (OAuthFilter)this.Context.RequestServices.GetService(typeof(OAuthFilter));
                 var claimsPrincipal = await oauthFilter.ExecuteAsync(this.Request);
 
-                // Add identity details to logs
-                logEntry.SetIdentity(claimsPrincipal.Jwt.Sub);
+                // Include selected token details in audit logs
+                var userId = claimsPrincipal.Jwt.Sub;
+                var scope = claimsPrincipal.Jwt.Scope.Split(" ").ToList();
+                var loggedClaims = new JsonObject
+                {
+                    ["managerId"] = claimsPrincipal.Jwt.GetStringClaim(ClaimNames.ManagerId),
+                    ["role"] = claimsPrincipal.Jwt.GetStringClaim(ClaimNames.Role),
+                };
+                logEntry.SetIdentity(userId, scope, loggedClaims);
+
+                // The sample API requires the same scope for all endpoints, and it is enforced here
+                var oauthConfiguration = (OAuthConfiguration)this.Context.RequestServices.GetService(typeof(OAuthConfiguration));
+                if (!scope.Contains(oauthConfiguration.Scope))
+                {
+                    throw ErrorFactory.CreateClientError(
+                        HttpStatusCode.Forbidden,
+                        BaseErrorCodes.InsufficientScope,
+                        "The token does not contain sufficient scope for this API");
+                }
 
                 // Set up .NET security so that authorization attributes work in the expected way
                 var ticket = new AuthenticationTicket(claimsPrincipal, new AuthenticationProperties(), this.Scheme.Name);
@@ -57,7 +79,11 @@ namespace FinalApi.Plumbing.Middleware
 
                 // Finish logging
                 logEntry.End(this.Context.Request, this.Context.Response);
-                logEntry.Write();
+
+                // Output the log data
+                var loggerFactory = (ILoggerFactory)this.Context.RequestServices.GetService(typeof(ILoggerFactory));
+                loggerFactory.GetRequestLogger()?.Info(logEntry.GetRequestLog());
+                loggerFactory.GetAuditLogger()?.Info(logEntry.GetAuditLog());
 
                 // Store results for the below challenge method, which will fire later
                 this.Request.HttpContext.Items.TryAdd(ClientErrorKey, clientError);

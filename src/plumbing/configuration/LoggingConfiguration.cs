@@ -10,10 +10,7 @@
         // The name of the API
         public string ApiName { get; set; }
 
-        // The production configuration
-        public JsonNode Production { get; set; }
-
-        // The development configuration
-        public JsonNode Development { get; set; }
+        // Configured loggers
+        public JsonArray Loggers { get; set; }
     }
 }

@@ -5,14 +5,13 @@
 
     /*
      * Represents a time measurement within an API operation
-     * These operations are exported and this interface can be used from business logic via the ILogEntry
      */
     public interface IPerformanceBreakdown : IDisposable
     {
-        // Set details to associate with the performance breakdown from an object
+        // Set details to associate with the performance breakdown
         void SetDetails(JsonNode value);
 
-        // Create a child entry
+        // Create a child breakdown for an inner timing
         IPerformanceBreakdown CreateChild(string name);
     }
 }

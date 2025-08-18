@@ -5,30 +5,22 @@ namespace FinalApi.Plumbing.Logging
     using System.Text.Json.Nodes;
     using FinalApi.Plumbing.Errors;
     using FinalApi.Plumbing.Utilities;
-    using log4net;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Routing;
 
     /*
-     * A basic log entry object with a per request scope
+     * A log entry collects data during an API request and outputs it at the end
      */
     internal sealed class LogEntry : ILogEntry
     {
-        private readonly ILog productionLogger;
         private readonly LogEntryData data;
         private bool started;
 
         /*
          * The main constructor
          */
-        public LogEntry(
-            string apiName,
-            ILog productionLogger,
-            int performanceThresholdMilliseconds = 1000)
+        public LogEntry(string apiName, int performanceThresholdMilliseconds = 1000)
         {
-            // Store the logger reference
-            this.productionLogger = productionLogger;
-
             // Initialise data
             this.data = new LogEntryData();
             this.data.ApiName = apiName;
@@ -90,9 +82,11 @@ namespace FinalApi.Plumbing.Logging
         /*
          * Add identity details for secured requests
          */
-        public void SetIdentity(string subject)
+        public void SetIdentity(string subject, List<string> scope, JsonNode claims)
         {
             this.data.UserId = subject;
+            this.data.Scope = scope;
+            this.data.Claims = claims;
         }
 
         /*
@@ -157,11 +151,19 @@ namespace FinalApi.Plumbing.Logging
         }
 
         /*
-         * Output this log entry
+         * Get the request data to output to logs for a support team
          */
-        public void Write()
+        public JsonNode GetRequestLog()
         {
-            this.WriteDataItem(this.data);
+            return this.data.ToRequestLog();
+        }
+
+        /*
+        * Get the audit data to output to logs for a security team
+        */
+        public JsonNode GetAuditLog()
+        {
+            return this.data.ToAuditLog();
         }
 
         /*
@@ -194,25 +196,6 @@ namespace FinalApi.Plumbing.Logging
             if (ids.Count > 0)
             {
                 this.data.ResourceId = string.Join('/', ids);
-            }
-        }
-
-        /*
-         * Write a single data item
-         */
-        private void WriteDataItem(LogEntryData item)
-        {
-            // Get the object to log
-            var logData = item.ToLogFormat();
-
-            // Output it
-            if (item.ErrorData != null)
-            {
-                this.productionLogger.Error(logData);
-            }
-            else
-            {
-                this.productionLogger.Info(logData);
             }
         }
     }

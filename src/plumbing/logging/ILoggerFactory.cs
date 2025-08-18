@@ -2,17 +2,27 @@ namespace FinalApi.Plumbing.Logging
 {
     using System;
     using FinalApi.Plumbing.Configuration;
+    using log4net;
     using Microsoft.Extensions.Logging;
 
     /*
-     * A logger factory interface
+     * An interface to create and get logger objects
      */
     public interface ILoggerFactory
     {
-        // The entry point for configuring logging
+        // Configure logging at startup
         void Configure(ILoggingBuilder builder, LoggingConfiguration configuration);
 
-        // Handle errors that prevent startup
+        // Log API startup errors
         void LogStartupError(Exception exception);
+
+        // Get the request logger
+        ILog GetRequestLogger();
+
+        // Get the audit logger
+        ILog GetAuditLogger();
+
+        // Get a named debug logger
+        ILog GetDebugLogger(string name);
     }
 }

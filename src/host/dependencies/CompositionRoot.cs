@@ -97,6 +97,8 @@
         {
             // The log entry is scoped to the current request and created via this factory method
             this.services.AddSingleton(this.loggingConfiguration);
+            this.services.AddSingleton(this.loggerFactory);
+
             this.services.AddScoped<ILogEntry>(
                 ctx =>
                 {

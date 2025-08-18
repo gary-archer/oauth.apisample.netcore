@@ -31,9 +31,13 @@ namespace FinalApi.Plumbing.Middleware
             // Run subsequent handlers including the controller operation
             await this.next(context);
 
-            // Log response details before exiting
+            // Add response details to logs
             logEntry.End(context.Request, context.Response);
-            logEntry.Write();
+
+            // Output log data
+            var loggerFactory = (ILoggerFactory)context.RequestServices.GetService(typeof(ILoggerFactory));
+            loggerFactory.GetRequestLogger()?.Info(logEntry.GetRequestLog());
+            loggerFactory.GetAuditLogger()?.Info(logEntry.GetAuditLog());
         }
     }
 }
