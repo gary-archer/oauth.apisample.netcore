@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text.Json.Nodes;
 
     /*
@@ -169,7 +170,7 @@
 
             if (this.Scope.Count > 0)
             {
-                output["scope"] = new JsonArray(this.Scope);
+                output["scope"] = new JsonArray(this.Scope.Select(s => JsonValue.Create(s)).ToArray());
             }
 
             if (this.Claims != null)
