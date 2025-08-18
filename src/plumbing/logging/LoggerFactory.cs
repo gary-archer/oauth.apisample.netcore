@@ -65,7 +65,7 @@ namespace FinalApi.Plumbing.Logging
                 this.CreateAuditLogger(auditLogConfig);
             }
 
-            // Create the fixed audit logger
+            // Create debug loggers
             var debugLogConfig = configuration.Loggers.FirstOrDefault(l => l["type"]?.GetValue<string>() == "debug");
             if (debugLogConfig != null)
             {
