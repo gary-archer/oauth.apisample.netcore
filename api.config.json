@@ -42,7 +42,7 @@
         "type": "debug",
         "level": "Info",
         "overrideLevels": {
-          "Microsoft": "Warning",
+          "Microsoft": "Debug",
           "Microsoft.AspNetCore.Server.Kestrel": "Error",
           "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
           "FinalApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",

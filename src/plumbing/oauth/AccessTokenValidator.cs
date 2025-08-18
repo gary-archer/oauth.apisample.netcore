@@ -2,7 +2,6 @@ namespace FinalApi.Plumbing.OAuth
 {
     using System;
     using System.Linq;
-    using System.Net;
     using System.Threading.Tasks;
     using FinalApi.Plumbing.Claims;
     using FinalApi.Plumbing.Configuration;
@@ -110,22 +109,6 @@ namespace FinalApi.Plumbing.OAuth
             if (claims.Exp < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
             {
                 throw ErrorFactory.CreateClient401Error("The access token is expired");
-            }
-
-            // Check there is a scope
-            if (string.IsNullOrWhiteSpace(claims.Scope))
-            {
-                throw ErrorUtils.FromMissingClaim(ClaimNames.Scope);
-            }
-
-            // The sample API requires the same scope for all endpoints, and it is enforced here
-            var scopes = claims.Scope.Split(" ");
-            if (!scopes.Contains(this.configuration.Scope))
-            {
-                throw ErrorFactory.CreateClientError(
-                    HttpStatusCode.Forbidden,
-                    BaseErrorCodes.InsufficientScope,
-                    "The token does not contain sufficient scope for this API");
             }
         }
     }

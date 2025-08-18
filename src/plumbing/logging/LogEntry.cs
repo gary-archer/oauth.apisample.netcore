@@ -5,7 +5,6 @@ namespace FinalApi.Plumbing.Logging
     using System.Text.Json.Nodes;
     using FinalApi.Plumbing.Errors;
     using FinalApi.Plumbing.Utilities;
-    using log4net;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Routing;
 
@@ -14,21 +13,14 @@ namespace FinalApi.Plumbing.Logging
      */
     internal sealed class LogEntry : ILogEntry
     {
-        private readonly ILog productionLogger;
         private readonly LogEntryData data;
         private bool started;
 
         /*
          * The main constructor
          */
-        public LogEntry(
-            string apiName,
-            ILog productionLogger,
-            int performanceThresholdMilliseconds = 1000)
+        public LogEntry(string apiName, int performanceThresholdMilliseconds = 1000)
         {
-            // Store the logger reference
-            this.productionLogger = productionLogger;
-
             // Initialise data
             this.data = new LogEntryData();
             this.data.ApiName = apiName;

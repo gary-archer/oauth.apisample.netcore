@@ -14,10 +14,10 @@ namespace FinalApi.Plumbing.Logging
 
     /*
      * The entry point for configuring logging and getting a logger
+     * https://blogs.perficient.com/2016/04/20/how-to-programmatically-create-log-instance-by-log4net-library/
      */
     internal sealed class LoggerFactory : ILoggerFactory
     {
-        private static readonly string InstanceName = "Production";
         private string apiName;
         private int performanceThresholdMilliseconds;
         private bool isInitialized;
@@ -30,18 +30,51 @@ namespace FinalApi.Plumbing.Logging
         }
 
         /*
-         * The entry point for configuring logging
+         * Configure logging at startup
          */
         public void Configure(ILoggingBuilder builder, LoggingConfiguration configuration)
         {
             this.apiName = configuration.ApiName;
-            this.ConfigureProductionLogging(builder, configuration.Production);
-            this.ConfigureDevelopmentTraceLogging(builder, configuration.Development);
+
+            // Uncomment to view internal log4net errors
+            // log4net.Util.LogLog.InternalDebugging = true;
+
+            // Tell .NET to use log4net
+            var options = new Log4NetProviderOptions
+            {
+                ExternalConfigurationSetup = true,
+                UseWebOrAppConfig = false,
+                LoggerRepository = "default",
+            };
+            builder.AddLog4Net(options);
+
+            // Create the fixed request logger
+            var requestLogConfig = configuration.Loggers.FirstOrDefault(l => l["type"]?.GetValue<string>() == "request");
+            if (requestLogConfig != null)
+            {
+                this.performanceThresholdMilliseconds = requestLogConfig["performanceThresholdMilliseconds"].GetValue<int>();
+                this.CreateRequestLogger(requestLogConfig);
+            }
+
+            // Create the fixed audit logger
+            var auditLogConfig = configuration.Loggers.FirstOrDefault(l => l["type"]?.GetValue<string>() == "audit");
+            if (auditLogConfig != null)
+            {
+                this.CreateAuditLogger(auditLogConfig);
+            }
+
+            // Create the fixed audit logger
+            var debugLogConfig = configuration.Loggers.FirstOrDefault(l => l["type"]?.GetValue<string>() == "debug");
+            if (debugLogConfig != null)
+            {
+                this.CreateDebugLoggers(builder, debugLogConfig);
+            }
+
             this.isInitialized = true;
         }
 
         /*
-         * Handle errors that prevent startup
+         * Log API startup errors
          */
         public void LogStartupError(Exception exception)
         {
@@ -51,20 +84,40 @@ namespace FinalApi.Plumbing.Logging
                 var error = (ServerError)ErrorUtils.FromException(exception);
 
                 // Output via log4net
-                var logEntry = new LogEntry(this.apiName, this.GetProductionLogger());
+                var logEntry = new LogEntry(this.apiName, this.performanceThresholdMilliseconds);
                 logEntry.SetOperationName("startup");
                 logEntry.SetServerError(error);
-
-                // GJA
-                // logEntry.Write();
+                this.GetRequestLogger()?.Info(logEntry.GetRequestLog());
             }
             else
             {
                 // If logging is not set up yet use a plain exception dump
-#pragma warning disable S2228
                 Console.WriteLine($"STARTUP ERROR : {exception}");
-#pragma warning restore S2228
             }
+        }
+
+        /*
+         * Get the request logger
+         */
+        public ILog GetRequestLogger()
+        {
+            return LogManager.GetLogger("request", "requestLogger");
+        }
+
+        /*
+         * Get the audit logger
+         */
+        public ILog GetAuditLogger()
+        {
+            return LogManager.GetLogger("audit", "auditLogger");
+        }
+
+        /*
+         * Get a named debug logger
+         */
+        public ILog GetDebugLogger(string name)
+        {
+            return LogManager.GetLogger("debug", name);
         }
 
         /*
@@ -72,79 +125,37 @@ namespace FinalApi.Plumbing.Logging
          */
         public LogEntry CreateLogEntry()
         {
-            return new LogEntry(this.apiName, this.GetProductionLogger(), this.performanceThresholdMilliseconds);
+            return new LogEntry(this.apiName, this.performanceThresholdMilliseconds);
         }
 
         /*
-         * Configure production logging, which works the same in all environments, to log queryable fields
-         * https://blogs.perficient.com/2016/04/20/how-to-programmatically-create-log-instance-by-log4net-library/
+         * Add an always on request logger for technical support details
          */
-        private void ConfigureProductionLogging(ILoggingBuilder builder, JsonNode loggingConfiguration)
+        private void CreateRequestLogger(JsonNode config)
         {
-            // Tell .NET to use log4net
-            var options = new Log4NetProviderOptions
-            {
-                ExternalConfigurationSetup = true,
-                UseWebOrAppConfig = false,
-                LoggerRepository = InstanceName,
-            };
-            builder.AddLog4Net(options);
+            var repository = (Hierarchy)LogManager.CreateRepository("request", typeof(Hierarchy));
+            repository.Root.Level = repository.LevelMap["Info"];
 
-            // Create a repository for production JSON logging
-            var level = loggingConfiguration["level"].GetValue<string>();
-            var repository = (Hierarchy)LogManager.CreateRepository($"{InstanceName}Repository", typeof(Hierarchy));
-            repository.Root.Level = repository.LevelMap[level];
-            this.performanceThresholdMilliseconds = loggingConfiguration["performanceThresholdMilliseconds"].GetValue<int>();
-
-            #pragma warning disable S125
-            /* Uncomment to view internal messages such as problems creating log files
-            log4net.Util.LogLog.InternalDebugging = true;
-            */
-            #pragma warning restore S125
-
-            // Create appenders from configuration
-            var appenders = this.CreateProductionAppenders(loggingConfiguration["appenders"].AsArray());
+            var appenders = this.CreateAppenders(config["appenders"].AsArray());
             BasicConfigurator.Configure(repository, appenders);
         }
 
         /*
-         * The production log4net logger
+         * Add an always on audit logger for security details
          */
-        private ILog GetProductionLogger()
+        private void CreateAuditLogger(JsonNode config)
         {
-            return LogManager.GetLogger($"{InstanceName}Repository", $"{InstanceName}Logger");
-        }
+            var repository = (Hierarchy)LogManager.CreateRepository("audit", typeof(Hierarchy));
+            repository.Root.Level = repository.LevelMap["Info"];
 
-        /*
-         * Use Microsoft .NET logging only for developer trace logging, which only ever runs on a developer PC
-         * This logging is off by default
-         */
-        private void ConfigureDevelopmentTraceLogging(ILoggingBuilder builder, JsonNode loggingConfiguration)
-        {
-            // Set the base log level from configuration
-            var level = this.ReadDevelopmentLogLevel(loggingConfiguration["level"].GetValue<string>());
-            builder.SetMinimumLevel(level);
-
-            // Process override levels
-            var overrideLevels = loggingConfiguration["overrideLevels"]?.AsObject();
-            if (overrideLevels != null)
-            {
-                foreach (var overrideLevel in overrideLevels)
-                {
-                    var className = overrideLevel.Key;
-                    var classLevel = this.ReadDevelopmentLogLevel(overrideLevel.Value.GetValue<string>());
-                    builder.AddFilter(className, classLevel);
-                }
-            }
-
-            // Developer trace logging is only output to the console
-            builder.AddConsole();
+            var appenders = this.CreateAppenders(config["appenders"].AsArray());
+            BasicConfigurator.Configure(repository, appenders);
         }
 
         /*
          * Create appenders from configuration
          */
-        private IAppender[] CreateProductionAppenders(JsonArray appendersConfiguration)
+        private IAppender[] CreateAppenders(JsonArray appendersConfiguration)
         {
             var appenders = new List<IAppender>();
 
@@ -154,7 +165,7 @@ namespace FinalApi.Plumbing.Logging
                 var consoleConfig = appendersConfiguration.FirstOrDefault(a => a["type"]?.GetValue<string>() == "console");
                 if (consoleConfig != null)
                 {
-                    var consoleAppender = this.CreateProductionConsoleAppender(consoleConfig);
+                    var consoleAppender = this.CreateConsoleAppender(consoleConfig);
                     if (consoleAppender != null)
                     {
                         appenders.Add(consoleAppender);
@@ -165,7 +176,7 @@ namespace FinalApi.Plumbing.Logging
                 var fileConfig = appendersConfiguration.FirstOrDefault(a => a["type"]?.GetValue<string>() == "file");
                 if (fileConfig != null)
                 {
-                    var fileAppender = this.CreateProductionFileAppender(fileConfig);
+                    var fileAppender = this.CreateFileAppender(fileConfig);
                     if (fileAppender != null)
                     {
                         appenders.Add(fileAppender);
@@ -177,9 +188,9 @@ namespace FinalApi.Plumbing.Logging
         }
 
         /*
-         * Create a console appender that uses JSON with pretty printing
+         * Create a JSON console appender
          */
-        private IAppender CreateProductionConsoleAppender(JsonNode consoleConfiguration)
+        private IAppender CreateConsoleAppender(JsonNode consoleConfiguration)
         {
             var prettyPrint = consoleConfiguration["prettyPrint"].GetValue<bool>();
             var jsonLayout = new JsonLayout(prettyPrint);
@@ -198,7 +209,7 @@ namespace FinalApi.Plumbing.Logging
          * Create a rolling file appender that uses JSON with an object per line
          * We use a new file per day and infinite backups of the form 2020-02-06.1.log
          */
-        private IAppender CreateProductionFileAppender(JsonNode fileConfiguration)
+        private IAppender CreateFileAppender(JsonNode fileConfiguration)
         {
             // Get values
             var prefix = fileConfiguration["filePrefix"].GetValue<string>();
@@ -226,9 +237,34 @@ namespace FinalApi.Plumbing.Logging
         }
 
         /*
+         * Add debug loggers
+         */
+        private void CreateDebugLoggers(ILoggingBuilder builder, JsonNode config)
+        {
+            // Set the base log level from configuration
+            var level = this.ReadDebugLogLevel(config["level"].GetValue<string>());
+            builder.SetMinimumLevel(level);
+
+            // Process override levels
+            var overrideLevels = config["overrideLevels"]?.AsObject();
+            if (overrideLevels != null)
+            {
+                foreach (var overrideLevel in overrideLevels)
+                {
+                    var className = overrideLevel.Key;
+                    var classLevel = this.ReadDebugLogLevel(overrideLevel.Value.GetValue<string>());
+                    builder.AddFilter(className, classLevel);
+                }
+            }
+
+            // Developer trace logging is only output to the console
+            builder.AddConsole();
+        }
+
+        /*
          * Parse a log level that uses Microsoft logging
          */
-        private LogLevel ReadDevelopmentLogLevel(string textValue)
+        private LogLevel ReadDebugLogLevel(string textValue)
         {
             LogLevel level;
             if (Enum.TryParse(textValue, true, out level))

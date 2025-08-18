@@ -11,7 +11,6 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #
 DOMAIN="authsamples-dev"
 PRIVATE_KEY_PASSWORD='Password1'
-cd "$SECRETS_FOLDER"
 
 #
 # Handle Git bash on Windows
@@ -69,6 +68,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+export MSYS_NO_PATHCONV=1
 openssl x509 -req \
     -in "$DOMAIN.ssl.csr" \
     -CA "$DOMAIN.ca.crt" \
@@ -95,5 +95,5 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-rm ./*.csr
+rm *.csr
 echo 'All certificates created successfully'

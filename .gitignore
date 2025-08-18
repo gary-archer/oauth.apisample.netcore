@@ -7,4 +7,3 @@ certs/*.crt
 certs/*.key
 logs
 *.sln
-
