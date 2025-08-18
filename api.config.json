@@ -1,5 +1,5 @@
 {
-  "api": {
+  "api": 
     "port": 446,
     "sslCertificateFileName": "../../../certs/authsamples-dev.ssl.p12",
     "sslCertificatePassword": "Password1",
@@ -42,7 +42,7 @@
         "type": "debug",
         "level": "Info",
         "overrideLevels": {
-          "Microsoft": "Debug",
+          "Microsoft": "Warning",
           "Microsoft.AspNetCore.Server.Kestrel": "Error",
           "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
           "FinalApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",

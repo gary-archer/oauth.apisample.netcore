@@ -7,3 +7,4 @@ certs/*.crt
 certs/*.key
 logs
 *.sln
+tasks.json
