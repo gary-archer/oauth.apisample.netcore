@@ -45,7 +45,7 @@
           "Microsoft": "Warning",
           "Microsoft.AspNetCore.Server.Kestrel": "Error",
           "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
-          "FinalApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",
+          "Microsoft.AspNetCore.Authentication": "Error"
           "FinalApi.Plumbing.Claims.ClaimsCache": "Info"
         }
       }
