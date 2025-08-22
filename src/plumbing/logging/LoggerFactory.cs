@@ -78,22 +78,17 @@ namespace FinalApi.Plumbing.Logging
          */
         public void LogStartupError(Exception exception)
         {
-            if (this.hasRequestLogger)
-            {
-                // Get the error into a loggable format
-                var error = (ServerError)ErrorUtils.FromException(exception);
+            // Create a request logger if required
+            var logger = this.GetStartupLogger();
 
-                // Output via log4net
-                var logEntry = new LogEntry(this.apiName, this.performanceThresholdMilliseconds);
-                logEntry.SetOperationName("startup");
-                logEntry.SetServerError(error);
-                this.GetRequestLogger()?.Info(logEntry.GetRequestLog());
-            }
-            else
-            {
-                // Use a plain exception dump if there is no request logger
-                Console.WriteLine($"STARTUP ERROR : {exception}");
-            }
+            // Get the error into a loggable format
+            var error = (ServerError)ErrorUtils.FromException(exception);
+
+            // Output via log4net
+            var logEntry = new LogEntry(this.apiName, this.performanceThresholdMilliseconds);
+            logEntry.SetOperationName("startup");
+            logEntry.SetServerError(error);
+            logger.Info(logEntry.GetRequestLog());
         }
 
         /*
@@ -167,7 +162,8 @@ namespace FinalApi.Plumbing.Logging
                 var consoleConfig = appendersConfiguration.FirstOrDefault(a => a["type"]?.GetValue<string>() == "console");
                 if (consoleConfig != null)
                 {
-                    var consoleAppender = this.CreateConsoleAppender(consoleConfig);
+                    var prettyPrint = consoleConfig["prettyPrint"].GetValue<bool>();
+                    var consoleAppender = this.CreateConsoleAppender(prettyPrint);
                     if (consoleAppender != null)
                     {
                         appenders.Add(consoleAppender);
@@ -192,9 +188,8 @@ namespace FinalApi.Plumbing.Logging
         /*
          * Create a JSON console appender
          */
-        private IAppender CreateConsoleAppender(JsonNode consoleConfiguration)
+        private IAppender CreateConsoleAppender(bool prettyPrint)
         {
-            var prettyPrint = consoleConfiguration["prettyPrint"].GetValue<bool>();
             var jsonLayout = new JsonLayout(prettyPrint);
             jsonLayout.ActivateOptions();
 
@@ -236,6 +231,24 @@ namespace FinalApi.Plumbing.Logging
 
             fileAppender.ActivateOptions();
             return fileAppender;
+        }
+
+        /*
+         * Create a default logger for startup errors if required
+         */
+        private ILog GetStartupLogger()
+        {
+            if (this.hasRequestLogger)
+            {
+                return LogManager.GetLogger("request", "request");
+            }
+
+            var repository = (Hierarchy)LogManager.CreateRepository("request", typeof(Hierarchy));
+            repository.Root.Level = repository.LevelMap["Info"];
+
+            IAppender[] appenders = { this.CreateConsoleAppender(false) };
+            BasicConfigurator.Configure(repository, appenders);
+            return LogManager.GetLogger("request", "request");
         }
 
         /*

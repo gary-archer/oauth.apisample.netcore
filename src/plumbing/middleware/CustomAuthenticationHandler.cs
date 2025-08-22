@@ -17,7 +17,7 @@ namespace FinalApi.Plumbing.Middleware
     using Microsoft.Extensions.Options;
 
     /*
-     * The Microsoft specific class for authenticating API requests
+     * A custom authentication filter to take finer control over processing of tokens and claims
      */
     public sealed class CustomAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
@@ -33,7 +33,7 @@ namespace FinalApi.Plumbing.Middleware
         }
 
         /*
-         * This is called once per API request to perform authorization
+         * Do the main work to process tokens, claims and log identity details
          */
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
