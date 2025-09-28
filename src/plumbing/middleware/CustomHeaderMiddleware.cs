@@ -27,7 +27,7 @@ namespace FinalApi.Plumbing.Middleware
         public async Task Invoke(HttpContext context, LoggingConfiguration configuration)
         {
             // Cause a 500 error if a special header is received
-            var apiToBreak = context.Request.GetHeader("x-authsamples-test-exception");
+            var apiToBreak = context.Request.GetHeader("authsamples-test-exception");
             if (!string.IsNullOrWhiteSpace(apiToBreak))
             {
                 if (apiToBreak.ToLowerInvariant() == configuration.ApiName.ToLowerInvariant())

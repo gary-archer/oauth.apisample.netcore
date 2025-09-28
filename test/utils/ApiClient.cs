@@ -70,12 +70,12 @@ namespace FinalApi.Test.Utils
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", options.AccessToken);
 
                 // Add headers
-                request.Headers.Add("x-authsamples-api-client", this.clientName);
-                request.Headers.Add("x-authsamples-session-id", this.sessionId);
-                request.Headers.Add("x-authsamples-correlation-id", correlationId);
+                request.Headers.Add("authsamples-api-client", this.clientName);
+                request.Headers.Add("authsamples-session-id", this.sessionId);
+                request.Headers.Add("authsamples-correlation-id", correlationId);
                 if (options.RehearseException)
                 {
-                    request.Headers.Add("x-authsamples-test-exception", "FinalApi");
+                    request.Headers.Add("authsamples-test-exception", "FinalApi");
                 }
 
                 // Send the request
