@@ -27,7 +27,7 @@ fi
 #
 # Build the docker image
 #
-docker build -t finalnetcoreapi:latest .
+docker build --no-cache -t finalnetcoreapi:latest .
 if [ $? -ne 0 ]; then
   echo 'Problem encountered building the API docker image'
   exit
