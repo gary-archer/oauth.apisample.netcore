@@ -60,7 +60,7 @@ If required, configure [Operating system trust](https://github.com/gary-archer/o
 
 ### Run the Code
 
-- Install a .NET 8+ SDK.
+- Install a .NET 10+ SDK.
 - Also install Docker to run integration tests that use Wiremock.
 
 Then run the API with this command:
