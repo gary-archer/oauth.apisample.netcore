@@ -22,7 +22,7 @@
             try
             {
                 // Build and run the web host
-                BuildWebHost(loggerFactory).Run();
+                BuildWebHost(loggerFactory).Build().Run();
             }
             catch (Exception ex)
             {
@@ -34,7 +34,7 @@
         /*
          * Build a host to handle HTTP requests
          */
-        private static IWebHost BuildWebHost(ILoggerFactory loggerFactory)
+        private static IWebHostBuilder BuildWebHost(ILoggerFactory loggerFactory)
         {
             // Load the configuration file
             var configuration = Configuration.LoadAsync("./api.config.json").Result;
@@ -72,8 +72,7 @@
                 })
 
                 // Do main configuration in the startup class
-                .UseStartup<Startup>()
-                .Build();
+                .UseStartup<Startup>();
         }
     }
 }
