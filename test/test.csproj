@@ -25,18 +25,15 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
 
-    <!-- Add test dependencies -->
+    <!-- Add test dependencies
+         https://xunit.net/docs/getting-started/v3/getting-started -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.2">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.2" />
 
-    <!-- Remove long namespaces from test output -->
-    <None Update="xunit.runner.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <!-- Improve presentation of test output: 
+         https://xunit.net/docs/config-xunit-runner-json -->
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
