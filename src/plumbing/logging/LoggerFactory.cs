@@ -39,7 +39,7 @@ namespace FinalApi.Plumbing.Logging
             this.apiName = configuration.ApiName;
 
             // Uncomment to view internal log4net errors
-            // log4net.Util.LogLog.InternalDebugging = true;
+            log4net.Util.LogLog.InternalDebugging = true;
 
             // Tell .NET to use log4net
             var options = new Log4NetProviderOptions
