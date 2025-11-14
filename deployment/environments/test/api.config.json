@@ -42,9 +42,7 @@
         "type": "debug",
         "level": "Info",
         "overrideLevels": {
-          "Microsoft": "Warning",
-          "Microsoft.AspNetCore.Server.Kestrel": "Error",
-          "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
+          "Microsoft.AspNetCore": "Error",
           "FinalApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",
           "FinalApi.Plumbing.Claims.ClaimsCache": "Info"
         }
