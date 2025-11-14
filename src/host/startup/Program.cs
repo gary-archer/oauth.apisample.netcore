@@ -96,20 +96,18 @@
             // Create the API
             var api = builder.Build();
 
-            // Configure .NET security
-            api.UseRouting();
-            api.UseAuthentication();
-            api.UseAuthorization();
-
             // Configure middleware classes
             api.UseMiddleware<LoggerMiddleware>();
             api.UseMiddleware<UnhandledExceptionMiddleware>();
             api.UseMiddleware<CustomHeaderMiddleware>();
 
+            // Configure .NET security
+            api.UseRouting();
+            api.UseAuthentication();
+            api.UseAuthorization();
+
             // Use controller attributes for API request routing
             api.MapControllers();
-
-            System.Console.WriteLine("*** HERE");
             return api;
         }
     }

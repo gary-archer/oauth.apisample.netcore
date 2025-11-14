@@ -39,7 +39,6 @@ namespace FinalApi.Plumbing.Middleware
             try
             {
                 // Run the API operation
-                System.Console.WriteLine("*** Exception Handler");
                 await this.next(context);
             }
             catch (Exception exception)
