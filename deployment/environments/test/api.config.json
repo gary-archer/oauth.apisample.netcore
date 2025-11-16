@@ -1,7 +1,7 @@
 {
   "api": {
     "port": 446,
-    "sslCertificateFileName": "../../../certs/authsamples-dev.ssl.p12",
+    "sslCertificateFileName": "./certs/authsamples-dev.ssl.p12",
     "sslCertificatePassword": "Password1",
     "useProxy": false,
     "proxyUrl": "http://127.0.0.1:8888"
@@ -42,9 +42,7 @@
         "type": "debug",
         "level": "Info",
         "overrideLevels": {
-          "Microsoft": "Warning",
-          "Microsoft.AspNetCore.Server.Kestrel": "Error",
-          "Microsoft.AspNetCore.DataProtection.KeyManagement": "Error",
+          "Microsoft.AspNetCore": "Error",
           "FinalApi.Plumbing.Middleware.CustomAuthenticationHandler": "Error",
           "FinalApi.Plumbing.Claims.ClaimsCache": "Info"
         }

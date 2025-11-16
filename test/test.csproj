@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <IsPublishable>false</IsPublishable>
   </PropertyGroup>
 
@@ -19,27 +19,21 @@
     <!-- JWT acess token handling -->
     <PackageReference Include="jose-jwt" Version="5.2.0" />
 
-    <!-- JSON handling -->
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
-
     <!-- Use code quality checks for test code -->
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
 
-    <!-- Add test dependencies -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <!-- Add test dependencies
+         https://xunit.net/docs/getting-started/v3/getting-started -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.2">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.2" />
 
-    <!-- Remove long namespaces from test output -->
-    <None Update="xunit.runner.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <!-- Improve presentation of test output: 
+         https://xunit.net/docs/config-xunit-runner-json -->
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

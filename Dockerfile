@@ -1,7 +1,7 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 
 WORKDIR /usr/api
-COPY --chown=10001:10000 bin/Release/net8.0/linux-x64/publish/*  /usr/api/
+COPY --chown=10001:10000 bin/Release/net10.0/linux-x64/publish/*  /usr/api/
 COPY --chown=10001:10000 data/*                                  /usr/api/data/
 
 RUN groupadd --gid 10000 apiuser \

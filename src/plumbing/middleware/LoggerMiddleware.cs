@@ -35,7 +35,7 @@ namespace FinalApi.Plumbing.Middleware
             logEntry.End(context.Request, context.Response);
 
             // Output log data
-            var loggerFactory = (ILoggerFactory)context.RequestServices.GetService(typeof(ILoggerFactory));
+            var loggerFactory = (ILoggerFactory)context.RequestServices.GetService(typeof(LoggerFactory));
             loggerFactory.GetRequestLogger()?.Info(logEntry.GetRequestLog());
             loggerFactory.GetAuditLogger()?.Info(logEntry.GetAuditLog());
         }
