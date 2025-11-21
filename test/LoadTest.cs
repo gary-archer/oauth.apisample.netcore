@@ -14,6 +14,13 @@ namespace FinalApi.Test
      */
     public class LoadTest : IDisposable
     {
+        // Codes for reliable colours in any terminal
+        private static string colorBlue = "\u001B[34m";
+        private static string colorGreen = "\u001B[32m";
+        private static string colorRed = "\u001B[31m";
+        private static string colorYellow = "\u001B[33m";
+
+        // Private class members
         private readonly MockAuthorizationServer mockAuthorizationServer;
         private readonly ApiClient apiClient;
         private readonly string sessionId;
@@ -59,7 +66,7 @@ namespace FinalApi.Test
             // Show a startup message
             Console.WriteLine();
             var startTime = DateTime.UtcNow;
-            this.OutputMessage(ConsoleColor.Blue, $"Load test session {this.sessionId} starting at {startTime.ToString("s")}");
+            this.OutputMessage(colorBlue, $"Load test session {this.sessionId} starting at {startTime.ToString("s")}");
 
             // Show headings for API requests
             string[] headings =
@@ -73,7 +80,7 @@ namespace FinalApi.Test
                 "ERROR-ID".PadRight(12, ' '),
             ];
             var header = string.Join(string.Empty, headings);
-            this.OutputMessage(ConsoleColor.DarkYellow, header);
+            this.OutputMessage(colorYellow, header);
 
             // Get some access tokens to send to the API and send the API requests
             var accessTokens = this.GetAccessTokens();
@@ -83,7 +90,7 @@ namespace FinalApi.Test
             var endTime = DateTime.UtcNow;
             var timeTaken = (endTime - startTime).TotalMilliseconds;
             this.OutputMessage(
-                ConsoleColor.Blue,
+                colorBlue,
                 $"Load test session {this.sessionId} completed in {timeTaken} milliseconds: {this.errorCount} errors from {this.totalCount} requests");
             Console.WriteLine();
         }
@@ -229,12 +236,12 @@ namespace FinalApi.Test
                 if (statusCode >= 200 && statusCode <= 299)
                 {
                     // Report successful requests
-                    this.OutputMessage(ConsoleColor.Green, this.FormatMetrics(response));
+                    this.OutputMessage(colorGreen, this.FormatMetrics(response));
                 }
                 else
                 {
                     // Report failed requests, some of which are expected
-                    this.OutputMessage(ConsoleColor.Red, this.FormatMetrics(response));
+                    this.OutputMessage(colorRed, this.FormatMetrics(response));
                     this.errorCount++;
                 }
 
@@ -283,10 +290,9 @@ namespace FinalApi.Test
         /*
          * A utility to output in a desired colour
          */
-        private void OutputMessage(ConsoleColor color, string message)
+        private void OutputMessage(string colourCode, string message)
         {
-            Console.ForegroundColor = color;
-            Console.WriteLine(message);
+            Console.WriteLine(colourCode + message);
         }
     }
 }
