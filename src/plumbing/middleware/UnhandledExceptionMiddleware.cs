@@ -47,7 +47,9 @@ namespace FinalApi.Plumbing.Middleware
                 var clientError = this.HandleException(exception, context);
 
                 // Write the error response to the client
-                await ResponseErrorWriter.WriteErrorResponse(context.Response, clientError);
+                var oauthConfiguration =
+                    (OAuthConfiguration)context.RequestServices.GetService(typeof(OAuthConfiguration));
+                await ResponseErrorWriter.WriteErrorResponse(context.Response, clientError, oauthConfiguration.Scope);
             }
         }
 

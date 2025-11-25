@@ -89,7 +89,8 @@ namespace FinalApi.Plumbing.Middleware
             var clientError = this.GetRequestItem<ClientError>(ClientErrorKey);
             if (clientError != null)
             {
-                await ResponseErrorWriter.WriteErrorResponse(this.Response, clientError);
+                var oauthConfiguration = (OAuthConfiguration)this.Context.RequestServices.GetService(typeof(OAuthConfiguration));
+                await ResponseErrorWriter.WriteErrorResponse(this.Response, clientError, oauthConfiguration.Scope);
             }
         }
 
