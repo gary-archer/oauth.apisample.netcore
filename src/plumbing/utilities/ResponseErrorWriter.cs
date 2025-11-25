@@ -23,13 +23,13 @@ namespace FinalApi.Plumbing.Utilities
             if (error.StatusCode == HttpStatusCode.Unauthorized)
             {
                 response.Headers.WWWAuthenticate =
-                    $"Bearer error=\"{error.StatusCode}\", error_description=\"${error.Message}\"";
+                    $"Bearer error=\"{error.ErrorCode}\", error_description=\"{error.Message}\"";
             }
 
             if (error.StatusCode == HttpStatusCode.Forbidden)
             {
                 response.Headers.WWWAuthenticate =
-                    $"Bearer error=\"{error.StatusCode}\", error_description=\"${error.Message}\", scope=\"${scope}\"";
+                    $"Bearer error=\"{error.ErrorCode}\", error_description=\"{error.Message}\", scope=\"{scope}\"";
             }
 
             await response.WriteAsync(error.ToResponseFormat().ToString());
